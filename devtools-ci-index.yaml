@@ -4,6 +4,14 @@
       - github-pull-request:
           admin-list:
               - kbsingh
+              - aslakknutsen
+              - kwk
+              - sbose78
+              - tsmaeder
+              - maxandersen
+              - bartoszmajsak
+              - pmuir
+              - pranavgore09
           cron: '* * * * *'
           github-hooks: false
           permit-all: false
