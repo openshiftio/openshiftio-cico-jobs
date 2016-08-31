@@ -64,10 +64,46 @@
             cico node done $CICO_ssid
             exit $rtn_code
 
+- job-template:
+    name: '{ci_project}-{git_repo}-build-master'
+    description: |
+        Managed by Jenkins Job Builder, do not edit manually!
+    node: "{ci_project}"
+    properties:
+        - github:
+            url: https://github.com/{git_username}/{git_repo}/
+    scm:
+        - git:
+            url: https://github.com/{git_username}/{git_repo}.git
+            shallow_clone: true
+            branches: 
+                - master
+    triggers:
+        - github
+    builders:
+        - shell: |
+            # testing out the cico client
+            set +e
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd yum -y install rsync
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            $ssh_cmd -t "cd payload && {ci_cmd}"
+            rtn_code=$?
+            cico node done $CICO_ssid
+            exit $rtn_code
+
 - project:
     name: devtools
     jobs:
         - '{ci_project}-{git_repo}':
+            git_username: almighty
+            git_repo: almighty-core
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+        - '{ci_project}-{git_repo}-build-master':
             git_username: almighty
             git_repo: almighty-core
             ci_project: 'devtools'
