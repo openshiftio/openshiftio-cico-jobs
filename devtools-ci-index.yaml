@@ -104,7 +104,6 @@
             git_username: almighty
             git_repo: almighty-jobs
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
             builders:
                 - shell: |
                     set +e
