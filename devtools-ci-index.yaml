@@ -99,10 +99,23 @@
     name: devtools
     jobs:
         - '{ci_project}-{git_repo}':
+            description: |
+                This job validates the syntax and yaml file used by JJB from PullReq's aginst the almighty-jobs repo
+            git_username: almighty
+            git_repo: almighty-jobs
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            builders:
+                - shell: |
+                    set +e
+                    jenkins-jobs test devtools-ci-index.yaml 2>&1 > /dev/null
+
+        - '{ci_project}-{git_repo}':
             git_username: almighty
             git_repo: almighty-core
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
+
         - '{ci_project}-{git_repo}-build-master':
             git_username: almighty
             git_repo: almighty-core
