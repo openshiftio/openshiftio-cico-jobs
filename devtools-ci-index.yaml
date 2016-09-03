@@ -93,7 +93,7 @@
             $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
             cico node done $CICO_ssid
-            if [ $rtn_code -eq 0 ]; then oc update {svc_name} --latest -n almighty ; fi
+            if [ $rtn_code -eq 0 ]; then oc deploy {svc_name} --latest -n almighty ; fi
             exit $rtn_code
 
 - project:
