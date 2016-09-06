@@ -58,7 +58,7 @@
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
-            git merge --ff-only ${ghprbTargetBranch} \
+            git merge --ff-only ${{ghprbTargetBranch}} \
             && rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload \
             && $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
