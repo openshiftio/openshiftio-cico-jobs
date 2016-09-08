@@ -55,7 +55,12 @@
             set +e
             export CICO_API_KEY=$(cat ~/duffy.key )
             read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
-            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            env | grep "JENKINS_URL" > ~/.ssh/environment
+            env | grep "GIT_BRANCH" >> ~/.ssh/environment
+            env | grep "GIT_COMMIT" >> ~/.ssh/environment
+            env | grep "BUILD_NUMBER" >> ~/.ssh/environment
+            env | grep "ghprb" >> ~/.ssh/environment
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root -o PermitUserEnvironment=yes"
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             git rebase origin/${{ghprbTargetBranch}} \
@@ -87,7 +92,12 @@
             set +e
             export CICO_API_KEY=$(cat ~/duffy.key )
             read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
-            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            env | grep "JENKINS_URL" > ~/.ssh/environment
+            env | grep "GIT_BRANCH" >> ~/.ssh/environment
+            env | grep "GIT_COMMIT" >> ~/.ssh/environment
+            env | grep "BUILD_NUMBER" >> ~/.ssh/environment
+            env | grep "ghprb" >> ~/.ssh/environment
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root -o PermitUserEnvironment=yes"
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
