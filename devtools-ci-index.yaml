@@ -58,10 +58,8 @@
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
             # Forward env vars to worker
-            env_file=$(mktemp)
-            env | grep -E "(JENKINS_URL|GIT_BRANCH|GIT_COMMIT|BUILD_NUMBER|ghprb)" >> $env_file
-            scp $sshopts $env_file $CICO_hostname:~/.bash_profile
-            rm -f $env_file
+            env | grep -E "(JENKINS_URL|GIT_BRANCH|GIT_COMMIT|BUILD_NUMBER|ghprb)" | sed 's/^/export /g' | \
+              $ssh_cmd tee -a .bashrc
             $ssh_cmd yum -y install rsync
             git rebase origin/${{ghprbTargetBranch}} \
             && rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload \
@@ -95,10 +93,8 @@
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
             # Forward env vars to worker
-            env_file=$(mktemp)
-            env | grep -E "(JENKINS_URL|GIT_BRANCH|GIT_COMMIT|BUILD_NUMBER|ghprb)" >> $env_file
-            scp $sshopts $env_file $CICO_hostname:~/.bash_profile
-            rm -f $env_file
+            env | grep -E "(JENKINS_URL|GIT_BRANCH|GIT_COMMIT|BUILD_NUMBER|ghprb)" | sed 's/^/export /g' | \
+              $ssh_cmd tee -a .bashrc
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && {ci_cmd}"
