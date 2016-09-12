@@ -1,2 +1,3 @@
 aslak@4fs.no
 gpg@xam.dk
+kkleine@redhat.com
