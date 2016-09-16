@@ -111,7 +111,29 @@
             $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
             cico node done $CICO_ssid
-            if [ $rtn_code -eq 0 ]; then oc deploy {svc_name} --latest -n almighty ; fi
+            if [ $rtn_code -eq 0 ]; then
+                # start deployment
+                oc deploy ${svc_name} --latest
+                # get deployment logs and wait for deployment to finish
+                # in Origin >= 1.3 triggering deployment and following logs can be done in one step `oc deploy ${svc_name} --latest --follow`
+                oc logs -f dc/${svc_name}
+                #source: https://github.com/tnozicka/nodejs-ex/blob/fab4bf2e9553a32a99fed984766059764c20b935/.openshift-pipeline/Jenkinsfile#L29-L45
+                function status {
+                    # get version number (used to get underliyng ReplicationController)
+                    local version="$(oc get dc ${svc_name} -o template --template='{{.status.latestVersion}}' || true)"
+                    if ! [[ "${version}" =~ ^[0-9]+$ ]]; then
+                        echo "Unknown" && return;
+                    fi
+                    # read annotation from ReplicationController to get status
+                    local phase="$(oc get rc ${svc_name}-${version} -o template --template='{{index .metadata.annotations "openshift.io/deployment.phase"}}')"
+                    echo ${phase}
+                }
+                # it may take some time between deployment finishes and ReplicationController is updated.
+                while [[ "$(status)" == "Running" ]]; do echo "Waiting for deployment to finish" && sleep 1; done
+                if [[ "$(status)" != "Complete" ]]; then
+                    exit 1;
+                fi
+            fi
             exit $rtn_code
             
 
