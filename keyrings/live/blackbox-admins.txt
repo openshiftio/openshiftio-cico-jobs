@@ -1,3 +1,4 @@
 aslak@4fs.no
 gpg@xam.dk
+kbsingh@karan.org
 kkleine@redhat.com
