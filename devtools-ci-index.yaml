@@ -61,7 +61,7 @@
             $ssh_cmd yum -y install rsync
             git rebase origin/${{ghprbTargetBranch}} \
             && rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload \
-            && /use/bin/timeout 15m $ssh_cmd -t "cd payload && {ci_cmd}"
+            && /usr/bin/timeout 15m $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
             cico node done $CICO_ssid
             if [[ $rtn_code -eq 124 ]]; then
