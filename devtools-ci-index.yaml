@@ -1,6 +1,8 @@
 - defaults:
     name: global
     timeout: '15m'
+    jobdescription: |
+      Managed by Jenkins Job Builder, do not edit manually!
 
 - trigger:
     name: githubprb
@@ -42,8 +44,7 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}'
-    description: |
-        Managed by Jenkins Job Builder, do not edit manually!
+    description: {jobdescription}
     node: "{ci_project}"
     properties:
         - github:
@@ -75,8 +76,7 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-build-master'
-    description: |
-        Managed by Jenkins Job Builder, do not edit manually (note: currently using dockerized branch)!
+    description: {jobdescription}
     node: "{ci_project}"
     properties:
         - github:
@@ -86,7 +86,7 @@
             url: https://github.com/{git_username}/{git_repo}.git
             shallow_clone: true
             branches: 
-                - dockerized
+                - master
     triggers:
         - github
     builders:
@@ -108,8 +108,7 @@
 
 - job-template:
     name: '{ci_project}-almighty-devdoc-build-master'
-    description: |
-        Managed by Jenkins Job Builder, do not edit manually!
+    description: {jobdescription}
     node: "{ci_project}"
     properties:
         - github:
