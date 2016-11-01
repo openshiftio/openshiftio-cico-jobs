@@ -1,8 +1,7 @@
 - defaults:
     name: global
     timeout: '15m'
-    jobdescription: |
-      Managed by Jenkins Job Builder, do not edit manually!
+    jobdescription: "Managed by Jenkins Job Builder, do not edit manually!"
 
 - trigger:
     name: githubprb
@@ -44,7 +43,8 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}'
-    description: {jobdescription}
+    description: |
+      {jobdescription}
     node: "{ci_project}"
     properties:
         - github:
@@ -76,7 +76,8 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-build-master'
-    description: {jobdescription}
+    description: |
+      {jobdescription}
     node: "{ci_project}"
     properties:
         - github:
@@ -108,7 +109,8 @@
 
 - job-template:
     name: '{ci_project}-almighty-devdoc-build-master'
-    description: {jobdescription}
+    description: |
+      {jobdescription}
     node: "{ci_project}"
     properties:
         - github:
