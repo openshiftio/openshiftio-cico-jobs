@@ -132,7 +132,7 @@
             env > jenkins-env
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload && {ci_cmd}"
+            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
             cico node done $CICO_ssid
             if [[ $rtn_code -eq 124 ]]; then
@@ -165,7 +165,7 @@
             git_repo: almighty-devdoc
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            timeout: '25m'
+            timeout: '30m'
 
         - '{ci_project}-{git_repo}-build-master':
             git_username: almighty
