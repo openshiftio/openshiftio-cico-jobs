@@ -1,4 +1,5 @@
 - defaults:
+    name: global
     timeout: '15m'
 
 - trigger:
