@@ -115,7 +115,12 @@
             git_repo: almighty-ui
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-
+        - '{ci_project}-{git_repo}':
+            git_username: almighty
+            git_repo: almighty-devdoc
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+        
         - '{ci_project}-{git_repo}-build-master':
             git_username: almighty
             git_repo: almighty-core
@@ -128,3 +133,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: ui
+        
+            
+        
