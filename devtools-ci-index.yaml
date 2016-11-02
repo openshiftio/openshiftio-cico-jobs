@@ -146,8 +146,12 @@
     publishers:
       - git:
           push-only-if-success: true
-          branch:
-            name: "gh-pages"
+          branches:
+            - branch:
+                remote: origin
+                name: "gh-pages"
+  
+          
 
 
 - project:
