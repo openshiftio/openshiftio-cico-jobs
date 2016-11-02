@@ -106,11 +106,13 @@
             cico node done $CICO_ssid
             if [ $rtn_code -eq 0 ]; then oc deploy {svc_name} --latest -n almighty ; fi
             exit $rtn_code
+            
 
 - job-template:
     name: '{ci_project}-almighty-devdoc-build-master'
     description: |
       {jobdescription}
+      If all goes well, gh-pages is pushed
     node: "{ci_project}"
     properties:
         - github:
@@ -141,6 +143,12 @@
                echo "BUILD TIMEOUT";
             fi
             exit $rtn_code
+    publishers:
+      - git:
+          push-only-if-success: true
+          branch:
+            name: "gh-pages"
+
 
 - project:
     name: devtools
