@@ -34,6 +34,7 @@
     name: git-scm
     scm:
         - git:
+            credentials-id: "c4872223-4024-4cd4-8e09-1bbdc7d6e971"
             url: "{git_url}"
             skip-tag: True
             git-tool: ci-git
