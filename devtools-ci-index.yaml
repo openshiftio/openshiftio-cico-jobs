@@ -127,7 +127,7 @@
             credentials-id: "c4872223-4024-4cd4-8e09-1bbdc7d6e971"
             shallow_clone: true
             branches: 
-                - master
+                - trycommit
     triggers:
         - github
     builders:
