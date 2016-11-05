@@ -88,8 +88,7 @@
             url: https://github.com/{git_organization}/{git_repo}/
     scm:
         - git:
-            credentials-id: "c4872223-4024-4cd4-8e09-1bbdc7d6e971"
-            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            url: https://github.com/{git_organization}/{git_repo}.git
             shallow_clone: true
             branches: 
                 - master
