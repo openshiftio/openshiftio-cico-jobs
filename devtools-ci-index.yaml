@@ -144,7 +144,7 @@
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && {ci_cmd}"
-            rsync -e "ssh $sshopts" -Ha $CICO_hostname:payload/ $(pwd)
+            rsync -delete -PHvae "ssh $sshopts" -Ha $CICO_hostname:payload/ $(pwd)
             rtn_code=$?
             cico node done $CICO_ssid
             if [[ $rtn_code -eq 124 ]]; then
