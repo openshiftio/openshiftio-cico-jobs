@@ -153,6 +153,7 @@
     publishers:
       - git:
           push-only-if-success: true
+          push-merge: true
           branches:
             - branch:
                 remote: origin
