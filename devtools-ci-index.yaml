@@ -120,7 +120,7 @@
     node: "{ci_project}"
     properties:
         - github:
-            url: https://{github_user}@{git_organization}/{git_repo}/
+            url: https://github.com/{git_organization}/{git_repo}/
     scm:
         - git:
             url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
@@ -129,6 +129,7 @@
             shallow_clone: true
             branches: 
                 - trycommit
+                - gh-pages
     triggers:
         - github
     builders:
