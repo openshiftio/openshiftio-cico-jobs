@@ -128,7 +128,7 @@
             git-tool: ci-git
             shallow_clone: true
             branches: 
-                - master
+                - trycommit
                 - gh-pages
     triggers:
         - github
