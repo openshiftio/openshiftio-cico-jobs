@@ -3,7 +3,7 @@
     timeout: '15m'
     jobdescription: "Managed by Jenkins Job Builder, do not edit manually!"
     git_organization: almighty
-    github_user: almigthy-bot
+    github_user: almighty-bot
     
 - trigger:
     name: githubprb
