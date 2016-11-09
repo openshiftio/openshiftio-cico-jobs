@@ -128,7 +128,7 @@
             git-tool: ci-git
             shallow_clone: false
             branches: 
-                - trycommit
+                - master
 
     triggers:
         - github
