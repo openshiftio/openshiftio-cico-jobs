@@ -129,7 +129,7 @@
             shallow_clone: false
             branches: 
                 - trycommit
-                - gh-pages
+
     triggers:
         - github
     builders:
