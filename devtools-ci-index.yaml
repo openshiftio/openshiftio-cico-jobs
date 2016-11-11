@@ -1,7 +1,7 @@
 - defaults:
     name: global
     timeout: '15m'
-    jobdescription: "Managed by Jenkins Job Builder, do not edit manually!"
+    jobdescription: "Managed by Jenkins Job Builder, do not edit manually! Update via https://github.com/almighty/almighty-jobs"
     git_organization: almighty
     github_user: almighty-bot
     
@@ -31,7 +31,7 @@
           permit-all: false
           trigger-phrase: '.*\[test\].*'
           allow-whitelist-orgs-as-admins: true
-          
+          status-context: "ci.centos.org PR build"
 - scm:
     name: git-scm
     scm:
