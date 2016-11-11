@@ -31,8 +31,7 @@
           permit-all: false
           trigger-phrase: '.*\[test\].*'
           allow-whitelist-orgs-as-admins: true
-          build-desc-template: "ci.centos.org pull-request build"
-
+          
 - scm:
     name: git-scm
     scm:
