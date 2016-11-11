@@ -31,6 +31,7 @@
           permit-all: false
           trigger-phrase: '.*\[test\].*'
           allow-whitelist-orgs-as-admins: true
+          build-desc-template: "ci.centos.org pull-request build"
 
 - scm:
     name: git-scm
@@ -140,16 +141,18 @@
             read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
-            #env > jenkins-env
+            env > jenkins-env
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && {ci_cmd}"
-            rsync -delete -PHva -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd)
             rtn_code=$?
-            cico node done $CICO_ssid
             if [[ $rtn_code -eq 124 ]]; then
                echo "BUILD TIMEOUT";
+            else
+               rsync -delete -PHva -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd)
+               rtn_code=$?
             fi
+            cico node done $CICO_ssid
             exit $rtn_code
     publishers:
       - git:
