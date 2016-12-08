@@ -172,6 +172,7 @@
             git_repo: almighty-core
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
         - '{ci_project}-{git_repo}':
             git_repo: almighty-ui
             ci_project: 'devtools'
@@ -193,6 +194,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: core
+            timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_repo: almighty-ui
             ci_project: 'devtools'
