@@ -201,6 +201,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: ui
+            timeout: '20m'
         
             
         
