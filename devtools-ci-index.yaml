@@ -179,6 +179,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
         - '{ci_project}-{git_repo}':
+            timeout: '20m'
             git_repo: almighty-devdoc
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
