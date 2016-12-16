@@ -192,6 +192,7 @@
             git_repo: fabric8-ui
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build-deploy.sh'
+            svc_name: ui
             timeout: '20m'
         - '{ci_project}-almighty-devdoc-build-master':
             git_repo: almighty-devdoc
