@@ -2,6 +2,5 @@
 
 image:https://ci.centos.org/buildStatus/icon?job=devtools-jjb-service[Jenkins,link="https://ci.centos.org/view/Devtools/job/devtools-jjb-service/lastBuild/"]
 
-This repository contains the defintions of the various jobs building
+This repository contains the definitions of the various jobs building
 on https://ci.centos.org.
-
