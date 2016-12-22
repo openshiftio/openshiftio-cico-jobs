@@ -26,6 +26,7 @@
               - sanbornsen
               - nimishamukherjee
               - SMahil
+              - xcoulon
           cron: '* * * * *'
           github-hooks: false
           permit-all: false
