@@ -28,6 +28,7 @@
               - SMahil
               - xcoulon
               - alexeykazakov
+              - michaelkleinhenz
           cron: '* * * * *'
           github-hooks: false
           permit-all: false
