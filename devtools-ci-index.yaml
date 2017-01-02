@@ -27,6 +27,7 @@
               - nimishamukherjee
               - SMahil
               - alexeykazakov
+              - michaelkleinhenz
           cron: '* * * * *'
           github-hooks: false
           permit-all: false
