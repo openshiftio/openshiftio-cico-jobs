@@ -4,6 +4,7 @@
     jobdescription: "Managed by Jenkins Job Builder, do not edit manually! Update via https://github.com/almighty/almighty-jobs"
     git_organization: almighty
     github_user: almighty-bot
+    sub_job: ''
     
 - trigger:
     name: githubprb
