@@ -82,6 +82,32 @@
             exit $rtn_code
 
 - job-template:
+    name: '{ci_project}-che-build-master'
+    description: |
+      {jobdescription}
+    node: "{ci_project}"
+    builders:
+        - shell: |
+            # testing out the cico client
+            set +e
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd -t "yum -y install centos-release-scl java-1.8.0-openjdk-devel git patch bzip2"
+            $ssh_cmd -t "yum -y install rh-maven33 rh-nodejs4"
+            $ssh_cmd -t "git clone https://github.com/eclipse/che"
+            $ssh_cmd -t "cd che && source scl_source enable rh-maven33 rh-nodejs4 && \
+                         export NPM_CONFIG_PREFIX=~/.che_node_modules && \
+                         export PATH=$NPM_CONFIG_PREFIX/bin:$PATH && \
+                         npm install -g bower gulp typings && \
+                         mvn clean install -Pfast"
+            rtn_code=$?
+            cico node done $CICO_ssid
+            exit $rtn_code
+            
+
+- job-template:
     name: '{ci_project}-{git_repo}-build-master'
     description: |
       {jobdescription}
@@ -218,6 +244,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: f8ui
             timeout: '20m'
-        
-            
-        
+        - '{ci_project}-che-build-master':
+            git_organisation: eclipse
+            git_repo: che
+            ci_project: 'devtools'
