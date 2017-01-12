@@ -86,6 +86,8 @@
     description: |
       {jobdescription}
     node: "{ci_project}"
+    triggers:
+        - timed: '20 00,12 * * *'
     builders:
         - shell: |
             # testing out the cico client
