@@ -97,8 +97,8 @@
             $ssh_cmd -t "yum -y install centos-release-scl java-1.8.0-openjdk-devel git patch bzip2"
             $ssh_cmd -t "yum -y install rh-maven33 rh-nodejs4"
             $ssh_cmd -t "git clone https://github.com/eclipse/che"
-            $ssh_cmd -t "cd che && source scl_source enable rh-maven33 rh-nodejs4 && \
-                         export NPM_CONFIG_PREFIX=~/.che_node_modules && \
+            $ssh_cmd -t "echo 'source scl_source enable rh-maven33 rh-nodejs4' >> ~/.bashrc"
+            $ssh_cmd -t "export NPM_CONFIG_PREFIX=~/.che_node_modules && \
                          export PATH=$NPM_CONFIG_PREFIX/bin:$PATH && \
                          npm install -g bower gulp typings && \
                          mvn clean install -Pfast"
