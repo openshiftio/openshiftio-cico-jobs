@@ -202,6 +202,11 @@
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}':
+            git_repo: almighty-core
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}':
             git_organization: fabric8io
             git_repo: fabric8-planner
             ci_project: 'devtools'
