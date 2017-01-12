@@ -48,7 +48,7 @@
                 - '${{ghprbActualCommit}}'
 
 - job-template:
-    name: '{ci_project}-{git_repo}'
+    name: '{ci_project}-{git_repo}{sub_job}'
     description: |
       {jobdescription}
     node: "{ci_project}"
@@ -206,6 +206,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             timeout: '20m'
+            sub_job: '-coverage'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8io
             git_repo: fabric8-planner
