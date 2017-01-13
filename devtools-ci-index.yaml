@@ -211,7 +211,7 @@
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             timeout: '20m'
             sub_job: '-coverage'
-            sub_job_status_context: ' Coverate calculation'
+            sub_job_status_context: ' Tests with coverage'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8io
             git_repo: fabric8-planner
