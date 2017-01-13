@@ -5,6 +5,7 @@
     git_organization: almighty
     github_user: almighty-bot
     sub_job: ''
+    status_context_extra: ''
     
 - trigger:
     name: githubprb
@@ -36,7 +37,7 @@
           permit-all: false
           trigger-phrase: '.*\[test\].*'
           allow-whitelist-orgs-as-admins: true
-          status-context: "ci.centos.org PR build"
+          status-context: "ci.centos.org PR build{status_context_extra}"
 - scm:
     name: git-scm
     scm:
@@ -203,12 +204,14 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            status_context_extra: ' Tests without coverage'
         - '{ci_project}-{git_repo}{sub_job}':
             git_repo: almighty-core
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             timeout: '20m'
             sub_job: '-coverage'
+            status_context_extra: ' Tests with coverage'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8io
             git_repo: fabric8-planner
