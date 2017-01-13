@@ -29,6 +29,7 @@
               - xcoulon
               - alexeykazakov
               - michaelkleinhenz
+              - ppitonak
           cron: '* * * * *'
           github-hooks: false
           permit-all: false
