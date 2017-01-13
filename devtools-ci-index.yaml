@@ -102,7 +102,7 @@
             $ssh_cmd -t "git clone https://github.com/eclipse/che"
             $ssh_cmd -t "cd che && export NPM_CONFIG_PREFIX=~/.che_node_modules && \
                          export PATH=$NPM_CONFIG_PREFIX/bin:$PATH && \
-                         scl enable rh-nodejs4 'npm install -g bower gulp typings' && \
+                         scl enable rh-nodejs4 'npm install --unsafe-perm -g bower gulp typings' && \
                          scl enable rh-maven33 rh-nodejs4 'mvn clean install -Pfast' "
             rtn_code=$?
             cico node done $CICO_ssid
