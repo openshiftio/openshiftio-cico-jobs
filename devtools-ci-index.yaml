@@ -257,3 +257,8 @@
             ci_cmd: '/bin/bash cico_build.sh && /bin/bash cico_deploy.sh'
             svc_name: che
             timeout: '30m'
+            wrappers:
+                    - credential-binding:
+                            -username-password-seperated:
+                                    credential-id: b2ae0d9a-307a-4df3-b027-9aa0c22e29dd
+                                    password: RHCHEBOT_DOCKER_HUB_PASSWORD
