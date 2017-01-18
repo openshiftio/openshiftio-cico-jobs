@@ -29,6 +29,8 @@
         - alexeykazakov
         - michaelkleinhenz
         - ppitonak
+        - naina-verma
+        - ldimaggi
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'  
