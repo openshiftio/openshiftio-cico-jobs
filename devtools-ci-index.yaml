@@ -191,6 +191,54 @@
             - branch:
                 remote: origin
                 name: "gh-pages"
+- wrapper:
+    name: dockerhub_credentials_wrapper
+    wrappers:
+        - credentials-binding:
+            - username-password-separated:
+                credential-id: b2ae0d9a-307a-4df3-b027-9aa0c22e29dd
+                username: RHCHEBOT_DOCKER_HUB_USERNAME
+                password: RHCHEBOT_DOCKER_HUB_PASSWORD
+
+- job:
+    name: 'devtools-build-run-che-build-master'
+    git_organization: kbsingh
+    git_repo: build-run-che
+    ci_project: 'devtools'
+    ci_cmd: '/bin/bash cico_build.sh && /bin/bash cico_deploy.sh'
+    svc_name: che
+    timeout: '30m'
+    wrappers:
+        - dockerhub_credentials_wrapper
+    defaults: global
+    node: devtools
+    properties:
+        - github:
+            url: https://github.com/kbsingh/build-run-che/
+    scm:
+        - git:
+            url: https://github.com/kbsingh/build-run-che.git
+            shallow_clone: true
+            branches: 
+                - master
+    triggers:
+        - github
+    builders:
+        - shell: |
+            # testing out the cico client
+            set +e
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            env > jenkins-env
+            $ssh_cmd yum -y install rsync
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            $ssh_cmd -t "cd payload && '/bin/bash cico_build.sh && /bin/bash cico_deploy.sh'"
+            rtn_code=$?
+            cico node done $CICO_ssid
+            if [ $rtn_code -eq 0 ]; then oc deploy che --latest -n almighty ; fi
+            exit $rtn_code
 
 - project:
     name: devtools
@@ -250,15 +298,3 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: f8ui
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master':
-            git_organization: kbsingh
-            git_repo: build-run-che
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build.sh && /bin/bash cico_deploy.sh'
-            svc_name: che
-            timeout: '30m'
-            wrappers:
-                - credentials-binding:
-                   - username-password-seperated:
-                        credential-id: b2ae0d9a-307a-4df3-b027-9aa0c22e29dd
-                        password: RHCHEBOT_DOCKER_HUB_PASSWORD
