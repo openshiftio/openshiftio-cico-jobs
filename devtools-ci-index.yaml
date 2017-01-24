@@ -235,7 +235,7 @@
             env > jenkins-env
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload && '/bin/bash cico_build.sh && /bin/bash cico_deploy.sh'"
+            $ssh_cmd -t "cd payload && /bin/bash cico_build.sh"
             rtn_code=$?
             cico node done $CICO_ssid
             if [ $rtn_code -eq 0 ]; then oc deploy che --latest -n almighty ; fi
