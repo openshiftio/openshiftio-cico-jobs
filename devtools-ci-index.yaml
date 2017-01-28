@@ -96,7 +96,7 @@
                    cico node done $CICO_ssid
                 else
                     # fail mode gives us 12 hrs to debug the machine
-                    curl "http://admin.ci.centos.org:8080/Node/fail?key=${CICO_API_KEY}&ssid=${CICO_ssid}"
+                    curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
                 fi
             fi 
             exit $rtn_code
@@ -148,7 +148,7 @@
               oc deploy {svc_name} --latest -n almighty
             else
               # fail mode gives us 12 hrs to debug the machine
-              curl "http://admin.ci.centos.org:8080/Node/fail?key=${CICO_API_KEY}&ssid=${CICO_ssid}"
+              curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
             fi
             exit $rtn_code
             
