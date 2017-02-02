@@ -31,6 +31,7 @@
         - ppitonak
         - naina-verma
         - ldimaggi
+        - hectorj2f
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'  
