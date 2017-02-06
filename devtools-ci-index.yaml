@@ -285,13 +285,11 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-        
         - '{ci_project}-almighty-devdoc-build-master':
             git_repo: almighty-devdoc
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '30m'
-
         - '{ci_project}-{git_repo}-build-master':
             git_repo: almighty-core
             ci_project: 'devtools'
@@ -311,4 +309,11 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: f8ui
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: redhat-developer
+            git_repo: che-starter
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: che-starter
             timeout: '20m'
