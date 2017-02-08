@@ -32,6 +32,7 @@
         - naina-verma
         - ldimaggi
         - VineetReynolds
+        - hectorj2f
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'  
@@ -89,10 +90,17 @@
             && rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload \
             && /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
-            cico node done $CICO_ssid
-            if [[ $rtn_code -eq 124 ]]; then
-               echo "BUILD TIMEOUT";
-            fi
+            if [ $rtn_code -eq 0 ]; then
+                cico node done $CICO_ssid
+            else
+                if [[ $rtn_code -eq 124 ]]; then
+                   echo "BUILD TIMEOUT";
+                   cico node done $CICO_ssid
+                else
+                    # fail mode gives us 12 hrs to debug the machine
+                    curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
+                fi
+            fi 
             exit $rtn_code
 
 - job-template:
@@ -137,8 +145,13 @@
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
-            cico node done $CICO_ssid
-            if [ $rtn_code -eq 0 ]; then oc deploy {svc_name} --latest -n almighty ; fi
+            if [ $rtn_code -eq 0 ]; then
+              cico node done $CICO_ssid
+              oc deploy {svc_name} --latest -n almighty
+            else
+              # fail mode gives us 12 hrs to debug the machine
+              curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
+            fi
             exit $rtn_code
             
 
