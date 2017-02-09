@@ -4,7 +4,6 @@
     jobdescription: "Managed by Jenkins Job Builder, do not edit manually! Update via https://github.com/almighty/almighty-jobs"
     git_organization: almighty
     github_user: almighty-bot
-    sub_job: ''
 
 - admin_list_defaults: &admin_list_defaults
     name: 'admin_list_defaults'
@@ -115,9 +114,8 @@
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
 
-
-- job-template:
-    name: '{ci_project}-{git_repo}-build-master'
+- job-template: &job_template_build_master_defaults
+    name: 'job_template_build_master_defaults'
     description: |
       {jobdescription}
     node: "{ci_project}"
@@ -153,7 +151,18 @@
               curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
             fi
             exit $rtn_code
-            
+
+- job-template:
+    name: '{ci_project}-{git_repo}-build-master'
+    <<: *job_template_build_master_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-build-master-coverage'
+    triggers:
+      - github-pull-request:
+          status-context: "ci.centos.org PR build master (coverage)"
+          <<: *job_template_build_master_defaults
+    <<: *job_template_defaults         
 
 - job-template:
     name: '{ci_project}-almighty-devdoc-build-master'
@@ -268,7 +277,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             timeout: '25m'
-            sub_job: 'coverage'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8io
             git_repo: fabric8-planner
@@ -303,6 +311,12 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: core
             timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master-coverage':
+            git_repo: almighty-core
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            svc_name: core
+            timeout: '25m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8io
             git_repo: fabric8-planner 
