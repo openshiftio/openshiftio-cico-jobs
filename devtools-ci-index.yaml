@@ -158,10 +158,6 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-build-master-coverage'
-    triggers:
-      - github-pull-request:
-          status-context: "ci.centos.org PR build master (coverage)"
-          <<: *job_template_build_master_defaults
     <<: *job_template_defaults         
 
 - job-template:
