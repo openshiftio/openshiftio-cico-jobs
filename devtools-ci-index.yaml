@@ -158,7 +158,7 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-build-master-coverage'
-    <<: *job_template_defaults         
+    <<: *job_template_build_master_defaults         
 
 - job-template:
     name: '{ci_project}-almighty-devdoc-build-master'
