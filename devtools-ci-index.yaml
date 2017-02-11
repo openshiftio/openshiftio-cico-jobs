@@ -32,6 +32,7 @@
         - ldimaggi
         - VineetReynolds
         - hectorj2f
+        - ibuziuk
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'  
