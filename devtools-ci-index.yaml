@@ -4,7 +4,6 @@
     jobdescription: "Managed by Jenkins Job Builder, do not edit manually! Update via https://github.com/almighty/almighty-jobs"
     git_organization: almighty
     github_user: almighty-bot
-    sub_job: ''
 
 - admin_list_defaults: &admin_list_defaults
     name: 'admin_list_defaults'
@@ -31,6 +30,9 @@
         - ppitonak
         - naina-verma
         - ldimaggi
+        - VineetReynolds
+        - hectorj2f
+        - ibuziuk
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'  
@@ -96,7 +98,7 @@
                    cico node done $CICO_ssid
                 else
                     # fail mode gives us 12 hrs to debug the machine
-                    curl "http://admin.ci.centos.org:8080/Node/fail?key=${CICO_API_KEY}&ssid=${CICO_ssid}"
+                    curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
                 fi
             fi 
             exit $rtn_code
@@ -113,9 +115,8 @@
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
 
-
-- job-template:
-    name: '{ci_project}-{git_repo}-build-master'
+- job-template: &job_template_build_master_defaults
+    name: 'job_template_build_master_defaults'
     description: |
       {jobdescription}
     node: "{ci_project}"
@@ -148,10 +149,17 @@
               oc deploy {svc_name} --latest -n almighty
             else
               # fail mode gives us 12 hrs to debug the machine
-              curl "http://admin.ci.centos.org:8080/Node/fail?key=${CICO_API_KEY}&ssid=${CICO_ssid}"
+              curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
             fi
             exit $rtn_code
-            
+
+- job-template:
+    name: '{ci_project}-{git_repo}-build-master'
+    <<: *job_template_build_master_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-build-master-coverage'
+    <<: *job_template_build_master_defaults         
 
 - job-template:
     name: '{ci_project}-almighty-devdoc-build-master'
@@ -266,7 +274,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             timeout: '25m'
-            sub_job: 'coverage'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8io
             git_repo: fabric8-planner
@@ -284,19 +291,29 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-        
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8io
+            git_repo: fabric8-forker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'
         - '{ci_project}-almighty-devdoc-build-master':
             git_repo: almighty-devdoc
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '30m'
-
         - '{ci_project}-{git_repo}-build-master':
             git_repo: almighty-core
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: core
             timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master-coverage':
+            git_repo: almighty-core
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            svc_name: core
+            timeout: '25m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8io
             git_repo: fabric8-planner 
@@ -311,3 +328,35 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: f8ui
             timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8io
+            git_repo: fabric8-forker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: f8forker
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: redhat-developer
+            git_repo: che-starter
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: che-starter
+            timeout: '20m'
+        - '{ci_project}-{git_repo}':
+            git_organization: redhat-developer
+            git_repo: che-starter
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: obsidian-toaster
+            git_repo: generator-frontend
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: obsidian-generator-frontend
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: obsidian-toaster
+            git_repo: generator-backend
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: obsidian-generator-backend
