@@ -360,3 +360,27 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: obsidian-generator-backend
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-ui
+            git_repo: ngx-widgets
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-ui
+            git_repo: ngx-widgets
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: fabric8-ui-ngx-widgets
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-ui
+            git_repo: ngx-login-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-ui
+            git_repo: ngx-login-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: fabric8-ui-ngx-login-client
