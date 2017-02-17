@@ -163,12 +163,25 @@
     name: '{ci_project}-{git_repo}-build-master-coverage'
     <<: *job_template_build_master_defaults         
 
+- wrapper:
+    name: npm-build-deliver-creds
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: a9450b57-2492-4c47-9bd1-cabf87f74bb1
+                variable: GH_TOKEN
+            - text:
+                credential-id: f8f7db1d-87c8-4f64-bae7-584142e44f8e
+                variable: NPM_TOKEN
+
 - job-template:
     name: '{ci_project}-{git_repo}-npm-publish-build-master'
     description: |
       {jobdescription}
       If all goes well, npm is published
     node: "{ci_project}"
+    wrappers:
+            - npm-build-deliver-creds
     properties:
         - github:
             url: https://github.com/{git_organization}/{git_repo}/
