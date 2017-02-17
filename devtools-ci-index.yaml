@@ -164,48 +164,6 @@
     <<: *job_template_build_master_defaults         
 
 - job-template:
-    name: '{ci_project}-npm-publish-build-master'
-    description: |
-      {jobdescription}
-      If all goes well, npm is published
-    node: "{ci_project}"
-    properties:
-        - github:
-            url: https://github.com/{git_organization}/{git_repo}/
-    scm:
-        - git:
-            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
-            credentials-id: "c4872223-4024-4cd4-8e09-1bbdc7d6e971"
-            git-tool: ci-git
-            shallow_clone: false
-            branches: 
-                - master
-
-    triggers:
-        - github
-    builders:
-        - shell: |
-             # testing out the cico client
-            set +e
-            export CICO_API_KEY=$(cat ~/duffy.key )
-            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
-            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
-            ssh_cmd="ssh $sshopts $CICO_hostname"
-            env > jenkins-env
-            $ssh_cmd yum -y install rsync
-            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload && {ci_cmd}"
-            rtn_code=$?
-            if [ $rtn_code -eq 0 ]; then
-              cico node done $CICO_ssid
-              npm publish dist/
-            else
-              # fail mode gives us 12 hrs to debug the machine
-              curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
-            fi
-            exit $rtn_code
-
-- job-template:
     name: '{ci_project}-almighty-devdoc-build-master'
     description: |
       {jobdescription}
@@ -410,31 +368,34 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-npm-publish-build-master':
+        - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-ui
             git_repo: ngx-widgets
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: fabric8-ui-ngx-widgets
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
             git_repo: ngx-login-client
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-npm-publish-build-master':
+        - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-ui
             git_repo: ngx-login-client
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: fabric8-ui-ngx-login-client
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
             git_repo: ngx-fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-npm-publish-build-master':
+        - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-ui
             git_repo: ngx-fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: fabric8-ui-ngx-fabric8-wit
+  
