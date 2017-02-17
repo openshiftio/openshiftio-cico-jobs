@@ -34,6 +34,7 @@
         - hectorj2f
         - ibuziuk
         - debloper
+        - vikram-raj
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'  
