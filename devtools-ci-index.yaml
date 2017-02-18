@@ -35,6 +35,8 @@
         - ibuziuk
         - debloper
         - vikram-raj
+        - dlabrecq
+        - dgutride
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'  
