@@ -187,6 +187,9 @@
     properties:
         - github:
             url: https://github.com/{git_organization}/{git_repo}/
+        - inject:
+            properties-content: |
+               JENKINS_URL=https://ci.centos.org   
     scm:
         - git:
             url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
