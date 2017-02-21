@@ -274,24 +274,21 @@
                 remote: origin
                 name: "gh-pages"
 - wrapper:
-    name: dockerhub_credentials_wrapper
+    name: che_credentials_wrapper 
     wrappers:
         - credentials-binding:
             - username-password-separated:
                 credential-id: b2ae0d9a-307a-4df3-b027-9aa0c22e29dd
                 username: RHCHEBOT_DOCKER_HUB_USERNAME
                 password: RHCHEBOT_DOCKER_HUB_PASSWORD
+            - file:
+                credential-id: 93da78ec-7785-49ab-a1ef-586424b3e94f
+                variable: creds_config_file
 
 - job:
     name: 'devtools-build-run-che-build-master'
-    git_organization: kbsingh
-    git_repo: build-run-che
-    ci_project: 'devtools'
-    ci_cmd: '/bin/bash cico_build.sh && /bin/bash cico_deploy.sh'
-    svc_name: che
-    timeout: '30m'
     wrappers:
-        - dockerhub_credentials_wrapper
+        - che_credentials_wrapper
     defaults: global
     node: devtools
     properties:
@@ -315,12 +312,12 @@
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
             env > jenkins-env
+            cat $creds_config_file >> jenkins-env
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload && /bin/bash cico_build.sh"
+            $ssh_cmd -t "cd payload && /bin/bash cico_build.sh && /bin/bash cico_deploy.sh"
             rtn_code=$?
             cico node done $CICO_ssid
-            if [ $rtn_code -eq 0 ]; then oc deploy che --latest -n almighty ; fi
             exit $rtn_code
 
 - project:
