@@ -337,7 +337,7 @@
             branches:
                 - master
     triggers:
-        - timed: '30 00 * * *'
+        - timed: '55 23 * * *'
     builders:
         - shell: |
             set +e
