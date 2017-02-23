@@ -420,7 +420,7 @@
             git_repo: fabric8-planner 
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: ui
+            svc_name: planner
             timeout: '35m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8io
