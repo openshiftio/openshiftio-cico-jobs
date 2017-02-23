@@ -150,7 +150,7 @@
             rtn_code=$?
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
-              oc deploy {svc_name} --latest -n almighty
+              oc deploy {svc_name} --latest 
             else
               # fail mode gives us 12 hrs to debug the machine
               curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
@@ -337,26 +337,17 @@
             branches:
                 - master
     triggers:
-        - timed: '30 00 * * *'
+        - timed: '15 00 * * *'
     builders:
         - shell: |
             set +e
             set +x
-            env > jenkins-env
-            cat $creds_config_file >> jenkins-env
-            export CICO_API_KEY=$(cat ~/duffy.key )
-            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
-            echo 'Using Host' $CICO_hostname
-            set -x
-            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
-            ssh_cmd="ssh $sshopts $CICO_hostname"
-            $ssh_cmd yum -y install rsync
-            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload && /bin/bash test.sh"
-            rtn_code=$?
-            cico node done $CICO_ssid
-            exit $rtn_code
-
+            oc set env dc almighty-performance RATE=120 DURATION=30s
+            sleep 10
+            oc scale --replicas=1 dc almighty-performance
+            sleep 10
+            oc scale --replicas=0 dc almighty-performance
+            oc logs dc/almighty-performance --follow
 
 - project:
     name: devtools
