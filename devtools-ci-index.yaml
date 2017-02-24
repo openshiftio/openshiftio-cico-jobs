@@ -349,6 +349,25 @@
             oc scale --replicas=0 dc almighty-performance
             oc logs dc/almighty-performance --follow
 
+- job:
+    name: 'devtools-test-perfcake-performance-core-db'
+    defaults: global
+    node: devtools
+    properties:
+        - github:
+            url: https://github.com/ldimaggi/perfcake
+    scm:
+        - git:
+            url: https://github.com/ldimaggi/perfcake.git
+            shallow_clone: true
+            branches:
+                - master
+    triggers:
+        - timed: '30 08 * * *'
+    builders:
+        - shell: |
+            sh ./POC_perf_test.sh
+
 - project:
     name: devtools
     jobs:
