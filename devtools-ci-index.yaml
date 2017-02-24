@@ -88,6 +88,7 @@
             read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
+            export GIT_BRANCH=`git branch | grep \* | cut -d ' ' -f2`
             env > jenkins-env
             $ssh_cmd yum -y install rsync
             git rebase --preserve-merges origin/${{ghprbTargetBranch}} \
