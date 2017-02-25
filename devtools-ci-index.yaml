@@ -237,7 +237,7 @@
             url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
             credentials-id: "c4872223-4024-4cd4-8e09-1bbdc7d6e971"
             git-tool: ci-git
-            shallow_clone: false
+            skip-tag: true
             branches: 
                 - master
 
