@@ -380,6 +380,12 @@
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '30m'
         - '{ci_project}-{git_repo}':
+            git_organization: openshiftio
+            git_repo: www.openshift.io
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}':
             git_organization: fabric8io
             git_repo: fabric8-forker
             ci_project: 'devtools'
@@ -433,6 +439,13 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: f8ui
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: openshiftio
+            git_repo: www.openshift.io
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: wwwopenshiftio
             timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8io
