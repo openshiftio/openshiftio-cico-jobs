@@ -427,7 +427,7 @@
             git_organization: fabric8io
             git_repo: fabric8-planner
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            ci_cmd: '/bin/bash cico_build_deploy_npm.sh'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8io
             git_repo: fabric8-ui
