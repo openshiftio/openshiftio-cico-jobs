@@ -363,7 +363,7 @@
             branches:
                 - master
     triggers:
-        - timed: '30 08 * * *'
+        - timed: '30 08,12 * * *'
     builders:
         - shell: |
             sh ./POC_perf_test.sh
