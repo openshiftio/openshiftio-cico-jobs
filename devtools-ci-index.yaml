@@ -39,7 +39,7 @@
         - dgutride
 
 - github_pull_request_defaults: &github_pull_request_defaults
-    name: 'github_pull_request_defaults'  
+    name: 'github_pull_request_defaults'
     <<: *admin_list_defaults
     cron: '* * * * *'
     github-hooks: false
@@ -53,7 +53,7 @@
     triggers:
       - github-pull-request:
           <<: *github_pull_request_defaults
-        
+
 - scm:
     name: git-scm
     scm:
@@ -104,7 +104,7 @@
                     # fail mode gives us 12 hrs to debug the machine
                     curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
                 fi
-            fi 
+            fi
             exit $rtn_code
 
 - job-template:
@@ -131,12 +131,12 @@
             url: https://github.com/{git_organization}/{git_repo}/
     - inject:
             properties-content: |
-               JENKINS_URL=https://ci.centos.org 
+               JENKINS_URL=https://ci.centos.org
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
             shallow_clone: false
-            branches: 
+            branches:
                 - master
     triggers:
         - github
@@ -155,7 +155,7 @@
             rtn_code=$?
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
-              oc deploy {svc_name} --latest 
+              oc deploy {svc_name} --latest
             else
               # fail mode gives us 12 hrs to debug the machine
               curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
@@ -168,7 +168,7 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-build-master-coverage'
-    <<: *job_template_build_master_defaults         
+    <<: *job_template_build_master_defaults
 
 - wrapper:
     name: npm-build-deliver-creds
@@ -194,7 +194,7 @@
             url: https://github.com/{git_organization}/{git_repo}/
         - inject:
             properties-content: |
-               JENKINS_URL=https://ci.centos.org   
+               JENKINS_URL=https://ci.centos.org
     scm:
         - git:
             url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
@@ -202,7 +202,7 @@
             git-tool: ci-git
             shallow_clone: false
             skip-tag: True
-            branches: 
+            branches:
                 - master
 
     triggers:
@@ -243,7 +243,7 @@
             credentials-id: "c4872223-4024-4cd4-8e09-1bbdc7d6e971"
             git-tool: ci-git
             shallow_clone: false
-            branches: 
+            branches:
                 - master
 
     triggers:
@@ -279,7 +279,7 @@
                 remote: origin
                 name: "gh-pages"
 - wrapper:
-    name: che_credentials_wrapper 
+    name: che_credentials_wrapper
     wrappers:
         - credentials-binding:
             - username-password-separated:
@@ -303,11 +303,11 @@
         - git:
             url: https://github.com/kbsingh/build-run-che.git
             shallow_clone: true
-            branches: 
+            branches:
                 - master
     triggers:
         - github
-        - timed: '20 00,12 * * *' 
+        - timed: '20 00,12 * * *'
     builders:
         - shell: |
             # testing out the cico client
@@ -387,7 +387,7 @@
             rtn_code=$?
             cico node done $CICO_ssid
             exit $rtn_code
-            
+
 
 - project:
     name: devtools
@@ -463,7 +463,7 @@
             timeout: '10m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8io
-            git_repo: fabric8-planner 
+            git_repo: fabric8-planner
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: planner
@@ -559,3 +559,9 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: fabric8-ui-ngx-fabric8-wit
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: almighty
+            git_repo: keycloak
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '20m'
