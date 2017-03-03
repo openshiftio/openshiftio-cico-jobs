@@ -156,6 +156,7 @@
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
               oc deploy {svc_name} --latest 
+              if [ $? -eq 0 ]; then oc logs -f dc/${svc_name} ; fi
             else
               # fail mode gives us 12 hrs to debug the machine
               curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
