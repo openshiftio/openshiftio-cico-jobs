@@ -124,13 +124,18 @@
     description: |
       {jobdescription}
     node: "{ci_project}"
+    wrappers:
+        - npm-build-deliver-creds
     properties:
         - github:
             url: https://github.com/{git_organization}/{git_repo}/
+    - inject:
+            properties-content: |
+               JENKINS_URL=https://ci.centos.org 
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
-            shallow_clone: true
+            shallow_clone: false
             branches: 
                 - master
     triggers:
