@@ -2,5 +2,62 @@
 
 image:https://ci.centos.org/buildStatus/icon?job=devtools-jjb-service[Jenkins,link="https://ci.centos.org/view/Devtools/job/devtools-jjb-service/lastBuild/"]
 
-This repository contains the definitions of the various jobs building
+This repository contains the definitions of the various jobs
 on https://ci.centos.org.
+
+### How to define a job for my repository ?
+
+In the `devtools-ci-index.yaml` file, we can find the definition of all the existing CI jobs
+for the project `devtools`. These job definitions are composed of several attributes
+whose purpose is explained in the following:
+
+- `git_organization`: represents the name of the github organization from which
+   to build, test and/or deploy an executable from a repository.
+- `git_repo`: specifies the name of the github repository inside an organization.
+- `branch`: this optional value identifies the name of the branch that will be
+    taken into consideration in the build process.
+- `ci_project`: specifies the name of the CI project. This value is used for scheduling
+   to use CI resources assigned per project.
+- `ci_cmd`: contains the command that will be triggered by the job inside the
+   repository, e.g. `/bin/bash cico_build_deploy.sh`. This command usually runs a
+   bash script named `cico_build_deploy.sh` where we can found all the logic.
+- `svc_name`: identifies the name of the Openshift service that will be redeployed.
+- `timeout`: specifies a maximum time to complete the execution of this job.
+- `<TEMPLATE_NAME>`: this name corresponds with the name assigned to one of the
+   available job templates.
+
+```
+- project:
+    name: <PROJECT_NAME>
+    jobs:
+
+    -  '<TEMPLATE_NAME':
+         git_organization: <ORGANIZATION-NAME>
+         git_repo: <GITHUB_REPO>
+         ci_project: '<CI_PROJECT>'
+         ci_cmd: '<COMMAND>'
+         svc_name: <SERVICE_NAME>
+         timeout: '<TIMEOUT>'
+         branch: <BRANCH_NAME>
+```
+
+A real example is described below:
+
+```
+- project:
+    name: 'devtools'
+    jobs:
+
+    - '{ci_project}-{git_repo}':
+        git_organization: almighty
+        git_repo: almighty-core
+        ci_project: 'devtools'
+        svc_name: core
+        ci_cmd: '/bin/bash cico_build_deploy.sh'
+        timeout: '20m'
+```
+
+
+This job definition is based on our pre-defined model for the communication between
+Github repositories and our Jenkins infrastructure. More information about This
+procedure can be found in https://wiki.centos.org/QaWiki/CI/GithubIntegration.
