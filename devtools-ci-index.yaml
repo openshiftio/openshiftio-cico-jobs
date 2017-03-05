@@ -203,6 +203,8 @@
             shallow_clone: true
             branches:
                 - master
+    wrappers:
+        - npm-build-deliver-creds
     <<: *job_template_build_defaults
 
 - job-template:
