@@ -629,3 +629,4 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '30m'
             branch: f8-custom
+            svc_name: keycloak-server
