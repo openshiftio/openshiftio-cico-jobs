@@ -629,3 +629,9 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '30m'
             branch: f8-custom
+        - '{ci_project}-{git_repo}':
+            git_organization: ldimaggi
+            git_repo: perfcake
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash POC_perf_test.sh'
+            timeout: '20m'
