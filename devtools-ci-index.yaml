@@ -447,6 +447,42 @@
             cico node done $CICO_ssid
             exit $rtn_code
 
+- job:
+    name: 'devtools-test-perfcake-performance-core-db-1kb-50thread'
+    defaults: global
+    node: devtools
+    properties:
+        - github:
+            url: https://github.com/ldimaggi/perfcake
+    scm:
+        - git:
+            url: https://github.com/ldimaggi/perfcake.git
+            shallow_clone: true
+            branches:
+                - master
+    triggers:
+        - timed: '30 09 * * *'
+    builders:
+        - shell: |
+            set +e
+            set +x
+            env > jenkins-env
+            cat $creds_config_file >> jenkins-env
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
+            echo 'Using Host' $CICO_hostname
+            set -x
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd yum -y install rsync
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            $ssh_cmd -t "cd payload && /bin/bash ./perf_test_runner.sh input_1kb.xml 50"
+            rtn_code=$?
+            cico node done $CICO_ssid
+            exit $rtn_code
+    publishers:
+        - archive:
+            artifacts: ./perfcake-7.4/perfcake-chart
 
 - project:
     name: devtools
