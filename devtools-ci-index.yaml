@@ -446,7 +446,9 @@
             rtn_code=$?
             cico node done $CICO_ssid
             exit $rtn_code
-
+    publishers:
+        - archive:
+            artifacts: ./perfcake-7.4/perfcake-chart
 
 - project:
     name: devtools
