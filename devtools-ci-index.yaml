@@ -571,13 +571,13 @@
             git_repo: generator-frontend
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: obsidian-generator-frontend
+            svc_name: generator-frontend
         - '{ci_project}-{git_repo}-build-master':
             git_organization: obsidian-toaster
             git_repo: generator-backend
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: obsidian-generator-backend
+            svc_name: generator-backend
         - '{ci_project}-{git_repo}-build-master':
             git_organization: redhat-kontinuity
             git_repo: catapult
