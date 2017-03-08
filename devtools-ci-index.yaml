@@ -223,7 +223,7 @@
             url: https://github.com/{git_organization}/{git_repo}.git
             shallow_clone: true
             branches:
-                - master
+                - {branch}
     <<: *job_template_build_branch_defaults
 
 - job-template:
@@ -625,6 +625,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '30m'
             branch: f8-custom
+            svc_name: keycloak-server
         - '{ci_project}-{git_repo}':
             git_organization: ldimaggi
             git_repo: perfcake
