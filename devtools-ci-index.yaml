@@ -184,7 +184,7 @@
             branches:
                 - '{branch}'
     triggers:
-        - github
+        - githubprb
     builders:
         - shell: |
             # testing out the cico client
@@ -224,6 +224,11 @@
             shallow_clone: true
             branches:
                 - '{branch}'
+    triggers:
+      - github-pull-request:
+          white-list-target-branches:
+             - '{branch}'
+          <<: *github_pull_request_defaults
     <<: *job_template_build_branch_defaults
 
 - job-template:
