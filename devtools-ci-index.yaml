@@ -67,6 +67,17 @@
             branches:
                 - '${{ghprbActualCommit}}'
 
+- wrapper:
+    name: npm-build-deliver-creds
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: a9450b57-2492-4c47-9bd1-cabf87f74bb1
+                variable: GH_TOKEN
+            - text:
+                credential-id: f8f7db1d-87c8-4f64-bae7-584142e44f8e
+                variable: NPM_TOKEN
+
 - job_template_defaults: &job_template_defaults
     name: 'job_template_defaults'
     description: |
@@ -133,7 +144,7 @@
             url: https://github.com/{git_organization}/{git_repo}.git
             shallow_clone: true
             branches:
-                - {branch}
+                - '{branch}'
     triggers:
         - github
     builders:
@@ -171,9 +182,9 @@
             url: https://github.com/{git_organization}/{git_repo}.git
             shallow_clone: true
             branches:
-                - {branch}
+                - '{branch}'
     triggers:
-        - github
+        - githubprb
     builders:
         - shell: |
             # testing out the cico client
@@ -212,7 +223,12 @@
             url: https://github.com/{git_organization}/{git_repo}.git
             shallow_clone: true
             branches:
-                - master
+                - '{branch}'
+    triggers:
+      - github-pull-request:
+          white-list-target-branches:
+             - '{branch}'
+          <<: *github_pull_request_defaults
     <<: *job_template_build_branch_defaults
 
 - job-template:
@@ -224,17 +240,6 @@
             branches:
                 - master
     <<: *job_template_build_defaults
-
-- wrapper:
-    name: npm-build-deliver-creds
-    wrappers:
-        - credentials-binding:
-            - text:
-                credential-id: a9450b57-2492-4c47-9bd1-cabf87f74bb1
-                variable: GH_TOKEN
-            - text:
-                credential-id: f8f7db1d-87c8-4f64-bae7-584142e44f8e
-                variable: NPM_TOKEN
 
 - job-template:
     name: '{ci_project}-{git_repo}-npm-publish-build-master'
@@ -262,6 +267,7 @@
 
     triggers:
         - github
+    svc_name: none
     builders:
         - shell: |
             # testing out the cico client
@@ -277,6 +283,9 @@
             rtn_code=$?
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
+              if [ "{svc_name}" -ne "none" ]; then
+                oc deploy {svc_name} --latest
+              fi
             else
               # fail mode gives us 12 hrs to debug the machine
               curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
@@ -528,7 +537,7 @@
             git_repo: fabric8-planner
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy_npm.sh'
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-npm-publish-build-master':
             git_organization: fabric8io
             git_repo: fabric8-ui
             ci_project: 'devtools'
@@ -567,13 +576,13 @@
             git_repo: generator-frontend
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: obsidian-generator-frontend
+            svc_name: generator-frontend
         - '{ci_project}-{git_repo}-build-master':
             git_organization: obsidian-toaster
             git_repo: generator-backend
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: obsidian-generator-backend
+            svc_name: generator-backend
         - '{ci_project}-{git_repo}-build-master':
             git_organization: redhat-kontinuity
             git_repo: catapult
@@ -618,6 +627,13 @@
             git_organization: almighty
             git_repo: keycloak
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            ci_cmd: 'git checkout f8-custom && /bin/bash cico_build_deploy.sh'
             timeout: '30m'
             branch: f8-custom
+            svc_name: keycloak-server
+        - '{ci_project}-{git_repo}':
+            git_organization: ldimaggi
+            git_repo: perfcake
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash POC_perf_test.sh'
+            timeout: '20m'

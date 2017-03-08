@@ -61,3 +61,20 @@ A real example is described below:
 This job definition is based on our pre-defined model for the communication between
 Github repositories and our Jenkins infrastructure. More information about This
 procedure can be found in https://wiki.centos.org/QaWiki/CI/GithubIntegration.
+
+
+### How to test your job definition ?
+
+You need to install `python-pip` and then use `pip` to install the
+`jenkins-job-builder` tool.
+
+```
+$ yum install python-pip
+$ pip install --user jenkins-job-builder
+```
+
+To test your job definition, you have to run the following command:
+
+```
+$ jenkins-jobs test devtools-ci-index.yaml name <JOB_NAME>
+```
