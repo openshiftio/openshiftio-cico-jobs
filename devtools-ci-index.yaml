@@ -283,7 +283,7 @@
             rtn_code=$?
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
-              if [ '"{svc_name}"' -ne '"none"' ]; then
+              if [ '{svc_name}' -ne 'none' ]; then
                 oc deploy {svc_name} --latest
               fi
             else
