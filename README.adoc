@@ -4,3 +4,20 @@ image:https://ci.centos.org/buildStatus/icon?job=devtools-jjb-service[Jenkins,li
 
 This repository contains the definitions of the various jobs building
 on https://ci.centos.org.
+
+
+==== How to test your job definition ?
+
+You need to install `python-pip` and then use `pip` to install the
+`jenkins-job-builder` tool.
+
+```
+$ yum install python-pip
+$ pip install --user jenkins-job-builder
+```
+
+To test your job definition, you have to run the following command:
+
+```
+$ jenkins-jobs test devtools-ci-index.yaml name <JOB_NAME>
+```

@@ -144,7 +144,7 @@
             url: https://github.com/{git_organization}/{git_repo}.git
             shallow_clone: true
             branches:
-                - {branch}
+                - '{branch}'
     triggers:
         - github
     builders:
@@ -182,7 +182,7 @@
             url: https://github.com/{git_organization}/{git_repo}.git
             shallow_clone: true
             branches:
-                - {branch}
+                - '{branch}'
     triggers:
         - github
     builders:
@@ -223,7 +223,7 @@
             url: https://github.com/{git_organization}/{git_repo}.git
             shallow_clone: true
             branches:
-                - {branch}
+                - '{branch}'
     <<: *job_template_build_branch_defaults
 
 - job-template:
