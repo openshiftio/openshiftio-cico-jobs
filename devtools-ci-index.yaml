@@ -144,7 +144,7 @@
             url: https://github.com/{git_organization}/{git_repo}.git
             shallow_clone: true
             branches:
-                - {branch}
+                - '{branch}'
     triggers:
         - github
     builders:
@@ -182,9 +182,9 @@
             url: https://github.com/{git_organization}/{git_repo}.git
             shallow_clone: true
             branches:
-                - {branch}
+                - '{branch}'
     triggers:
-        - github
+        - githubprb
     builders:
         - shell: |
             # testing out the cico client
@@ -223,7 +223,12 @@
             url: https://github.com/{git_organization}/{git_repo}.git
             shallow_clone: true
             branches:
-                - {branch}
+                - '{branch}'
+    triggers:
+      - github-pull-request:
+          white-list-target-branches:
+             - '{branch}'
+          <<: *github_pull_request_defaults
     <<: *job_template_build_branch_defaults
 
 - job-template:
@@ -622,7 +627,7 @@
             git_organization: almighty
             git_repo: keycloak
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            ci_cmd: 'git checkout f8-custom && /bin/bash cico_build_deploy.sh'
             timeout: '30m'
             branch: f8-custom
             svc_name: keycloak-server
