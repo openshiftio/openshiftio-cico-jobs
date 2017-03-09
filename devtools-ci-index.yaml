@@ -185,6 +185,7 @@
                 - '{branch}'
     triggers:
         - githubprb
+    svc_name: none
     builders:
         - shell: |
             # testing out the cico client
