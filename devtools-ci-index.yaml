@@ -287,7 +287,7 @@
             rtn_code=$?
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
-              if [ "{svc_name}" -ne "none" ]; then
+              if [ "{svc_name}" != "none" ]; then
                 oc deploy {svc_name} --latest
               fi
             else
@@ -455,7 +455,9 @@
             rtn_code=$?
             cico node done $CICO_ssid
             exit $rtn_code
-
+    publishers:
+        - archive:
+            artifacts: ./perfcake-7.4/perfcake-chart
 
 - project:
     name: devtools
