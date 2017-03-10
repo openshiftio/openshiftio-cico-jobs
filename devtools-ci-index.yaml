@@ -169,8 +169,8 @@
             fi
             exit $rtn_code
 
-- job-template: &job_template_build_branch_defaults
-    name: 'job_template_build_branch_defaults'
+- job-template: &job_template_publish_branch_defaults
+    name: 'job_template_publish_branch_defaults'
     description: |
       {jobdescription}
     node: "{ci_project}"
@@ -201,7 +201,7 @@
             rtn_code=$?
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
-              if [ "{svc_name}" -ne "none" ]; then
+              if [ "{svc_name}" != "none" ]; then
                 oc deploy {svc_name} --latest
               fi
             else
@@ -221,7 +221,7 @@
     <<: *job_template_build_defaults
 
 - job-template:
-    name: '{ci_project}-{git_repo}-build-branch'
+    name: '{ci_project}-{git_repo}-publish-branch'
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
@@ -233,7 +233,7 @@
           white-list-target-branches:
              - '{branch}'
           <<: *github_pull_request_defaults
-    <<: *job_template_build_branch_defaults
+    <<: *job_template_publish_branch_defaults
 
 - job-template:
     name: '{ci_project}-{git_repo}-build-master-coverage'
@@ -629,7 +629,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: fabric8-ui-ngx-fabric8-wit
-        - '{ci_project}-{git_repo}-build-branch':
+        - '{ci_project}-{git_repo}-publish-branch':
             git_organization: almighty
             git_repo: keycloak
             ci_project: 'devtools'
