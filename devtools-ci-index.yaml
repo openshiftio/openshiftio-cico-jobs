@@ -101,7 +101,7 @@
             n=1
             while true
             do
-                read CICO_hostname CICO_ssid <<< $(ecdho "host ssid")
+                read CICO_hostname CICO_ssid <<< $(echo "host ssid")
                 # we got hostname from cico
                 if  [ ! -z "$CICO_hostname" ]; then
                     break
@@ -173,7 +173,7 @@
             n=1
             while true
             do
-                read CICO_hostname CICO_ssid <<< $(ecdho "host ssid")
+                read CICO_hostname CICO_ssid <<< $(echo "host ssid")
                 # we got hostname from cico
                 if  [ ! -z "$CICO_hostname" ]; then
                     break
@@ -229,7 +229,7 @@
             n=1
             while true
             do
-                read CICO_hostname CICO_ssid <<< $(ecdho "host ssid")
+                read CICO_hostname CICO_ssid <<< $(echo "host ssid")
                 # we got hostname from cico
                 if  [ ! -z "$CICO_hostname" ]; then
                     break
@@ -332,7 +332,7 @@
             n=1
             while true
             do
-                read CICO_hostname CICO_ssid <<< $(ecdho "host ssid")
+                read CICO_hostname CICO_ssid <<< $(echo "host ssid")
                 # we got hostname from cico
                 if  [ ! -z "$CICO_hostname" ]; then
                     break
@@ -393,7 +393,7 @@
             n=1
             while true
             do
-                read CICO_hostname CICO_ssid <<< $(ecdho "host ssid")
+                read CICO_hostname CICO_ssid <<< $(echo "host ssid")
                 # we got hostname from cico
                 if  [ ! -z "$CICO_hostname" ]; then
                     break
@@ -473,7 +473,7 @@
             n=1
             while true
             do
-                read CICO_hostname CICO_ssid <<< $(ecdho "host ssid")
+                read CICO_hostname CICO_ssid <<< $(echo "host ssid")
                 # we got hostname from cico
                 if  [ ! -z "$CICO_hostname" ]; then
                     break
@@ -550,7 +550,7 @@
             n=1
             while true
             do
-                read CICO_hostname CICO_ssid <<< $(ecdho "host ssid")
+                read CICO_hostname CICO_ssid <<< $(echo "host ssid")
                 # we got hostname from cico
                 if  [ ! -z "$CICO_hostname" ]; then
                     break
