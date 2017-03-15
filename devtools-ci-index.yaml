@@ -97,7 +97,24 @@
             # testing out the cico client
             set +e
             export CICO_API_KEY=$(cat ~/duffy.key )
-            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
+            # get node
+            n=1
+            while true
+            do
+                read CICO_hostname CICO_ssid <<< $(ecdho "host ssid")
+                # we got hostname from cico
+                if  [ ! -z "$CICO_hostname" ]; then
+                    break
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, retrying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
             env > jenkins-env
@@ -152,7 +169,24 @@
             # testing out the cico client
             set +e
             export CICO_API_KEY=$(cat ~/duffy.key )
-            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
+            # get node
+            n=1
+            while true
+            do
+                read CICO_hostname CICO_ssid <<< $(ecdho "host ssid")
+                # we got hostname from cico
+                if  [ ! -z "$CICO_hostname" ]; then
+                    break
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, retrying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
             env > jenkins-env
@@ -191,7 +225,24 @@
             # testing out the cico client
             set +e
             export CICO_API_KEY=$(cat ~/duffy.key )
-            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
+            # get node
+            n=1
+            while true
+            do
+                read CICO_hostname CICO_ssid <<< $(ecdho "host ssid")
+                # we got hostname from cico
+                if  [ ! -z "$CICO_hostname" ]; then
+                    break
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, retrying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
             env > jenkins-env
@@ -277,7 +328,24 @@
             # testing out the cico client
             set +e
             export CICO_API_KEY=$(cat ~/duffy.key )
-            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
+            # get node
+            n=1
+            while true
+            do
+                read CICO_hostname CICO_ssid <<< $(ecdho "host ssid")
+                # we got hostname from cico
+                if  [ ! -z "$CICO_hostname" ]; then
+                    break
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, retrying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
             env > jenkins-env
@@ -321,7 +389,24 @@
             # testing out the cico client
             set +e
             export CICO_API_KEY=$(cat ~/duffy.key )
-            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
+            # get node
+            n=1
+            while true
+            do
+                read CICO_hostname CICO_ssid <<< $(ecdho "host ssid")
+                # we got hostname from cico
+                if  [ ! -z "$CICO_hostname" ]; then
+                    break
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, retrying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
             env > jenkins-env
@@ -384,7 +469,24 @@
             env > jenkins-env
             cat $creds_config_file >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
-            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
+            # get node
+            n=1
+            while true
+            do
+                read CICO_hostname CICO_ssid <<< $(ecdho "host ssid")
+                # we got hostname from cico
+                if  [ ! -z "$CICO_hostname" ]; then
+                    break
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, retrying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
             echo 'Using Host' $CICO_hostname
             set -x
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
@@ -444,7 +546,24 @@
             env > jenkins-env
             cat $creds_config_file >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
-            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
+            # get node
+            n=1
+            while true
+            do
+                read CICO_hostname CICO_ssid <<< $(ecdho "host ssid")
+                # we got hostname from cico
+                if  [ ! -z "$CICO_hostname" ]; then
+                    break
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, retrying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
             echo 'Using Host' $CICO_hostname
             set -x
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
