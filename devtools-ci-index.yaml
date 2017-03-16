@@ -643,3 +643,9 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash POC_perf_test.sh'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: redhat-developer
+            git_repo: osd-monitor-poc
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            svc_name: osd-monitor-poc
