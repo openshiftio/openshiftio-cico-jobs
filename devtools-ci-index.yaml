@@ -648,4 +648,4 @@
             git_repo: osd-monitor-poc
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
-            svc_name: osd-monitor-poc
+            svc_name: osd-monitor
