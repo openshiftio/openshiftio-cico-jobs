@@ -577,6 +577,13 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+          - '{ci_project}-{git_repo}-build-master':
+            git_organization: redhat-developer
+            git_repo: osd-monitor-poc
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: osd-monitor
+            timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: obsidian-toaster
             git_repo: generator-frontend
