@@ -471,7 +471,7 @@
             git_repo: almighty-core
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
-            timeout: '30m'
+            timeout: '35m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8io
             git_repo: fabric8-planner
