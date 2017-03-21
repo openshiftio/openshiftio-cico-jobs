@@ -465,7 +465,6 @@
         - credentials-binding:
             - username-password-separated:
                 credential-id: 061479ee-de4a-4fb0-b752-7b86659ba3ca
-                username: GENERATOR_DOCKER_HUB_USERNAME
                 password: GENERATOR_DOCKER_HUB_PASSWORD
             - file:
                 credential-id: 061479ee-de4a-4fb0-b752-7b86659ba3ca
