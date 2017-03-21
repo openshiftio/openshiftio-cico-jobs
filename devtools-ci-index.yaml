@@ -466,9 +466,6 @@
             - username-password-separated:
                 credential-id: 061479ee-de4a-4fb0-b752-7b86659ba3ca
                 password: GENERATOR_DOCKER_HUB_PASSWORD
-            - file:
-                credential-id: 061479ee-de4a-4fb0-b752-7b86659ba3ca
-                variable: creds_config_file
 
 - job:
     name: 'devtools-generator-backend-master'
@@ -494,7 +491,6 @@
             set +e
             set +x
             env > jenkins-env
-            cat $creds_config_file >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
             read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
             echo 'Using Host' $CICO_hostname
@@ -532,7 +528,6 @@
             set +e
             set +x
             env > jenkins-env
-            cat $creds_config_file >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
             read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
             echo 'Using Host' $CICO_hostname
@@ -570,7 +565,6 @@
             set +e
             set +x
             env > jenkins-env
-            cat $creds_config_file >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
             read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
             echo 'Using Host' $CICO_hostname
