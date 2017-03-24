@@ -1,0 +1,204 @@
+- defaults:
+    name: global
+    timeout: '15m'
+    jobdescription: "Managed by Jenkins Job Builder, do not edit manually! Update via https://github.com/almighty/almighty-jobs"
+    git_organization: almighty
+    github_user: almighty-bot
+    branch: master
+
+- project:
+    name: devtools
+    jobs:
+        - '{ci_project}-{git_repo}':
+            git_repo: almighty-core
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-coverage':
+            git_repo: almighty-core
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            timeout: '35m'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8io
+            git_repo: fabric8-planner
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '35m'
+        - '{ci_project}-{git_repo}':
+            git_repo: almighty-devdoc
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8io
+            git_repo: fabric8-ui
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}':
+            git_organization: openshiftio
+            git_repo: www.openshift.io
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8io
+            git_repo: fabric8-forker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8io
+            git_repo: fabric8-init-tenant
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'
+        - '{ci_project}-almighty-devdoc-build-master':
+            git_repo: almighty-devdoc
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_repo: almighty-core
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: core
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master-coverage':
+            git_repo: almighty-core
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            svc_name: core
+            timeout: '25m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: aslakknutsen
+            git_repo: almighty-performance
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: aslak-almighty-perf
+            timeout: '20m'
+        - '{ci_project}-{git_repo}':
+            git_organization: aslakknutsen
+            git_repo: almighty-performance
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8io
+            git_repo: fabric8-planner
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: planner
+            timeout: '35m'
+        - '{ci_project}-{git_repo}-npm-publish-build-master':
+            git_organization: fabric8io
+            git_repo: fabric8-planner
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy_npm.sh'
+        - '{ci_project}-{git_repo}-npm-publish-build-master':
+            git_organization: fabric8io
+            git_repo: fabric8-ui
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: f8ui
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: openshiftio
+            git_repo: www.openshift.io
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: wwwopenshiftio
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8io
+            git_repo: fabric8-forker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: f8forker
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8io
+            git_repo: fabric8-init-tenant
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: f8tenant
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: redhat-developer
+            git_repo: che-starter
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: che-starter
+            timeout: '20m'
+        - '{ci_project}-{git_repo}':
+            git_organization: redhat-developer
+            git_repo: che-starter
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-ui
+            git_repo: ngx-widgets
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-npm-publish-build-master':
+            git_organization: fabric8-ui
+            git_repo: ngx-widgets
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-ui
+            git_repo: ngx-login-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-npm-publish-build-master':
+            git_organization: fabric8-ui
+            git_repo: ngx-login-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-ui
+            git_repo: ngx-fabric8-wit
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-npm-publish-build-master':
+            git_organization: fabric8-ui
+            git_repo: ngx-fabric8-wit
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: fabric8-ui-ngx-fabric8-wit
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: almighty
+            git_repo: keycloak
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '30m'
+            svc_name: keycloak-server
+        - '{ci_project}-{git_repo}':
+            git_organization: ldimaggi
+            git_repo: perfcake
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash POC_perf_test.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: redhat-developer
+            git_repo: osd-monitor-poc
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            svc_name: osd-monitor
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-ui
+            git_repo: ngx-base
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-npm-publish-build-master':
+            git_organization: fabric8-ui
+            git_repo: ngx-base
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            svc_name: fabric8-ui-ngx-base

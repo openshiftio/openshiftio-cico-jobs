@@ -1,0 +1,119 @@
+
+- wrapper:
+    name: generator_credentials_wrapper
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: 061479ee-de4a-4fb0-b752-7b86659ba3ca
+                variable: GENERATOR_DOCKER_HUB_PASSWORD
+
+- job:
+    name: 'devtools-generator-backend-master'
+    wrappers:
+        - generator_credentials_wrapper
+    defaults: global
+    node: devtools
+    properties:
+        - github:
+            url: https://github.com/obsidian-toaster/generator-backend/
+    scm:
+        - git:
+            url: https://github.com/obsidian-toaster/generator-backend.git
+            shallow_clone: true
+            branches:
+                - master
+    triggers:
+        - github
+        - timed: '20 00,12 * * *'
+    builders:
+        - shell: |
+            # testing out the cico client
+            set +e
+            set +x
+            env > jenkins-env
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
+            echo 'Using Host' $CICO_hostname
+            set -x
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd yum -y install rsync
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            $ssh_cmd -t "cd payload && /bin/bash cico_build.sh && /bin/bash cico_deploy.sh"
+            rtn_code=$?
+            cico node done $CICO_ssid
+            exit $rtn_code
+
+- job:
+    name: 'devtools-generator-frontend-master'
+    wrappers:
+        - generator_credentials_wrapper
+    defaults: global
+    node: devtools
+    properties:
+        - github:
+            url: https://github.com/obsidian-toaster/generator-frontend/
+    scm:
+        - git:
+            url: https://github.com/obsidian-toaster/generator-frontend.git
+            shallow_clone: true
+            branches:
+                - master
+    triggers:
+        - github
+        - timed: '20 00,12 * * *'
+    builders:
+        - shell: |
+            # testing out the cico client
+            set +e
+            set +x
+            env > jenkins-env
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
+            echo 'Using Host' $CICO_hostname
+            set -x
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd yum -y install rsync
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            $ssh_cmd -t "cd payload && /bin/bash cico_build.sh && /bin/bash cico_deploy.sh"
+            rtn_code=$?
+            cico node done $CICO_ssid
+            exit $rtn_code
+
+- job:
+    name: 'devtools-generator-catapult-master'
+    wrappers:
+        - generator_credentials_wrapper
+    defaults: global
+    node: devtools
+    properties:
+        - github:
+            url: https://github.com/redhat-kontinuity/catapult/
+    scm:
+        - git:
+            url: https://github.com/redhat-kontinuity/catapult.git
+            shallow_clone: true
+            branches:
+                - master
+    triggers:
+        - github
+        - timed: '20 00,12 * * *'
+    builders:
+        - shell: |
+            # testing out the cico client
+            set +e
+            set +x
+            env > jenkins-env
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
+            echo 'Using Host' $CICO_hostname
+            set -x
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd yum -y install rsync
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            $ssh_cmd -t "cd payload && /bin/bash cico_build.sh && /bin/bash cico_deploy.sh"
+            rtn_code=$?
+            cico node done $CICO_ssid
+            exit $rtn_code
