@@ -921,3 +921,11 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: fabric8-ui-ngx-base
+        - '{ci_project}-{git_repo}-build-publish-images':
+            git_organization: redhat-developer
+            git_repo: che-dockerfiles
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_publish_images.sh'
+            timeout: '10m'
+            wrappers:
+                - che_credentials_wrapper
