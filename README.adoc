@@ -76,5 +76,5 @@ $ pip install --user jenkins-job-builder
 To test your job definition, you have to run the following command:
 
 ```
-$ jenkins-jobs test devtools-ci-index.yaml name <JOB_NAME>
+$ jenkins-jobs test ./devtools-ci name <JOB_NAME>
 ```
