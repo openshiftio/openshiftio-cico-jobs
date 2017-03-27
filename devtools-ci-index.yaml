@@ -902,7 +902,7 @@
             git_repo: keycloak
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
+            timeout: '40m'
         - '{ci_project}-{git_repo}':
             git_organization: ldimaggi
             git_repo: perfcake
