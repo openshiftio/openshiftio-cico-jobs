@@ -933,5 +933,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_publish_images.sh'
             timeout: '10m'
+            svc_name: none
             wrappers:
                 - che_credentials_wrapper
