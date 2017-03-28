@@ -38,6 +38,9 @@
         - vikram-raj
         - dlabrecq
         - dgutride
+        - mindreeper2420
+        - invincibleJai
+        - arunkumars08
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
