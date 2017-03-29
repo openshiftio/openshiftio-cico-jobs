@@ -41,6 +41,7 @@
         - mindreeper2420
         - invincibleJai
         - arunkumars08
+        - fabric8cd
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
