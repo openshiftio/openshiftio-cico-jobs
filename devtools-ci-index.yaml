@@ -172,8 +172,15 @@
                 - '{branch}'
     triggers:
         - github
+    svc_name: none
+    template_name: none
     builders:
         - shell: |
+            # Verify Job configuration
+            if [ "{svc_name}" == "none" && "{template_name}" == "none" ]; then
+                echo "require either svc_name or template_name to be set"
+                exit 1
+            fi
             # testing out the cico client
             set +e
             export CICO_API_KEY=$(cat ~/duffy.key )
@@ -208,7 +215,12 @@
             rtn_code=$?
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
-              oc deploy {svc_name} --latest
+              if [ "{svc_name}" != "none" ]; then
+                oc deploy {svc_name} --latest
+              fi
+              if [ "{template_name}" != "none" ]; then
+                oc process -f {template_name} | oc apply -f -
+              fi
             else
               # fail mode gives us 12 hrs to debug the machine
               curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
