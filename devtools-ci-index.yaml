@@ -930,7 +930,7 @@
             git_repo: osd-monitor-poc
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
-            svc_name: osd-monitor
+            template_name: osd-monitor.yml
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
             git_repo: ngx-base
