@@ -867,8 +867,8 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: launchpad-backend
         - '{ci_project}-{git_repo}-generator-build-master':
-            git_organization: launchpad-missioncontrol
-            git_repo: openshiftio
+            git_organization: openshiftio
+            git_repo: launchpad-missioncontrol
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: catapult
