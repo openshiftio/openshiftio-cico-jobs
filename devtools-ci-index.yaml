@@ -497,10 +497,14 @@
                 - master
     triggers:
         - github
-        - timed: '20 00,12 * * *'
+        - timed: 'H/45 * * * *'
     builders:
         - shell: |
             # testing out the cico client
+            if [ "$GIT_PREVIOUS_COMMIT" = "$GIT_COMMIT" ]
+            then
+                exit 0
+            fi
             set +e
             set +x
             env > jenkins-env
@@ -934,5 +938,3 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: catapult
-
-
