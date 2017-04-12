@@ -481,6 +481,29 @@
                 variable: creds_config_file
 
 - job:
+    name: 'eclipse-che-build-openshift-connector'
+    wrappers:
+        - che_credentials_wrapper
+    defaults: global
+    node: devtools
+    properties:
+        - github:
+            url: https://github.com/eclipse/che
+    scm:
+        - git:
+            url: https://github.com/eclipse/che.git
+            shallow_clone: true
+            branches:
+                - openshift-connector
+    triggers:
+        - github
+    builders:
+        - trigger-builds:
+            - project:
+                - "devtools-build-run-che-build-master"
+              current-parameters: true
+
+- job:
     name: 'devtools-build-run-che-build-master'
     wrappers:
         - che_credentials_wrapper
@@ -830,17 +853,17 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: che-starter
             timeout: '20m'
-        - '{ci_project}-{git_repo}':
-            git_organization: redhat-developer
-            git_repo: che-starter
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: redhat-developer
             git_repo: che-vertx-server
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}':
+            git_organization: redhat-developer
+            git_repo: che-starter
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
@@ -940,5 +963,3 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: catapult
-
-
