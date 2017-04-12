@@ -220,7 +220,8 @@
                 oc deploy {svc_name} --latest
               fi
               if [ "{template_name}" != "none" ]; then
-                oc process -f {template_name} | oc apply -f -
+                TAG=$(echo $GIT_COMMIT | cut -c1-6)
+                oc process -f {template_name} IMAGE_TAG=$TAG | oc apply -f -
               fi
             else
               # fail mode gives us 12 hrs to debug the machine
