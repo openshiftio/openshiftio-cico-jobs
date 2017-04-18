@@ -665,7 +665,7 @@
             branches:
                 - master
     triggers:
-        - timed: '30 08,12,16,20 * * *'
+        - timed: '30 04,06,08,10,12,14,16,20 * * *'
     wrappers:
         - credentials-binding:
             - username-password-separated:
@@ -711,6 +711,10 @@
             rtn_code=$?
             cico node done $CICO_ssid
             exit $rtn_code
+    publishers:
+        - archive:
+            artifacts: ./target
+
 
 - wrapper:
     name: generator_credentials_wrapper
