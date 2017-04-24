@@ -737,6 +737,28 @@
         - generator_credentials_wrapper
     <<: *job_template_build_defaults
 
+- job:
+    name: 'dsaas-promote-to-prod'
+    defaults: global
+    node: devtools
+    properties:
+        - github:
+            url: https://github.com/openshiftio/saas/
+    scm:
+        - git:
+            url: https://github.com/openshiftio/saas.git
+            shallow_clone: true
+            branches:
+                - master
+    triggers:
+        - github
+    builders:
+        - shell: |
+            set +x
+            /bin/bash ./fetch_and_apply.sh
+            exit $rtn_code
+
+
 - project:
     name: devtools
     jobs:
