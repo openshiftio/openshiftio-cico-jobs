@@ -738,7 +738,7 @@
     <<: *job_template_build_defaults
 
 - job:
-    name: 'dsaas-promote-to-prod'
+    name: 'devtools-promote-to-prod'
     defaults: global
     node: devtools
     properties:
