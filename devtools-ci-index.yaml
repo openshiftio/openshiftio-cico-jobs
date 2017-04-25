@@ -728,7 +728,7 @@
             exit $rtn_code
     publishers:
       - archive:
-           artifacts: './target/*.*'
+           artifacts: './target/screenshots/*.*'
            allow-empty: true
            fingerprint: true
 
