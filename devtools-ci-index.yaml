@@ -727,9 +727,10 @@
             cico node done $CICO_ssid
             exit $rtn_code
     publishers:
-        - archive:
-            artifacts: ./target
-
+      - archive:
+           artifacts: './target/*.*'
+           allow-empty: true
+           fingerprint: true
 
 - wrapper:
     name: generator_credentials_wrapper
