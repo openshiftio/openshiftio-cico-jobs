@@ -84,6 +84,18 @@
                 credential-id: f8f7db1d-87c8-4f64-bae7-584142e44f8e
                 variable: NPM_TOKEN
 
+- wrapper:
+    name: che_credentials_wrapper
+    wrappers:
+        - credentials-binding:
+            - username-password-separated:
+                credential-id: b2ae0d9a-307a-4df3-b027-9aa0c22e29dd
+                username: RHCHEBOT_DOCKER_HUB_USERNAME
+                password: RHCHEBOT_DOCKER_HUB_PASSWORD
+            - file:
+                credential-id: 93da78ec-7785-49ab-a1ef-586424b3e94f
+                variable: creds_config_file
+
 - job_template_defaults: &job_template_defaults
     name: 'job_template_defaults'
     description: |
@@ -306,6 +318,18 @@
     <<: *job_template_build_defaults
 
 - job-template:
+    name: '{ci_project}-{git_repo}-build-che-credentials-master'
+    wrappers:
+        - che_credentials_wrapper
+    scm:
+        - git:
+            url: https://github.com/{git_organization}/{git_repo}.git
+            shallow_clone: true
+            branches:
+                - master
+    <<: *job_template_build_defaults
+
+- job-template:
     name: '{ci_project}-{git_repo}-publish-branch'
     scm:
         - git:
@@ -473,17 +497,7 @@
             - branch:
                 remote: origin
                 name: "gh-pages"
-- wrapper:
-    name: che_credentials_wrapper
-    wrappers:
-        - credentials-binding:
-            - username-password-separated:
-                credential-id: b2ae0d9a-307a-4df3-b027-9aa0c22e29dd
-                username: RHCHEBOT_DOCKER_HUB_USERNAME
-                password: RHCHEBOT_DOCKER_HUB_PASSWORD
-            - file:
-                credential-id: 93da78ec-7785-49ab-a1ef-586424b3e94f
-                variable: creds_config_file
+
 
 - job:
     name: 'eclipse-che-build-openshift-connector'
@@ -967,15 +981,13 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: fabric8-ui-ngx-base
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-build-che-credentials-master':
             git_organization: redhat-developer
             git_repo: che-dockerfiles
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_publish_images.sh'
             timeout: '10m'
             svc_name: none
-            wrappers:
-                - che_credentials_wrapper
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: openshiftio
             git_repo: launchpad-frontend
