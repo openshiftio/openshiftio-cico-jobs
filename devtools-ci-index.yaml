@@ -621,7 +621,7 @@
             branches:
                 - master
     triggers:
-        - timed: '30 08,12 * * *'
+        - timed: '1 22 * * *'
     builders:
         - shell: |
             set +e
@@ -663,7 +663,7 @@
             exit $rtn_code
     publishers:
         - archive:
-            artifacts: ./perfcake-7.4/perfcake-chart
+            artifacts: ./devtools-performance-results
 
 - job:
     name: 'devtools-test-end-to-end'
