@@ -680,7 +680,7 @@
             branches:
                 - master
     triggers:
-        - timed: '30 04,06,08,10,12,14,16,20 * * *'
+        - timed: '30 * * * *'
     wrappers:
         - credentials-binding:
             - username-password-separated:
