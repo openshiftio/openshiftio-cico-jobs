@@ -571,6 +571,8 @@
     properties:
         - github:
             url: https://github.com/kbsingh/build-run-che/
+        - github:
+            url: https://github.com/eclipse/che/
     scm:
         - git:
             url: https://github.com/kbsingh/build-run-che.git
