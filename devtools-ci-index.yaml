@@ -577,6 +577,10 @@
             shallow_clone: true
             branches:
                 - master
+    publishers:
+        - junit:
+            results: /srv/che-build/rh-che/target/**/target/surefire-reports/*.xml
+
     triggers:
         - github
         - timed: '20 00,12 * * *'
