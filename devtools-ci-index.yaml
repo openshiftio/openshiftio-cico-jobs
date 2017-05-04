@@ -579,7 +579,6 @@
                 - master
     triggers:
         - github
-        - timed: '20 00,12 * * *'
     builders:
         - shell: |
             # testing out the cico client
