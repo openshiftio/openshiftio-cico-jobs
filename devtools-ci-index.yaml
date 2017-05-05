@@ -563,6 +563,35 @@
               current-parameters: true
 
 - job:
+    name: 'eclipse-che-promotion'
+
+    parameters:
+        - string:
+            name: DOCKER_REPO
+            description: "Full docker location with organization/repo:tag"
+
+    wrappers:
+        - che_credentials_wrapper
+    defaults: global
+    node: devtools
+    builders:
+        - shell: |
+            # promoting to rhche
+            set +e
+            set +x
+
+            # downloads staging image
+            docker pull $DOCKER_REPO
+
+            # rename to production organization
+            PROD_DOCKER="${DOCKER_REPO/rhchestage/rhche}"
+
+            docker login -u ${RHCHEBOT_DOCKER_HUB_USERNAME} -p $RHCHEBOT_DOCKER_HUB_PASSWORD -e noreply@redhat.co
+
+            # push to Docker hub
+            docker push PROD_DOCKER
+
+- job:
     name: 'devtools-build-run-che-build-master'
     wrappers:
         - che_credentials_wrapper
