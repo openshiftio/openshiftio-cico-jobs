@@ -570,16 +570,15 @@
     node: devtools
     properties:
         - github:
-            url: https://github.com/kbsingh/build-run-che/
+            url: https://github.com/redhat-developer/rh-che/
     scm:
         - git:
-            url: https://github.com/kbsingh/build-run-che.git
+            url: https://github.com/redhat-developer/rh-che.git
             shallow_clone: true
             branches:
                 - master
     publishers:
-        - junit:
-            results: /srv/che-build/rh-che/target/**/target/surefire-reports/*.xml
+        - junit:./target/**/target/surefire-reports/*.xml
 
     triggers:
         - github
