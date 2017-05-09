@@ -567,7 +567,7 @@
 
     parameters:
         - string:
-            name: DOCKER_REPO
+            name: CHE_SERVER_STAGE_DOCKER_IMAGE
             description: "Full docker location with organization/repo:tag"
 
     wrappers:
@@ -581,15 +581,16 @@
             set +x
 
             # downloads staging image
-            docker pull $DOCKER_REPO
+            docker pull ${CHE_SERVER_STAGE_DOCKER_IMAGE}
 
             # rename to production organization
-            PROD_DOCKER="${DOCKER_REPO/rhchestage/rhche}"
+            PROD_DOCKER="${CHE_SERVER_STAGE_DOCKER_IMAGE/rhchestage/rhche}"
 
-            docker login -u ${RHCHEBOT_DOCKER_HUB_USERNAME} -p $RHCHEBOT_DOCKER_HUB_PASSWORD -e noreply@redhat.co
+            docker login -u ${RHCHEBOT_DOCKER_HUB_USERNAME} -p ${RHCHEBOT_DOCKER_HUB_PASSWORD} -e noreply@redhat.co
 
             # push to Docker hub
-            docker push PROD_DOCKER
+            docker tag ${CHE_SERVER_STAGE_DOCKER_IMAGE} ${PROD_DOCKER}
+            docker push ${CHE_SERVER_PROD_DOCKER_IMAGE}
 
 - job:
     name: 'devtools-build-run-che-build-master'
