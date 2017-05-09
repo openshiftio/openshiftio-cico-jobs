@@ -584,12 +584,12 @@
             docker pull ${CHE_SERVER_STAGE_DOCKER_IMAGE}
 
             # rename to production organization
-            PROD_DOCKER="${CHE_SERVER_STAGE_DOCKER_IMAGE/rhchestage/rhche}"
+            CHE_SERVER_PROD_DOCKER_IMAGE="${CHE_SERVER_STAGE_DOCKER_IMAGE/rhchestage/rhche}"
 
             docker login -u ${RHCHEBOT_DOCKER_HUB_USERNAME} -p ${RHCHEBOT_DOCKER_HUB_PASSWORD} -e noreply@redhat.co
 
             # push to Docker hub
-            docker tag ${CHE_SERVER_STAGE_DOCKER_IMAGE} ${PROD_DOCKER}
+            docker tag ${CHE_SERVER_STAGE_DOCKER_IMAGE} ${CHE_SERVER_PROD_DOCKER_IMAGE}
             docker push ${CHE_SERVER_PROD_DOCKER_IMAGE}
 
 - job:
