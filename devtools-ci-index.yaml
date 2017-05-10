@@ -578,7 +578,8 @@
             branches:
                 - master
     publishers:
-        - junit:./target/**/target/surefire-reports/*.xml
+        - junit:
+            results: target/**/target/surefire-reports/*.xml
 
     triggers:
         - github
@@ -621,6 +622,7 @@
             $ssh_cmd -t "cd payload && /bin/bash cico_build.sh && /bin/bash cico_deploy.sh"
             rtn_code=$?
             cico node done $CICO_ssid
+            rsync -e "ssh $sshopts" -Ha --include 'target/**/target/surefire-reports/*.xml' --exclude '*' $CICO_hostname:payload $(pwd)/
             exit $rtn_code
 
 - job:
