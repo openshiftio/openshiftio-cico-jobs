@@ -556,6 +556,10 @@
                 - openshift-connector
     triggers:
         - github
+        - github-pull-request:
+            trigger-phrase: 'test PR'
+            white-list-target-branches: 
+            - openshift-connector
     builders:
         - trigger-builds:
             - project:
@@ -571,16 +575,14 @@
     properties:
         - github:
             url: https://github.com/redhat-developer/rh-che/
+        - copyartifact:
+            projects: eclipse-che-verification
     scm:
         - git:
             url: https://github.com/redhat-developer/rh-che.git
             shallow_clone: true
             branches:
                 - master
-    publishers:
-        - junit:
-            results: target/**/target/surefire-reports/*.xml
-
     triggers:
         - github
     builders:
@@ -619,12 +621,92 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload && /bin/bash cico_build.sh && /bin/bash cico_deploy.sh"
+            $ssh_cmd -t "cd payload && /bin/bash cico_build.sh"
             rtn_code=$?
             cico node done $CICO_ssid
             rsync -e "ssh $sshopts" -Ha --include 'target/**/target/surefire-reports/*.xml' --exclude '*' $CICO_hostname:payload $(pwd)/
             exit $rtn_code
+    publishers:
+      - junit:
+            results: target/**/target/surefire-reports/*.xml
+      - archive:
+            artifacts: che.image.env
+      - trigger:
+          project: eclipse-che-verification
+          threshold: SUCCESS
 
+- job:
+    name: 'eclipse-che-verification'
+    wrappers:
+        - che_credentials_wrapper
+    defaults: global
+    node: devtools
+    builders:
+    builders:
+      - copyartifact:
+          project: devtools-build-run-che-build-master
+          filter: "*che.image.env"
+          optional: false
+          flatten: true
+          do-not-fingerprint: true
+      - shell: |
+            ## At first, deploy Che server
+            . ./che.image.env
+            export VAULT_PORT=8200
+            export VAULT_ROOT_TOKEN_ID=${RHCHEBOT_DOCKER_HUB_PASSWORD}
+            export VAULT_HOST=li546-232.members.linode.com
+            export SECRET_KEY=os_token
+            export OSO_TOKEN=$(curl -sSL \
+                 -H "X-Vault-Token: ${VAULT_ROOT_TOKEN_ID}" \
+                 -H "Content-Type: application/json" \
+                 -X GET \
+                 http://${VAULT_HOST}:${VAULT_PORT}/v1/secret/${SECRET_KEY} | cut -d\" -f18)
+            export CHE_IMAGE=${CHE_SERVER_DOCKER_IMAGE}
+            export OSO_USER=mario-loriedo
+            export OSO_DOMAIN=8a09.starter-us-east-2.openshiftapps.com
+            export OSO_API_ENDPOINT=https://api.starter-us-east-2.openshift.com
+            export OSIO_VERSION=$(curl -sSL http://central.maven.org/maven2/io/fabric8/online/apps/che/maven-metadata.xml | grep latest | sed -e 's,.*<latest>\([^<]*\)</latest>.*,\1,g')
+            export CHE_OPENSHIFT_HOSTNAME=${OSO_USER}-che.${OSO_DOMAIN}
+            export CHE_OPENSHIFT_PROJECT=${OSO_USER}-che
+            oc login ${OSO_API_ENDPOINT} --token=${OSO_TOKEN}
+            oc project ${CHE_OPENSHIFT_PROJECT}
+            curl -sSL http://central.maven.org/maven2/io/fabric8/online/apps/che/${OSIO_VERSION}/che-${OSIO_VERSION}-openshift.yml | \
+              sed "s/    hostname-http:.*/    hostname-http: ${CHE_OPENSHIFT_HOSTNAME}/" | \
+              sed "s/          image:.*/          image: ${CHE_IMAGE}/" | \
+              oc apply -f -
+            ## Check status of deployment
+            che_server_status=$(oc get pods | awk '{ if ($1 ~ /che-[0-9]+-.*/ && $1 !~ /che-[0-9]+-deploy/) print $3 }')
+            counter=0
+            timeout=60
+            echo "Checking state of Che pod."
+            # Wait up to 1 minutes for running Che pod
+            while [ "${che_server_status}" != "Running" ]; do
+              che_server_status=$(oc get pods | awk '{ if ($1 ~ /che-[0-9]+-.*/ && $1 !~ /che-[0-9]+-deploy/) print $3 }')
+              counter=$((counter+1))
+              if [ $counter -gt $timeout ]; then
+                echo "Che server is not running after ${timeout} seconds"
+                exit 1
+              fi
+              sleep 1
+            done
+            echo "Che pod is running."
+            server_log=$(oc logs dc/che)
+            counter=0
+            timeout=60
+            echo "Checking whether a Che server in Che pod has already started."
+            # Wait up to 1 minute for running Che server in pod 
+            while [[ $(echo "${server_log}" | grep ".*Server startup in [0-9]\+ ms.*" | wc -l) -ne 1 ]];
+            do
+              server_log=$(oc logs dc/che)
+              counter=$((counter+1))
+              if [ $counter -gt $timeout ]; then
+                echo "Server log does not contain information about server startup. Timeouted after ${timeout} seconds."
+                exit 1
+              fi
+              sleep 1
+            done
+            echo "Che server is running."
+            
 - job:
     name: 'devtools-test-performance-core-db'
     defaults: global
