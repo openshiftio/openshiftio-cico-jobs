@@ -936,7 +936,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             template_name: OpenShiftTemplate.yml
             timeout: '10m'
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-build-che-credentials-master':
             git_organization: redhat-developer
             git_repo: che-starter
             ci_project: 'devtools'
