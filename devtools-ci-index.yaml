@@ -722,11 +722,6 @@
             rtn_code=$?
             cico node done $CICO_ssid
             exit $rtn_code
-    publishers:
-        - archive:
-            artifacts: './target/screenshots/*.*'
-            allow-empty: true
-            fingerprint: true
 
 - job:
     name: 'devtools-test-performance-core-db'
