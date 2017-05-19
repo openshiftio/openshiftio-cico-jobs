@@ -187,6 +187,7 @@
     triggers:
         - github
     svc_name: none
+    prj_name: dsaas-preview
     template_name: none
     builders:
         - shell: |
@@ -230,14 +231,14 @@
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
               if [ "{svc_name}" != "none" ]; then
-                oc deploy {svc_name} --latest
+                oc deploy {svc_name} --latest -n {prj_name}
               fi
               if [ "{template_name}" != "none" ]; then
                 if oc process -f {template_name} --parameters | grep IMAGE_TAG; then
                     TAG=$(echo $GIT_COMMIT | cut -c1-6)
                     PARAMETERS="IMAGE_TAG=$TAG"
                 fi
-                oc process -f {template_name} $PARAMETERS | oc apply -f -
+                oc process -f {template_name} $PARAMETERS | oc apply -f - -n {prj_name}
               fi
             else
               # fail mode gives us 12 hrs to debug the machine
@@ -1027,6 +1028,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '30m'
             svc_name: keycloak-server
+            prj_name: dsaas-keycloak-preview
         - '{ci_project}-{git_repo}':
             git_organization: almighty
             git_repo: keycloak
