@@ -672,12 +672,7 @@
                 - master
     triggers:
         - github
-        - github-pull-request
-            white-list:
-                - mlabuda
-            trigger-phase: '[testPR]'
-            white-list-target-branches:
-                - master
+        - githubprb
     wrappers:
         - credentials-binding:
             - text:
