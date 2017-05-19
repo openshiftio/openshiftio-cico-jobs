@@ -187,6 +187,7 @@
     triggers:
         - github
     svc_name: none
+    prj_name: dsaas-preview
     template_name: none
     builders:
         - shell: |
@@ -230,14 +231,14 @@
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
               if [ "{svc_name}" != "none" ]; then
-                oc deploy {svc_name} --latest
+                oc deploy {svc_name} --latest -n {prj_name}
               fi
               if [ "{template_name}" != "none" ]; then
                 if oc process -f {template_name} --parameters | grep IMAGE_TAG; then
                     TAG=$(echo $GIT_COMMIT | cut -c1-6)
                     PARAMETERS="IMAGE_TAG=$TAG"
                 fi
-                oc process -f {template_name} $PARAMETERS | oc apply -f -
+                oc process -f {template_name} $PARAMETERS | oc apply -f - -n {prj_name}
               fi
             else
               # fail mode gives us 12 hrs to debug the machine
@@ -563,6 +564,36 @@
               current-parameters: true
 
 - job:
+    name: 'eclipse-che-promotion'
+
+    parameters:
+        - string:
+            name: CHE_SERVER_STAGE_DOCKER_IMAGE
+            description: "Full docker location with organization/repo:tag"
+
+    wrappers:
+        - che_credentials_wrapper
+    defaults: global
+    node: devtools
+    builders:
+        - shell: |
+            # promoting to rhche
+            set +e
+            set +x
+
+            # downloads staging image
+            docker pull ${CHE_SERVER_STAGE_DOCKER_IMAGE}
+
+            # rename to production organization
+            CHE_SERVER_PROD_DOCKER_IMAGE="${CHE_SERVER_STAGE_DOCKER_IMAGE/rhchestage/rhche}"
+
+            docker login -u ${RHCHEBOT_DOCKER_HUB_USERNAME} -p ${RHCHEBOT_DOCKER_HUB_PASSWORD} -e noreply@redhat.co
+
+            # push to Docker hub
+            docker tag ${CHE_SERVER_STAGE_DOCKER_IMAGE} ${CHE_SERVER_PROD_DOCKER_IMAGE}
+            docker push ${CHE_SERVER_PROD_DOCKER_IMAGE}
+
+- job:
     name: 'devtools-build-run-che-build-master'
     wrappers:
         - che_credentials_wrapper
@@ -570,13 +601,18 @@
     node: devtools
     properties:
         - github:
-            url: https://github.com/kbsingh/build-run-che/
+            url: https://github.com/redhat-developer/rh-che/
     scm:
         - git:
-            url: https://github.com/kbsingh/build-run-che.git
+            url: https://github.com/redhat-developer/rh-che.git
             shallow_clone: true
             branches:
                 - master
+    publishers:
+        - junit:
+            results: target/**/target/surefire-reports/*.xml
+            allow-empty-results: false
+
     triggers:
         - github
     builders:
@@ -617,6 +653,7 @@
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && /bin/bash cico_build.sh && /bin/bash cico_deploy.sh"
             rtn_code=$?
+            rsync --progress -e "ssh $sshopts" -Ha --include='surefire-reports/***' --include='*/' --exclude='*' $CICO_hostname:payload/target/ $(pwd)/target
             cico node done $CICO_ssid
             exit $rtn_code
 
@@ -821,11 +858,11 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-#        - '{ci_project}-{git_repo}-coverage':
-#            git_repo: almighty-core
-#            ci_project: 'devtools'
-#            ci_cmd: '/bin/bash cico_run_coverage.sh'
-#            timeout: '45m'
+        - '{ci_project}-{git_repo}-coverage':
+            git_repo: almighty-core
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            timeout: '45m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8io
             git_repo: fabric8-planner
@@ -872,12 +909,12 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: core
             timeout: '20m'
-#        - '{ci_project}-{git_repo}-build-master-coverage':
-#            git_repo: almighty-core
-#            ci_project: 'devtools'
-#            ci_cmd: '/bin/bash cico_run_coverage.sh'
-#            svc_name: core
-#            timeout: '25m'
+        - '{ci_project}-{git_repo}-build-master-coverage':
+            git_repo: almighty-core
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            svc_name: core
+            timeout: '25m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: aslakknutsen
             git_repo: almighty-performance
@@ -931,7 +968,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             template_name: OpenShiftTemplate.yml
             timeout: '10m'
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-build-che-credentials-master':
             git_organization: redhat-developer
             git_repo: che-starter
             ci_project: 'devtools'
@@ -991,6 +1028,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '30m'
             svc_name: keycloak-server
+            prj_name: dsaas-keycloak-preview
         - '{ci_project}-{git_repo}':
             git_organization: almighty
             git_repo: keycloak
