@@ -141,7 +141,7 @@
             done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
-            env > jenkins-env
+            declare -p > jenkins-env
             $ssh_cmd yum -y install rsync
             git rebase --preserve-merges origin/${{ghprbTargetBranch}} \
             && rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload \
@@ -225,7 +225,7 @@
             done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
-            env > jenkins-env
+            declare -p > jenkins-env
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && {ci_cmd}"
@@ -294,7 +294,7 @@
             done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
-            env > jenkins-env
+            declare -p > jenkins-env
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && {ci_cmd}"
@@ -335,7 +335,7 @@
             # testing out the cico client
             set +e
             set +x
-            env > jenkins-env
+            declare -p > jenkins-env
             cat $creds_config_file >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
@@ -453,7 +453,7 @@
             done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
-            env > jenkins-env
+            declare -p > jenkins-env
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && {ci_cmd}"
@@ -518,7 +518,7 @@
             done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
-            env > jenkins-env
+            declare -p > jenkins-env
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && {ci_cmd}"
@@ -622,7 +622,7 @@
             # testing out the cico client
             set +e
             set +x
-            env > jenkins-env
+            declare -p > jenkins-env
             cat $creds_config_file >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
@@ -689,7 +689,7 @@
         - shell: |
             set +e
             set +x
-            env > jenkins-env
+            declare -p > jenkins-env
             cat $creds_config_file >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
@@ -770,7 +770,7 @@
         - shell: |
             set +e
             set +x
-            env > jenkins-env
+            declare -p > jenkins-env
             cat $creds_config_file >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
@@ -835,7 +835,7 @@
         - shell: |
             set +e
             set +x
-            env > jenkins-env
+            declare -p > jenkins-env
             cat $creds_config_file >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
