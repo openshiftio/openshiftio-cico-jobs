@@ -1152,3 +1152,9 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: catapult
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: openshiftio
+            git_repo: status-api
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            template_name: /openshift/status-api.app.yaml
