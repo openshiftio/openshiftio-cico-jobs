@@ -613,7 +613,7 @@
     publishers:
         - junit:
             results: target/**/target/surefire-reports/*.xml
-            allow-empty-results: false
+            allow-empty-results: true
 
     triggers:
         - github
@@ -655,7 +655,7 @@
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && /bin/bash cico_build.sh && /bin/bash cico_deploy.sh"
             rtn_code=$?
-            rsync --progress -e "ssh $sshopts" -Ha --include='surefire-reports/***' --include='*/' --exclude='*' $CICO_hostname:payload/target/ $(pwd)/target
+            rsync -e "ssh $sshopts" -Ha --include='surefire-reports/***' --include='*/' --exclude='*' $CICO_hostname:payload/target/ $(pwd)/target
             cico node done $CICO_ssid
             exit $rtn_code
 
