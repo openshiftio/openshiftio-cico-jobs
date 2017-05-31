@@ -1094,7 +1094,7 @@
             git_repo: keycloak-deployment
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            timeout: '30m'
+            timeout: '50m'
             svc_name: keycloak-server
             prj_name: dsaas-keycloak-preview
         - '{ci_project}-{git_repo}':
@@ -1102,7 +1102,7 @@
             git_repo: keycloak-deployment
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '40m'
+            timeout: '60m'
         - '{ci_project}-{git_repo}':
             git_organization: ldimaggi
             git_repo: perfcake
