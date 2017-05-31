@@ -1151,4 +1151,4 @@
             git_repo: launchpad-missioncontrol
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: catapult
+            svc_name: launchpad-missioncontrol
