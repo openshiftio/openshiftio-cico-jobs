@@ -1157,4 +1157,4 @@
             git_repo: status-api
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            template_name: /openshift/status-api.app.yaml
+            template_name: openshift/status-api.app.yaml
