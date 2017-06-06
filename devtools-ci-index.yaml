@@ -1096,7 +1096,6 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '50m'
             template_name: ./openshift/keycloak.app.yaml
-            svc_name: keycloak-server
             prj_name: dsaas-keycloak-preview
         - '{ci_project}-{git_repo}':
             git_organization: fabric8io
