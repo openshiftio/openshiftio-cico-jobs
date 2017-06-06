@@ -917,6 +917,53 @@
             /bin/bash ./fetch_and_apply.sh
             exit $rtn_code
 
+- job:
+    name: 'deploy-preview'
+    scm:
+      - git:
+          url: https://github.com/openshiftio/saas
+          shallow_clone: true
+          branches:
+              - 'master'
+    parameters:
+    - string:
+        name: GIT_COMMIT
+    - string:
+        name: SERVICE_NAME
+    - string:
+        name: PRJ_NAME
+    builders:
+      - shell: |
+          echo $GIT_COMMIT
+
+          #FIXME!!!
+          curl -O https://bootstrap.pypa.io/get-pip.py
+          python get-pip.py --user
+          pip install --user -r requirements.txt
+          python saasherder/cli.py pull $SERVICE_NAME
+          python saasherder/cli.py update hash $SERVICE_NAME $GIT_COMMIT
+          python saasherder/cli.py template tag $SERVICE_NAME
+          cat dsaas-templates/$SERVICE_NAME.yaml
+
+          oc apply -f dsaas-templates/$SERVICE_NAME.yaml -n $PRJ_NAME
+
+- job-template:
+    name: '{ci_project}-{git_repo}-che-credentials-pipeline'
+    project-type: pipeline
+    dsl: |
+        def service_name = "{git_repo}"
+        stage "Build"
+        def j = build job: "{ci_project}-{git_repo}-build-che-credentials-master"
+        def git_commit = j.rawBuild.environment["GIT_COMMIT"]
+        stage "Deploy"
+        build job: "deploy-preview", parameters: [[$class: 'StringParameterValue', name: 'GIT_COMMIT', value: git_commit], [$class: 'StringParameterValue', name: 'SERVICE_NAME', value: service_name],[$class: 'StringParameterValue', name: 'PRJ_NAME', value: "{prj_name}"]]
+    <<: *job_template_build_defaults
+
+- job-group:
+    name: '{ci_project}-{git_repo}-build-che-credentials-main'
+    jobs:
+      - '{ci_project}-{git_repo}-che-credentials-pipeline'
+      - '{ci_project}-{git_repo}-build-che-credentials-master'
 
 - project:
     name: devtools
@@ -1036,7 +1083,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             template_name: OpenShiftTemplate.yml
             timeout: '10m'
-        - '{ci_project}-{git_repo}-build-che-credentials-master':
+        - '{ci_project}-{git_repo}-build-che-credentials-main':
             git_organization: redhat-developer
             git_repo: che-starter
             ci_project: 'devtools'
