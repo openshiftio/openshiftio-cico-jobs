@@ -1090,15 +1090,15 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: fabric8-ui-ngx-fabric8-wit
         - '{ci_project}-{git_repo}-build-master':
-            git_organization: almighty
+            git_organization: fabric8io
             git_repo: keycloak-deployment
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '50m'
-            svc_name: keycloak-server
+            template_name: ./openshift/keycloak.app.yaml
             prj_name: dsaas-keycloak-preview
         - '{ci_project}-{git_repo}':
-            git_organization: almighty
+            git_organization: fabric8io
             git_repo: keycloak-deployment
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
