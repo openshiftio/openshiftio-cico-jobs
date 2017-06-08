@@ -1140,3 +1140,9 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             template_name: openshift/status-api.app.yaml
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-ui
+            git_repo: fabric8-recommender
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '30m'
