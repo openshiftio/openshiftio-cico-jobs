@@ -932,12 +932,6 @@
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             timeout: '45m'
         - '{ci_project}-{git_repo}':
-            git_organization: fabric8io
-            git_repo: fabric8-planner
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '35m'
-        - '{ci_project}-{git_repo}':
             git_repo: almighty-devdoc
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
@@ -996,18 +990,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '10m'
-        - '{ci_project}-{git_repo}-build-master':
-            git_organization: fabric8io
-            git_repo: fabric8-planner
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: planner
-            timeout: '35m'
-        - '{ci_project}-{git_repo}-npm-publish-build-master':
-            git_organization: fabric8io
-            git_repo: fabric8-planner
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy_npm.sh'
         - '{ci_project}-{git_repo}-npm-publish-build-master':
             git_organization: fabric8io
             git_repo: fabric8-ui
