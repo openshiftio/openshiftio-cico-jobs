@@ -599,6 +599,14 @@
     name: 'devtools-build-run-che-build-master'
     wrappers:
         - che_credentials_wrapper
+        - credentials-binding:
+            - text:
+                credential-id: de793dce-5821-4182-af4f-6c7b42b5c21d
+                variable: KEYCLOAK_TOKEN
+            - username-password-separated:
+                credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
+                username: OSIO_USERNAME
+                password: OSIO_PASSWORD
     defaults: global
     node: devtools
     properties:
