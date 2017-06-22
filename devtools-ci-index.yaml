@@ -761,6 +761,7 @@
 
 - job:
     name: 'devtools-test-perfcake-performance-core-db'
+    disabled: true
     defaults: global
     node: devtools
     properties:
