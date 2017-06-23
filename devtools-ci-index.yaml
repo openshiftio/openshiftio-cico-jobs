@@ -668,15 +668,15 @@
             exit $rtn_code
 
 - job:
-    name: 'devtools-che-test-end-to-end'
+    name: 'devtools-che-functional-tests'
     defaults: global
     node: devtools
     properties:
         - github:
-            url: https://github.com/redhat-developer/che-e2e-tests
+            url: https://github.com/redhat-developer/che-functional-tests
     scm:
         - git:
-            url: https://github.com/redhat-developer/che-e2e-tests.git
+            url: https://github.com/redhat-developer/che-functional-tests.git
 
             shallow_clone: true
             branches:
