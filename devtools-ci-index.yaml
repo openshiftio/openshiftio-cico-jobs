@@ -601,7 +601,7 @@
         - che_credentials_wrapper
         - credentials-binding:
             - text:
-                credential-id: de793dce-5821-4182-af4f-6c7b42b5c21d
+                credential-id: 3db5097b-03b7-4d47-9193-170e26085b44
                 variable: KEYCLOAK_TOKEN
             - username-password-separated:
                 credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
@@ -687,7 +687,7 @@
     wrappers:
         - credentials-binding:
             - text:
-                credential-id: de793dce-5821-4182-af4f-6c7b42b5c21d
+                credential-id: 3db5097b-03b7-4d47-9193-170e26085b44
                 variable: KEYCLOAK_TOKEN
             - username-password-separated:
                 credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
