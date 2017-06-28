@@ -470,7 +470,7 @@
             exit $rtn_code
 
 - job-template:
-    name: '{ci_project}-fabric8-services-devdoc-build-master'
+    name: '{ci_project}-fabric8-devdoc-build-master'
     description: |
       {jobdescription}
       If all goes well, gh-pages is pushed
