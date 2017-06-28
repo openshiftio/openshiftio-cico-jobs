@@ -2,7 +2,7 @@
     name: global
     timeout: '15m'
     jobdescription: "Managed by Jenkins Job Builder, do not edit manually! Update via https://github.com/almighty/almighty-jobs"
-    git_organization: almighty
+    git_organization: fabric8-services
     github_user: almighty-bot
     branch: master
 
@@ -470,7 +470,7 @@
             exit $rtn_code
 
 - job-template:
-    name: '{ci_project}-almighty-devdoc-build-master'
+    name: '{ci_project}-fabric8-services-devdoc-build-master'
     description: |
       {jobdescription}
       If all goes well, gh-pages is pushed
@@ -931,17 +931,17 @@
     name: devtools
     jobs:
         - '{ci_project}-{git_repo}':
-            git_repo: almighty-core
+            git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}-coverage':
-            git_repo: almighty-core
+            git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             timeout: '45m'
         - '{ci_project}-{git_repo}':
-            git_repo: almighty-devdoc
+            git_repo: fabric8-devdoc
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
@@ -969,19 +969,19 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '10m'
-        - '{ci_project}-almighty-devdoc-build-master':
-            git_repo: almighty-devdoc
+        - '{ci_project}-fabric8-devdoc-build-master':
+            git_repo: fabric8-devdoc
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '30m'
         - '{ci_project}-{git_repo}-build-master':
-            git_repo: almighty-core
+            git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             template_name: ./openshift/core.app.yaml
             timeout: '20m'
         - '{ci_project}-{git_repo}-build-master-coverage':
-            git_repo: almighty-core
+            git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             svc_name: core
