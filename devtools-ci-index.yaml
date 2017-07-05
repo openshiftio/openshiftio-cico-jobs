@@ -2,7 +2,7 @@
     name: global
     timeout: '15m'
     jobdescription: "Managed by Jenkins Job Builder, do not edit manually! Update via https://github.com/almighty/almighty-jobs"
-    git_organization: almighty
+    git_organization: fabric8-services
     github_user: almighty-bot
     branch: master
 
@@ -470,7 +470,7 @@
             exit $rtn_code
 
 - job-template:
-    name: '{ci_project}-almighty-devdoc-build-master'
+    name: '{ci_project}-fabric8-devdoc-build-master'
     description: |
       {jobdescription}
       If all goes well, gh-pages is pushed
@@ -599,6 +599,14 @@
     name: 'devtools-build-run-che-build-master'
     wrappers:
         - che_credentials_wrapper
+        - credentials-binding:
+            - text:
+                credential-id: de793dce-5821-4182-af4f-6c7b42b5c21d
+                variable: KEYCLOAK_TOKEN
+            - username-password-separated:
+                credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
+                username: OSIO_USERNAME
+                password: OSIO_PASSWORD
     defaults: global
     node: devtools
     properties:
@@ -613,7 +621,7 @@
     publishers:
         - junit:
             results: target/**/target/surefire-reports/*.xml
-            allow-empty-results: false
+            allow-empty-results: true
 
     triggers:
         - github
@@ -655,20 +663,20 @@
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && /bin/bash cico_build.sh && /bin/bash cico_deploy.sh"
             rtn_code=$?
-            rsync --progress -e "ssh $sshopts" -Ha --include='surefire-reports/***' --include='*/' --exclude='*' $CICO_hostname:payload/target/ $(pwd)/target
+            rsync -e "ssh $sshopts" -Ha --include='surefire-reports/***' --include='*/' --exclude='*' $CICO_hostname:payload/target/ $(pwd)/target
             cico node done $CICO_ssid
             exit $rtn_code
 
 - job:
-    name: 'devtools-che-test-end-to-end'
+    name: 'devtools-che-functional-tests'
     defaults: global
     node: devtools
     properties:
         - github:
-            url: https://github.com/redhat-developer/che-e2e-tests
+            url: https://github.com/redhat-developer/che-functional-tests
     scm:
         - git:
-            url: https://github.com/redhat-developer/che-e2e-tests.git
+            url: https://github.com/redhat-developer/che-functional-tests.git
 
             shallow_clone: true
             branches:
@@ -753,6 +761,7 @@
 
 - job:
     name: 'devtools-test-perfcake-performance-core-db'
+    disabled: true
     defaults: global
     node: devtools
     properties:
@@ -815,10 +824,10 @@
     node: devtools
     properties:
         - github:
-            url: https://github.com/fabric8io/fabric8-ui
+            url: https://github.com/fabric8-ui/fabric8-ui
     scm:
         - git:
-            url: https://github.com/fabric8io/fabric8-ui.git
+            url: https://github.com/fabric8-ui/fabric8-ui.git
 
             shallow_clone: true
             branches:
@@ -922,28 +931,22 @@
     name: devtools
     jobs:
         - '{ci_project}-{git_repo}':
-            git_repo: almighty-core
+            git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}-coverage':
-            git_repo: almighty-core
+            git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             timeout: '45m'
         - '{ci_project}-{git_repo}':
-            git_organization: fabric8io
-            git_repo: fabric8-planner
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '35m'
-        - '{ci_project}-{git_repo}':
-            git_repo: almighty-devdoc
+            git_repo: fabric8-devdoc
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}':
-            git_organization: fabric8io
+            git_organization: fabric8-ui
             git_repo: fabric8-ui
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
@@ -966,19 +969,19 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '10m'
-        - '{ci_project}-almighty-devdoc-build-master':
-            git_repo: almighty-devdoc
+        - '{ci_project}-fabric8-devdoc-build-master':
+            git_repo: fabric8-devdoc
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '30m'
         - '{ci_project}-{git_repo}-build-master':
-            git_repo: almighty-core
+            git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: core
+            template_name: ./openshift/core.app.yaml
             timeout: '20m'
         - '{ci_project}-{git_repo}-build-master-coverage':
-            git_repo: almighty-core
+            git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             svc_name: core
@@ -996,20 +999,8 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '10m'
-        - '{ci_project}-{git_repo}-build-master':
-            git_organization: fabric8io
-            git_repo: fabric8-planner
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: planner
-            timeout: '35m'
         - '{ci_project}-{git_repo}-npm-publish-build-master':
-            git_organization: fabric8io
-            git_repo: fabric8-planner
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy_npm.sh'
-        - '{ci_project}-{git_repo}-npm-publish-build-master':
-            git_organization: fabric8io
+            git_organization: fabric8-ui
             git_repo: fabric8-ui
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
@@ -1090,19 +1081,19 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: fabric8-ui-ngx-fabric8-wit
         - '{ci_project}-{git_repo}-build-master':
-            git_organization: almighty
-            git_repo: keycloak
+            git_organization: fabric8io
+            git_repo: keycloak-deployment
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            timeout: '30m'
-            svc_name: keycloak-server
+            timeout: '50m'
+            template_name: ./openshift/keycloak.app.yaml
             prj_name: dsaas-keycloak-preview
         - '{ci_project}-{git_repo}':
-            git_organization: almighty
-            git_repo: keycloak
+            git_organization: fabric8io
+            git_repo: keycloak-deployment
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '40m'
+            timeout: '60m'
         - '{ci_project}-{git_repo}':
             git_organization: ldimaggi
             git_repo: perfcake
@@ -1152,3 +1143,15 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: catapult
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: openshiftio
+            git_repo: status-api
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            template_name: openshift/status-api.app.yaml
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-ui
+            git_repo: fabric8-recommender
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '30m'
