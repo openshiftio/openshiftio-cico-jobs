@@ -833,7 +833,7 @@
             branches:
                 - master
     triggers:
-        - timed: '30 * * * *'
+        - timed: '30 0,6,12,18 * * *'
     wrappers:
         - credentials-binding:
             - username-password-separated:
