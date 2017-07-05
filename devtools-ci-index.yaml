@@ -833,7 +833,7 @@
             branches:
                 - master
     triggers:
-        - timed: '30 * * * *'
+        - timed: '30 0,6,12,18 * * *'
     wrappers:
         - credentials-binding:
             - username-password-separated:
@@ -875,7 +875,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload && /bin/bash cico_run_EE_tests.sh  https://openshift.io"
+            $ssh_cmd -t "cd payload && /bin/bash cico_run_EE_tests.sh https://openshift.io"
             rtn_code=$?
             cico node done $CICO_ssid
             exit $rtn_code
