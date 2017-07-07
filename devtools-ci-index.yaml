@@ -46,6 +46,7 @@
         - corinnekrych
         - mlabuda
         - jstrachan
+        - Katka92
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
