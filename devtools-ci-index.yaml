@@ -927,6 +927,7 @@
             /bin/bash ./fetch_and_apply.sh
             exit $rtn_code
 
+!include: saas.yaml
 
 - project:
     name: devtools
