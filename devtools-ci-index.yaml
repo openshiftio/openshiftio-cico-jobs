@@ -924,7 +924,7 @@
     builders:
         - shell: |
             set -ex
-            /bin/bash ~/saasherder/fetch_and_apply.sh
+            PATH=$PATH:~/.local/bin /bin/bash ~/saasherder/fetch_and_apply.sh
 
 - job:
     name: 'devtools-saasherder-test-master'
