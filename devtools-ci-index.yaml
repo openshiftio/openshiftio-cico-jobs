@@ -906,16 +906,16 @@
         - generator_credentials_wrapper
     <<: *job_template_build_defaults
 
-- job:
-    name: 'devtools-promote-to-prod'
+- job-template:
+    name: '{ci_project}-{git_repo}-promote-to-prod'
     defaults: global
     node: devtools
     properties:
         - github:
-            url: https://github.com/openshiftio/saas/
+            url: https://github.com/openshiftio/{git_repo}/
     scm:
         - git:
-            url: https://github.com/openshiftio/saas.git
+            url: https://github.com/openshiftio/{git_repo}.git
             shallow_clone: true
             branches:
                 - master
@@ -923,9 +923,8 @@
         - github
     builders:
         - shell: |
-            set +x
-            /bin/bash ./fetch_and_apply.sh
-            exit $rtn_code
+            set -ex
+            /bin/bash ~/saasherder/fetch_and_apply.sh
 
 - job:
     name: 'devtools-saasherder-test-master'
@@ -1219,3 +1218,12 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '30m'
+        - '{ci_project}-{git_repo}-promote-to-prod':
+            git_repo: saas-openshiftio
+            ci_project: 'devtools'
+        - '{ci_project}-{git_repo}-promote-to-prod':
+            git_repo: saas-analytics
+            ci_project: 'devtools'
+        - '{ci_project}-{git_repo}-promote-to-prod':
+            git_repo: saas-launchpad
+            ci_project: 'devtools'
