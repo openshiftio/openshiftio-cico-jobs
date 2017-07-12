@@ -982,7 +982,7 @@
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
               set -ex
-              python setup.py install
+              python setup.py install --user
               mkdir -p ~/saasherder/
               cp fetch_and_apply.sh ~/saasherder/fetch_and_apply.sh
             else
