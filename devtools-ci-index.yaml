@@ -238,7 +238,7 @@
               fi
               if [ "{template_name}" != "none" ]; then
                 if oc process -f {template_name} --parameters | grep IMAGE_TAG; then
-                    TAG=$(echo $GIT_COMMIT | cut -c1-6)
+                    TAG=$(echo $GIT_COMMIT | cut -c1-7)
                     PARAMETERS="IMAGE_TAG=$TAG"
                 fi
                 oc process -f {template_name} $PARAMETERS | oc apply -f - -n {prj_name}
