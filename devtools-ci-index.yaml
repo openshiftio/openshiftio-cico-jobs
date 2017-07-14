@@ -199,7 +199,7 @@
         if [ "$SAAS_GIT" != "none" ]; then
             git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
             cd saas.git
-            saasherder update hash $GIT_REPO $GIT_COMMIT; then
+            saasherder update hash $GIT_REPO $GIT_COMMIT
             saasherder pull $GIT_REPO
             saasherder template --output-dir $GIT_REPO-processed tag $GIT_REPO
             oc apply -f $GIT_REPO-processed/$GIT_REPO.yaml -n $PRJ_NAME
