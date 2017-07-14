@@ -197,6 +197,7 @@
             oc deploy $SVC_NAME --latest -n $PRJ_NAME
         fi
         if [ "$SAAS_GIT" != "none" ]; then
+            PATH=$PATH:~/.local/bin/
             git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
             cd saas.git
             saasherder update hash $GIT_REPO $GIT_COMMIT
