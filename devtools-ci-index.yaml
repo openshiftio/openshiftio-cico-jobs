@@ -191,12 +191,24 @@
         - github
     svc_name: none
     prj_name: dsaas-preview
-    template_name: none
+    saas_git: none
+    saasherder_deploy: |
+        if [ "$SVC_NAME" != "none" ]; then
+            oc deploy $SVC_NAME --latest -n $PRJ_NAME
+        fi
+        if [ "$SAAS_GIT" != "none" ]; then
+            git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
+            cd saas.git
+            saasherder update hash $GIT_REPO $GIT_COMMIT; then
+            saasherder pull $GIT_REPO
+            saasherder template --output-dir $GIT_REPO-processed tag $GIT_REPO
+            oc apply -f $GIT_REPO-processed/$GIT_REPO.yaml -n $PRJ_NAME
+        fi
     builders:
         - shell: |
             # Verify Job configuration
-            if [ "{svc_name}" == "none" && "{template_name}" == "none" ]; then
-                echo "require either svc_name or template_name to be set"
+            if [ "{svc_name}" == "none" && "{saas_git}" == "none" ]; then
+                echo "require either svc_name or saas_git to be set"
                 exit 1
             fi
             # testing out the cico client
@@ -233,16 +245,13 @@
             rtn_code=$?
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
-              if [ "{svc_name}" != "none" ]; then
-                oc deploy {svc_name} --latest -n {prj_name}
-              fi
-              if [ "{template_name}" != "none" ]; then
-                if oc process -f {template_name} --parameters | grep IMAGE_TAG; then
-                    TAG=$(echo $GIT_COMMIT | cut -c1-6)
-                    PARAMETERS="IMAGE_TAG=$TAG"
-                fi
-                oc process -f {template_name} $PARAMETERS | oc apply -f - -n {prj_name}
-              fi
+              #Prepare values for deployment
+              SVC_NAME={svc_name}
+              GIT_REPO={git_repo}
+              PRJ_NAME={prj_name}
+              SAAS_GIT={saas_git}
+              #Deploy preview
+              {saasherder_deploy}
             else
               # fail mode gives us 12 hrs to debug the machine
               curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
@@ -370,6 +379,15 @@
             $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
             cico node done $CICO_ssid
+            if [ $rtn_code -eq 0]; then
+                #Prepare values for deployment
+                SVC_NAME={svc_name}
+                GIT_REPO={git_repo}
+                PRJ_NAME={prj_name}
+                SAAS_GIT={saas_git}
+                #Deploy preview
+                {saasherder_deploy}
+            fi
             exit $rtn_code
     <<: *job_template_build_defaults
 
@@ -1041,7 +1059,7 @@
             git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            template_name: ./openshift/core.app.yaml
+            saas_git: saas-openshiftio
             timeout: '20m'
         - '{ci_project}-{git_repo}-build-master-coverage':
             git_repo: fabric8-wit
@@ -1074,7 +1092,7 @@
             git_repo: openshift.io
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: wwwopenshiftio
+            saas_git: saas-openshiftio
             timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8io
@@ -1088,14 +1106,14 @@
             git_repo: fabric8-tenant
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            template_name: OpenShiftTemplate.yml
+            saas_git: saas-openshiftio
             timeout: '10m'
         - '{ci_project}-{git_repo}-build-che-credentials-master':
             git_organization: redhat-developer
             git_repo: che-starter
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            template_name: /openshift-template/che-starter.app.yaml
+            saas_git: saas-openshiftio
             timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: redhat-developer
@@ -1149,7 +1167,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '50m'
-            template_name: ./openshift/keycloak.app.yaml
+            saas_git: saas-openshiftio
             prj_name: dsaas-keycloak-preview
         - '{ci_project}-{git_repo}':
             git_organization: fabric8io
@@ -1168,7 +1186,7 @@
             git_repo: osd-monitor-poc
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
-            template_name: osd-monitor.yml
+            saas_git: saas-openshiftio
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
             git_repo: ngx-base
@@ -1194,24 +1212,30 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: launchpad-frontend
+            saas_git: saas-launchpad
+            prj_name: launchpad-preview
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: openshiftio
             git_repo: launchpad-backend
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: launchpad-backend
+            saas_git: saas-launchpad
+            prj_name: launchpad-preview
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: openshiftio
             git_repo: launchpad-missioncontrol
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: catapult
+            saas_git: saas-launchpad
+            prj_name: launchpad-preview
         - '{ci_project}-{git_repo}-build-master':
             git_organization: openshiftio
             git_repo: status-api
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            template_name: openshift/status-api.app.yaml
+            saas_git: saas-openshiftio
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
             git_repo: fabric8-recommender
