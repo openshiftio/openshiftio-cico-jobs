@@ -380,7 +380,7 @@
             $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
             cico node done $CICO_ssid
-            if [ $rtn_code -eq 0]; then
+            if [ $rtn_code -eq 0 ]; then
                 #Prepare values for deployment
                 SVC_NAME={svc_name}
                 GIT_REPO={git_repo}
