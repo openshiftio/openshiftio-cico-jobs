@@ -1163,7 +1163,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: fabric8-ui-ngx-fabric8-wit
         - '{ci_project}-{git_repo}-build-master':
-            git_organization: fabric8io
+            git_organization: fabric8-services
             git_repo: keycloak-deployment
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
@@ -1171,7 +1171,7 @@
             saas_git: saas-openshiftio
             prj_name: dsaas-keycloak-preview
         - '{ci_project}-{git_repo}':
-            git_organization: fabric8io
+            git_organization: fabric8-services
             git_repo: keycloak-deployment
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
