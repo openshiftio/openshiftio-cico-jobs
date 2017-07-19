@@ -208,7 +208,7 @@
     builders:
         - shell: |
             # Verify Job configuration
-            if [ "{svc_name}" == "none" && "{saas_git}" == "none" ]; then
+            if [ "{svc_name}" == "none" -a "{saas_git}" == "none" ]; then
                 echo "require either svc_name or saas_git to be set"
                 exit 1
             fi
