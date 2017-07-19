@@ -198,8 +198,11 @@
         fi
         if [ "$SAAS_GIT" != "none" ]; then
             PATH=$PATH:~/.local/bin/
+            CONTEXT=$(echo $SAAS_GIT | sed 's/.*://')
+            SAAS_GIT=$(echo $SAAS_GIT | sed 's/:.*//')
             git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
             cd saas.git
+            [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
             saasherder update hash $GIT_REPO $GIT_COMMIT
             saasherder pull $GIT_REPO
             saasherder template --output-dir $GIT_REPO-processed tag $GIT_REPO
@@ -1168,7 +1171,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '50m'
-            saas_git: saas-openshiftio
+            saas_git: saas-openshiftio:keycloak
             prj_name: dsaas-keycloak-preview
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-services
