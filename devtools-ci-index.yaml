@@ -946,7 +946,7 @@
     builders:
         - shell: |
             set -ex
-            PATH=$PATH:~/.local/bin /bin/bash ~/saasherder/fetch_and_apply.sh
+            PATH=$PATH:~/.local/bin APPSEC=true /bin/bash ~/saasherder/fetch_and_apply.sh
 
 - job:
     name: 'devtools-saasherder-test-master'
