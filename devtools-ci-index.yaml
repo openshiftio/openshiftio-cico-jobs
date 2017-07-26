@@ -1231,7 +1231,13 @@
             git_repo: launchpad-missioncontrol
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: catapult
+            saas_git: saas-launchpad
+            prj_name: launchpad-preview
+        - '{ci_project}-{git_repo}-generator-build-master':
+            git_organization: openshiftio
+            git_repo: launchpad-templates
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash true'
             saas_git: saas-launchpad
             prj_name: launchpad-preview
         - '{ci_project}-{git_repo}-build-master':
