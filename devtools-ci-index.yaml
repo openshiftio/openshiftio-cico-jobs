@@ -847,10 +847,10 @@
     node: devtools
     properties:
         - github:
-            url: https://github.com/fabric8-ui/fabric8-ui
+            url: https://github.com/fabric8io/fabric8-test
     scm:
         - git:
-            url: https://github.com/fabric8-ui/fabric8-ui.git
+            url: https://github.com/fabric8io/fabric8-test.git
 
             shallow_clone: true
             branches:
@@ -898,7 +898,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload && /bin/bash cico_run_EE_tests.sh https://openshift.io"
+            $ssh_cmd -t "cd payload && /bin/bash ee_tests/cico_run_EE_tests.sh https://openshift.io"
             rtn_code=$?
             cico node done $CICO_ssid
             exit $rtn_code
