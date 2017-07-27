@@ -2,7 +2,7 @@
     name: global
     timeout: '15m'
     jobdescription: "Managed by Jenkins Job Builder, do not edit manually! Update via https://github.com/almighty/almighty-jobs"
-    git_organization: almighty
+    git_organization: fabric8-services
     github_user: almighty-bot
     branch: master
 
@@ -46,6 +46,7 @@
         - corinnekrych
         - mlabuda
         - jstrachan
+        - Katka92
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
@@ -196,12 +197,28 @@
         - github
     svc_name: none
     prj_name: dsaas-preview
-    template_name: none
+    saas_git: none
+    saasherder_deploy: |
+        if [ "$SVC_NAME" != "none" ]; then
+            oc deploy $SVC_NAME --latest -n $PRJ_NAME
+        fi
+        if [ "$SAAS_GIT" != "none" ]; then
+            PATH=$PATH:~/.local/bin/
+            CONTEXT=$(echo $SAAS_GIT | sed 's/.*://')
+            SAAS_GIT=$(echo $SAAS_GIT | sed 's/:.*//')
+            git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
+            cd saas.git
+            [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
+            saasherder update hash $GIT_REPO $GIT_COMMIT
+            saasherder pull $GIT_REPO
+            saasherder template --output-dir $GIT_REPO-processed tag $GIT_REPO
+            oc apply -f $GIT_REPO-processed/$GIT_REPO.yaml -n $PRJ_NAME
+        fi
     builders:
         - shell: |
             # Verify Job configuration
-            if [ "{svc_name}" == "none" && "{template_name}" == "none" ]; then
-                echo "require either svc_name or template_name to be set"
+            if [ "{svc_name}" == "none" -a "{saas_git}" == "none" ]; then
+                echo "require either svc_name or saas_git to be set"
                 exit 1
             fi
             # testing out the cico client
@@ -238,16 +255,13 @@
             rtn_code=$?
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
-              if [ "{svc_name}" != "none" ]; then
-                oc deploy {svc_name} --latest -n {prj_name}
-              fi
-              if [ "{template_name}" != "none" ]; then
-                if oc process -f {template_name} --parameters | grep IMAGE_TAG; then
-                    TAG=$(echo $GIT_COMMIT | cut -c1-6)
-                    PARAMETERS="IMAGE_TAG=$TAG"
-                fi
-                oc process -f {template_name} $PARAMETERS | oc apply -f - -n {prj_name}
-              fi
+              #Prepare values for deployment
+              SVC_NAME={svc_name}
+              GIT_REPO={git_repo}
+              PRJ_NAME={prj_name}
+              SAAS_GIT={saas_git}
+              #Deploy preview
+              {saasherder_deploy}
             else
               # fail mode gives us 12 hrs to debug the machine
               curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
@@ -375,6 +389,15 @@
             $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
             cico node done $CICO_ssid
+            if [ $rtn_code -eq 0 ]; then
+                #Prepare values for deployment
+                SVC_NAME={svc_name}
+                GIT_REPO={git_repo}
+                PRJ_NAME={prj_name}
+                SAAS_GIT={saas_git}
+                #Deploy preview
+                {saasherder_deploy}
+            fi
             exit $rtn_code
     <<: *job_template_build_defaults
 
@@ -476,7 +499,7 @@
             exit $rtn_code
 
 - job-template:
-    name: '{ci_project}-almighty-devdoc-build-master'
+    name: '{ci_project}-fabric8-devdoc-build-master'
     description: |
       {jobdescription}
       If all goes well, gh-pages is pushed
@@ -605,6 +628,14 @@
     name: 'devtools-build-run-che-build-master'
     wrappers:
         - che_credentials_wrapper
+        - credentials-binding:
+            - text:
+                credential-id: de793dce-5821-4182-af4f-6c7b42b5c21d
+                variable: KEYCLOAK_TOKEN
+            - username-password-separated:
+                credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
+                username: OSIO_USERNAME
+                password: OSIO_PASSWORD
     defaults: global
     node: devtools
     properties:
@@ -666,15 +697,15 @@
             exit $rtn_code
 
 - job:
-    name: 'devtools-che-test-end-to-end'
+    name: 'devtools-che-functional-tests'
     defaults: global
     node: devtools
     properties:
         - github:
-            url: https://github.com/redhat-developer/che-e2e-tests
+            url: https://github.com/redhat-developer/che-functional-tests
     scm:
         - git:
-            url: https://github.com/redhat-developer/che-e2e-tests.git
+            url: https://github.com/redhat-developer/che-functional-tests.git
 
             shallow_clone: true
             branches:
@@ -759,6 +790,7 @@
 
 - job:
     name: 'devtools-test-perfcake-performance-core-db'
+    disabled: true
     defaults: global
     node: devtools
     properties:
@@ -821,16 +853,16 @@
     node: devtools
     properties:
         - github:
-            url: https://github.com/fabric8io/fabric8-ui
+            url: https://github.com/fabric8-ui/fabric8-ui
     scm:
         - git:
-            url: https://github.com/fabric8io/fabric8-ui.git
+            url: https://github.com/fabric8-ui/fabric8-ui.git
 
             shallow_clone: true
             branches:
                 - master
     triggers:
-        - timed: '30 * * * *'
+        - timed: '30 0,6,12,18 * * *'
     wrappers:
         - credentials-binding:
             - username-password-separated:
@@ -872,7 +904,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload && /bin/bash cico_run_EE_tests.sh  https://openshift.io"
+            $ssh_cmd -t "cd payload && /bin/bash cico_run_EE_tests.sh https://openshift.io"
             rtn_code=$?
             cico node done $CICO_ssid
             exit $rtn_code
@@ -902,16 +934,16 @@
         - generator_credentials_wrapper
     <<: *job_template_build_defaults
 
-- job:
-    name: 'devtools-promote-to-prod'
+- job-template:
+    name: '{ci_project}-{git_repo}-promote-to-prod'
     defaults: global
     node: devtools
     properties:
         - github:
-            url: https://github.com/openshiftio/saas/
+            url: https://github.com/openshiftio/{git_repo}/
     scm:
         - git:
-            url: https://github.com/openshiftio/saas.git
+            url: https://github.com/openshiftio/{git_repo}.git
             shallow_clone: true
             branches:
                 - master
@@ -919,31 +951,93 @@
         - github
     builders:
         - shell: |
-            set +x
-            /bin/bash ./fetch_and_apply.sh
-            exit $rtn_code
+            set -ex
+            PATH=$PATH:~/.local/bin /bin/bash ~/saasherder/fetch_and_apply.sh
 
+- job:
+    name: 'devtools-saasherder-test-master'
+    defaults: global
+    node: devtools
+    properties:
+        - github:
+            url: https://github.com/openshiftio/saasherder
+    scm:
+        - git:
+            url: https://github.com/openshiftio/saasherder.git
+            shallow_clone: true
+            branches:
+                - master
+    triggers:
+        - github
+    builders:
+        - shell: |
+            # testing out the cico client
+            set +e
+            set +x
+            env > jenkins-env
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            # get node
+            n=1
+            while true
+            do
+                cico_output=$(cico node get -f value -c ip_address -c comment)
+                if [ $? -eq 0 ]; then
+                    read CICO_hostname CICO_ssid <<< $cico_output
+                    if  [ ! -z "$CICO_hostname" ]; then
+                        # we got hostname from cico
+                        break
+                    fi
+                    echo "'cico node get' succeed, but can't get hostname from output"
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
+            echo 'Using Host' $CICO_hostname
+            set -x
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd yum -y install rsync
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            $ssh_cmd -t "cd payload && /bin/bash cico_test.sh"
+            rtn_code=$?
+            if [ $rtn_code -eq 0 ]; then
+              cico node done $CICO_ssid
+              set -ex
+              python setup.py install --user
+              mkdir -p ~/saasherder/
+              cp fetch_and_apply.sh ~/saasherder/fetch_and_apply.sh
+            else
+              # fail mode gives us 12 hrs to debug the machine
+              curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
+            fi
+            exit $rtn_code
 
 - project:
     name: devtools
     jobs:
         - '{ci_project}-{git_repo}':
-            git_repo: almighty-core
+            git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}-coverage':
-            git_repo: almighty-core
+            git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             timeout: '45m'
         - '{ci_project}-{git_repo}':
-            git_repo: almighty-devdoc
+            git_repo: fabric8-devdoc
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}':
-            git_organization: fabric8io
+            git_organization: fabric8-ui
             git_repo: fabric8-ui
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
@@ -961,24 +1055,30 @@
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '10m'
         - '{ci_project}-{git_repo}':
-            git_organization: fabric8io
-            git_repo: fabric8-init-tenant
+            git_organization: fabric8-services
+            git_repo: fabric8-tenant
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '10m'
-        - '{ci_project}-almighty-devdoc-build-master':
-            git_repo: almighty-devdoc
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-services
+            git_repo: fabric8-notification
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'
+        - '{ci_project}-fabric8-devdoc-build-master':
+            git_repo: fabric8-devdoc
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '30m'
         - '{ci_project}-{git_repo}-build-master':
-            git_repo: almighty-core
+            git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: core
+            saas_git: saas-openshiftio
             timeout: '20m'
         - '{ci_project}-{git_repo}-build-master-coverage':
-            git_repo: almighty-core
+            git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             svc_name: core
@@ -997,7 +1097,7 @@
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '10m'
         - '{ci_project}-{git_repo}-npm-publish-build-master':
-            git_organization: fabric8io
+            git_organization: fabric8-ui
             git_repo: fabric8-ui
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
@@ -1008,7 +1108,7 @@
             git_repo: openshift.io
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: wwwopenshiftio
+            saas_git: saas-openshiftio
             timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8io
@@ -1018,18 +1118,25 @@
             svc_name: f8forker
             timeout: '10m'
         - '{ci_project}-{git_repo}-build-master':
-            git_organization: fabric8io
-            git_repo: fabric8-init-tenant
+            git_organization: fabric8-services
+            git_repo: fabric8-tenant
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            template_name: OpenShiftTemplate.yml
+            saas_git: saas-openshiftio
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-services
+            git_repo: fabric8-notification
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-openshiftio
             timeout: '10m'
         - '{ci_project}-{git_repo}-build-che-credentials-master':
             git_organization: redhat-developer
             git_repo: che-starter
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            template_name: /openshift-template/che-starter.app.yaml
+            saas_git: saas-openshiftio
             timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: redhat-developer
@@ -1084,15 +1191,15 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: fabric8-ui-ngx-fabric8-wit
         - '{ci_project}-{git_repo}-build-master':
-            git_organization: fabric8io
+            git_organization: fabric8-services
             git_repo: keycloak-deployment
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '50m'
-            template_name: ./openshift/keycloak.app.yaml
+            saas_git: saas-openshiftio:keycloak
             prj_name: dsaas-keycloak-preview
         - '{ci_project}-{git_repo}':
-            git_organization: fabric8io
+            git_organization: fabric8-services
             git_repo: keycloak-deployment
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
@@ -1108,7 +1215,7 @@
             git_repo: osd-monitor-poc
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
-            template_name: osd-monitor.yml
+            saas_git: saas-openshiftio
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
             git_repo: ngx-base
@@ -1134,27 +1241,59 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: launchpad-frontend
+            saas_git: saas-launchpad
+            prj_name: launchpad-preview
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: openshiftio
             git_repo: launchpad-backend
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: launchpad-backend
+            saas_git: saas-launchpad
+            prj_name: launchpad-preview
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: openshiftio
             git_repo: launchpad-missioncontrol
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: catapult
+            saas_git: saas-launchpad
+            prj_name: launchpad-preview
+        - '{ci_project}-{git_repo}-generator-build-master':
+            git_organization: openshiftio
+            git_repo: launchpad-templates
+            ci_project: 'devtools'
+            ci_cmd: 'echo "Nothing to build, just deploy nginx"'
+            saas_git: saas-launchpad
+            prj_name: launchpad-preview
         - '{ci_project}-{git_repo}-build-master':
             git_organization: openshiftio
             git_repo: status-api
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            template_name: openshift/status-api.app.yaml
+            saas_git: saas-openshiftio
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
             git_repo: fabric8-recommender
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '30m'
+        - '{ci_project}-{git_repo}-promote-to-prod':
+            git_repo: saas-openshiftio
+            ci_project: 'devtools'
+        - '{ci_project}-{git_repo}-promote-to-prod':
+            git_repo: saas-analytics
+            ci_project: 'devtools'
+        - '{ci_project}-{git_repo}-promote-to-prod':
+            git_repo: saas-launchpad
+            ci_project: 'devtools'
+        - '{ci_project}-{git_repo}-build-master':
+            git_repo: fabric8-auth
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-openshiftio
+            timeout: '20m'
+        - '{ci_project}-{git_repo}':
+            git_repo: fabric8-auth
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
