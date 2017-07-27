@@ -98,7 +98,7 @@
                 credential-id: 93da78ec-7785-49ab-a1ef-586424b3e94f
                 variable: creds_config_file
 
-- job_template_defaults: &job_template_defaults
+- : &job_template_defaults
     name: 'job_template_defaults'
     description: |
       {jobdescription}
@@ -170,6 +170,12 @@
       - github-pull-request:
           status-context: "ci.centos.org PR build (coverage)"
           <<: *github_pull_request_defaults
+    <<: *job_template_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-wit-go-benchmarks'
+    triggers:
+      - timed: '59 23 * * 6'
     <<: *job_template_defaults
 
 - job-template: &job_template_build_defaults
@@ -1064,6 +1070,12 @@
             git_repo: ngx-fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-wit-go-benchmarks':
+            git_organization: fabric8-services
+            git_repo: fabric8-wit
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_go_benchmarks.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}-npm-publish-build-master':
             git_organization: fabric8-ui
