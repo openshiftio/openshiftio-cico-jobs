@@ -194,6 +194,7 @@
     saasherder_deploy: |
         if [ "$SVC_NAME" != "none" ]; then
             oc deploy $SVC_NAME --latest -n $PRJ_NAME
+            rtn_code=$?
         fi
         if [ "$SAAS_GIT" != "none" ]; then
             SAAS_ENV=staging
@@ -207,6 +208,7 @@
             saasherder --environment $SAAS_ENV pull $GIT_REPO
             saasherder --environment $SAAS_ENV template --output-dir $GIT_REPO-processed tag $GIT_REPO
             oc apply -f $GIT_REPO-processed/$GIT_REPO.yaml -n $PRJ_NAME
+            rtn_code=$?
         fi
     builders:
         - shell: |
