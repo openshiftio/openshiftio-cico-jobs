@@ -99,7 +99,7 @@
                 credential-id: 93da78ec-7785-49ab-a1ef-586424b3e94f
                 variable: creds_config_file
 
-- : &job_template_defaults
+- job_template_defaults: &job_template_defaults
     name: 'job_template_defaults'
     description: |
       {jobdescription}
