@@ -904,7 +904,7 @@
     builders:
         - shell: |
             set -ex
-            ENVIRONMENT=production PATH=$PATH:~/.local/bin /bin/bash ~/saasherder/fetch_and_apply.sh
+            ENVIRONMENT=production APPSEC=true PATH=$PATH:~/.local/bin /bin/bash ~/saasherder/fetch_and_apply.sh
 
 - job:
     name: 'devtools-saasherder-test-master'
