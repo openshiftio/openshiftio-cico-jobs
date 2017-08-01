@@ -29,7 +29,6 @@
         - alexeykazakov
         - michaelkleinhenz
         - ppitonak
-        - naina-verma
         - ldimaggi
         - VineetReynolds
         - hectorj2f
@@ -44,9 +43,9 @@
         - fabric8cd
         - mharpur
         - corinnekrych
-        - mlabuda
         - jstrachan
         - Katka92
+        - rhopp
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
