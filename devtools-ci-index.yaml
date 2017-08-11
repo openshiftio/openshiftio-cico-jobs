@@ -197,11 +197,7 @@
     svc_name: none
     prj_name: dsaas-preview
     saas_git: none
-    saasherder_deploy: |
-        if [ "$SVC_NAME" != "none" ]; then
-            oc deploy $SVC_NAME --latest -n $PRJ_NAME
-            rtn_code=$?
-        fi
+    saasherder_prepare: |
         if [ "$SAAS_GIT" != "none" ]; then
             SAAS_ENV=staging
             PATH=$PATH:~/.local/bin/
@@ -210,6 +206,14 @@
             git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
             cd saas.git
             [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
+            export DEVSHIFT_TAG_LEN=$(saasherder --environment $SAAS_ENV get hash_length $GIT_REPO)
+        fi
+    saasherder_deploy: |
+        if [ "$SVC_NAME" != "none" ]; then
+            oc deploy $SVC_NAME --latest -n $PRJ_NAME
+            rtn_code=$?
+        fi
+        if [ "$SAAS_GIT" != "none" ]; then
             saasherder --environment $SAAS_ENV update hash $GIT_REPO $GIT_COMMIT
             saasherder --environment $SAAS_ENV pull $GIT_REPO
             saasherder --environment $SAAS_ENV template --output-dir $GIT_REPO-processed tag $GIT_REPO
@@ -225,6 +229,7 @@
             fi
             # testing out the cico client
             set +e
+
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
             n=1
@@ -250,6 +255,18 @@
             done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
+
+            #Prepare values for deployment
+            SVC_NAME={svc_name}
+            GIT_REPO={git_repo}
+            PRJ_NAME={prj_name}
+            SAAS_GIT={saas_git}
+            {saasherder_prepare}
+
+            if [ -z "$DEVSHIFT_TAG_LEN" ]; then
+                export DEVSHIFT_TAG_LEN=7
+            fi
+
             env > jenkins-env
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
@@ -257,11 +274,6 @@
             rtn_code=$?
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
-              #Prepare values for deployment
-              SVC_NAME={svc_name}
-              GIT_REPO={git_repo}
-              PRJ_NAME={prj_name}
-              SAAS_GIT={saas_git}
               #Deploy preview
               {saasherder_deploy}
             else
@@ -369,8 +381,6 @@
             # testing out the cico client
             set +e
             set +x
-            env > jenkins-env
-            cat $creds_config_file >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
             n=1
@@ -396,22 +406,31 @@
             done
             echo 'Using Host' $CICO_hostname
             set -x
+
+            #Prepare values for deployment
+            SVC_NAME={svc_name}
+            GIT_REPO={git_repo}
+            PRJ_NAME={prj_name}
+            SAAS_GIT={saas_git}
+            {saasherder_prepare}
+
+            if [ -z "$DEVSHIFT_TAG_LEN" ]; then
+                export DEVSHIFT_TAG_LEN=7
+            fi
+            env > jenkins-env
+            cat $creds_config_file >> jenkins-env
+
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
-            cico node done $CICO_ssid
             if [ $rtn_code -eq 0 ]; then
-                #Prepare values for deployment
-                SVC_NAME={svc_name}
-                GIT_REPO={git_repo}
-                PRJ_NAME={prj_name}
-                SAAS_GIT={saas_git}
                 #Deploy preview
                 {saasherder_deploy}
             fi
+            cico node done $CICO_ssid
             exit $rtn_code
     <<: *job_template_build_defaults
 
