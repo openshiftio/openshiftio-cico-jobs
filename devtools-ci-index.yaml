@@ -207,6 +207,7 @@
             cd saas.git
             [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
             export DEVSHIFT_TAG_LEN=$(saasherder --environment $SAAS_ENV get hash_length $GIT_REPO)
+            cd ..
         fi
     saasherder_deploy: |
         if [ "$SVC_NAME" != "none" ]; then
@@ -214,11 +215,13 @@
             rtn_code=$?
         fi
         if [ "$SAAS_GIT" != "none" ]; then
+            cd saas.git
             saasherder --environment $SAAS_ENV update hash $GIT_REPO $GIT_COMMIT
             saasherder --environment $SAAS_ENV pull $GIT_REPO
             saasherder --environment $SAAS_ENV template --output-dir $GIT_REPO-processed tag $GIT_REPO
             oc apply -f $GIT_REPO-processed/$GIT_REPO.yaml -n $PRJ_NAME
             rtn_code=$?
+            cd ..
         fi
     builders:
         - shell: |
