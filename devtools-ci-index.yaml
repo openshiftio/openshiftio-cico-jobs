@@ -144,8 +144,12 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             env > jenkins-env
             $ssh_cmd yum -y install rsync
-            git rebase --preserve-merges origin/${{ghprbTargetBranch}} \
-            && rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload \
+            if [ -n "${{ghprbTargetBranch}}" ]; then
+                git rebase --preserve-merges origin/${{ghprbTargetBranch}}
+            else
+                echo "Not a PR build, using master"
+            fi
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload \
             && /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
             if [ $rtn_code -eq 0 ]; then
@@ -690,20 +694,8 @@
             cico node done $CICO_ssid
             exit $rtn_code
 
-- job:
-    name: 'devtools-che-functional-tests'
-    defaults: global
-    node: devtools
-    properties:
-        - github:
-            url: https://github.com/redhat-developer/che-functional-tests
-    scm:
-        - git:
-            url: https://github.com/redhat-developer/che-functional-tests.git
-
-            shallow_clone: true
-            branches:
-                - master
+- job-template:
+    name: '{ci_project}-{git_repo}-che-tests'
     triggers:
         - github
         - githubprb
@@ -716,45 +708,7 @@
                 credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
                 username: OSIO_USERNAME
                 password: OSIO_PASSWORD
-    builders:
-        - shell: |
-            set +e
-            set -x
-            env > jenkins-env
-            cat $creds_config_file >> jenkins-env
-            export CICO_API_KEY=$(cat ~/duffy.key )
-            # get node
-            n=1
-            while true
-            do
-                cico_output=$(cico node get -f value -c ip_address -c comment)
-                if [ $? -eq 0 ]; then
-                    read CICO_hostname CICO_ssid <<< $cico_output
-                    if  [ ! -z "$CICO_hostname" ]; then
-                        # we got hostname from cico
-                        break
-                    fi
-                    echo "'cico node get' succeed, but can't get hostname from output"
-                fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
-                    echo "giving up on 'cico node get'"
-                    exit 1
-                fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
-                n=$[$n+1]
-                sleep 60
-            done
-            echo 'Using Host' $CICO_hostname
-            set -x
-            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
-            ssh_cmd="ssh $sshopts $CICO_hostname"
-            $ssh_cmd yum -y install rsync
-            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload && /bin/bash prepare_git.sh && /bin/bash cico_run_EE_tests.sh"
-            rtn_code=$?
-            cico node done $CICO_ssid
-            exit $rtn_code
+    <<: *job_template_defaults
 
 - job:
     name: 'devtools-test-performance-core-db'
@@ -1144,6 +1098,11 @@
             git_repo: che-starter
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-che-tests':
+            git_repo: che-functional-tests
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_EE_tests.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
