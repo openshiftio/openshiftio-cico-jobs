@@ -719,7 +719,7 @@
     builders:
         - shell: |
             set +e
-            set +x
+            set -x
             env > jenkins-env
             cat $creds_config_file >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
