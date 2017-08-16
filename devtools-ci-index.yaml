@@ -29,7 +29,6 @@
         - alexeykazakov
         - michaelkleinhenz
         - ppitonak
-        - naina-verma
         - ldimaggi
         - VineetReynolds
         - hectorj2f
@@ -44,9 +43,10 @@
         - fabric8cd
         - mharpur
         - corinnekrych
-        - mlabuda
         - jstrachan
         - Katka92
+        - rhopp
+        - vpavlin
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
@@ -144,8 +144,12 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             env > jenkins-env
             $ssh_cmd yum -y install rsync
-            git rebase --preserve-merges origin/${{ghprbTargetBranch}} \
-            && rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload \
+            if [ -n "${{ghprbTargetBranch}}" ]; then
+                git rebase --preserve-merges origin/${{ghprbTargetBranch}}
+            else
+                echo "Not a PR build, using master"
+            fi
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload \
             && /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
             if [ $rtn_code -eq 0 ]; then
@@ -173,6 +177,12 @@
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
 
+- job-template:
+    name: '{ci_project}-{git_repo}-wit-go-benchmarks'
+    triggers:
+      - timed: '59 23 * * 6'
+    <<: *job_template_defaults
+
 - job-template: &job_template_build_defaults
     name: 'job_template_build_defaults'
     description: |
@@ -192,21 +202,31 @@
     svc_name: none
     prj_name: dsaas-preview
     saas_git: none
-    saasherder_deploy: |
-        if [ "$SVC_NAME" != "none" ]; then
-            oc deploy $SVC_NAME --latest -n $PRJ_NAME
-        fi
+    saasherder_prepare: |
         if [ "$SAAS_GIT" != "none" ]; then
+            SAAS_ENV=staging
             PATH=$PATH:~/.local/bin/
             CONTEXT=$(echo $SAAS_GIT | sed 's/.*://')
             SAAS_GIT=$(echo $SAAS_GIT | sed 's/:.*//')
             git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
             cd saas.git
             [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
-            saasherder update hash $GIT_REPO $GIT_COMMIT
-            saasherder pull $GIT_REPO
-            saasherder template --output-dir $GIT_REPO-processed tag $GIT_REPO
+            export DEVSHIFT_TAG_LEN=$(saasherder --environment $SAAS_ENV get hash_length $GIT_REPO)
+            cd ..
+        fi
+    saasherder_deploy: |
+        if [ "$SVC_NAME" != "none" ]; then
+            oc deploy $SVC_NAME --latest -n $PRJ_NAME
+            rtn_code=$?
+        fi
+        if [ "$SAAS_GIT" != "none" ]; then
+            cd saas.git
+            saasherder --environment $SAAS_ENV update hash $GIT_REPO $GIT_COMMIT
+            saasherder --environment $SAAS_ENV pull $GIT_REPO
+            saasherder --environment $SAAS_ENV template --output-dir $GIT_REPO-processed tag $GIT_REPO
             oc apply -f $GIT_REPO-processed/$GIT_REPO.yaml -n $PRJ_NAME
+            rtn_code=$?
+            cd ..
         fi
     builders:
         - shell: |
@@ -217,6 +237,7 @@
             fi
             # testing out the cico client
             set +e
+
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
             n=1
@@ -242,6 +263,18 @@
             done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
+
+            #Prepare values for deployment
+            SVC_NAME={svc_name}
+            GIT_REPO={git_repo}
+            PRJ_NAME={prj_name}
+            SAAS_GIT={saas_git}
+            {saasherder_prepare}
+
+            if [ -z "$DEVSHIFT_TAG_LEN" ]; then
+                export DEVSHIFT_TAG_LEN=7
+            fi
+
             env > jenkins-env
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
@@ -249,11 +282,6 @@
             rtn_code=$?
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
-              #Prepare values for deployment
-              SVC_NAME={svc_name}
-              GIT_REPO={git_repo}
-              PRJ_NAME={prj_name}
-              SAAS_GIT={saas_git}
               #Deploy preview
               {saasherder_deploy}
             else
@@ -324,8 +352,19 @@
             fi
             exit $rtn_code
 
+- wrapper:
+    name: registry_devshift_credentials
+    wrappers:
+        - credentials-binding:
+            - username-password-separated:
+                credential-id: 1e87842e-7bb7-42f3-aad0-9431acb55c01
+                username: DEVSHIFT_USERNAME
+                password: DEVSHIFT_PASSWORD
+
 - job-template:
     name: '{ci_project}-{git_repo}-build-master'
+    wrappers:
+        - registry_devshift_credentials
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
@@ -338,6 +377,7 @@
     name: '{ci_project}-{git_repo}-build-che-credentials-master'
     wrappers:
         - che_credentials_wrapper
+        - registry_devshift_credentials
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
@@ -349,8 +389,6 @@
             # testing out the cico client
             set +e
             set +x
-            env > jenkins-env
-            cat $creds_config_file >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
             n=1
@@ -376,22 +414,31 @@
             done
             echo 'Using Host' $CICO_hostname
             set -x
+
+            #Prepare values for deployment
+            SVC_NAME={svc_name}
+            GIT_REPO={git_repo}
+            PRJ_NAME={prj_name}
+            SAAS_GIT={saas_git}
+            {saasherder_prepare}
+
+            if [ -z "$DEVSHIFT_TAG_LEN" ]; then
+                export DEVSHIFT_TAG_LEN=7
+            fi
+            env > jenkins-env
+            cat $creds_config_file >> jenkins-env
+
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
-            cico node done $CICO_ssid
             if [ $rtn_code -eq 0 ]; then
-                #Prepare values for deployment
-                SVC_NAME={svc_name}
-                GIT_REPO={git_repo}
-                PRJ_NAME={prj_name}
-                SAAS_GIT={saas_git}
                 #Deploy preview
                 {saasherder_deploy}
             fi
+            cico node done $CICO_ssid
             exit $rtn_code
     <<: *job_template_build_defaults
 
@@ -428,6 +475,7 @@
     node: "{ci_project}"
     wrappers:
             - npm-build-deliver-creds
+            - registry_devshift_credentials
     properties:
         - github:
             url: https://github.com/{git_organization}/{git_repo}/
@@ -446,51 +494,7 @@
 
     triggers:
         - github
-    svc_name: none
-    builders:
-        - shell: |
-            # testing out the cico client
-            set +e
-            export CICO_API_KEY=$(cat ~/duffy.key )
-            # get node
-            n=1
-            while true
-            do
-                cico_output=$(cico node get -f value -c ip_address -c comment)
-                if [ $? -eq 0 ]; then
-                    read CICO_hostname CICO_ssid <<< $cico_output
-                    if  [ ! -z "$CICO_hostname" ]; then
-                        # we got hostname from cico
-                        break
-                    fi
-                    echo "'cico node get' succeed, but can't get hostname from output"
-                fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
-                    echo "giving up on 'cico node get'"
-                    exit 1
-                fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
-                n=$[$n+1]
-                sleep 60
-            done
-            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
-            ssh_cmd="ssh $sshopts $CICO_hostname"
-            env > jenkins-env
-            $ssh_cmd yum -y install rsync
-            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload && {ci_cmd}"
-            rtn_code=$?
-            if [ $rtn_code -eq 0 ]; then
-              cico node done $CICO_ssid
-              if [ "{svc_name}" != "none" ]; then
-                oc deploy {svc_name} --latest
-              fi
-            else
-              # fail mode gives us 12 hrs to debug the machine
-              curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
-            fi
-            exit $rtn_code
+    <<: *job_template_build_defaults
 
 - job-template:
     name: '{ci_project}-fabric8-devdoc-build-master'
@@ -690,20 +694,8 @@
             cico node done $CICO_ssid
             exit $rtn_code
 
-- job:
-    name: 'devtools-che-functional-tests'
-    defaults: global
-    node: devtools
-    properties:
-        - github:
-            url: https://github.com/redhat-developer/che-functional-tests
-    scm:
-        - git:
-            url: https://github.com/redhat-developer/che-functional-tests.git
-
-            shallow_clone: true
-            branches:
-                - master
+- job-template:
+    name: '{ci_project}-{git_repo}-che-tests'
     triggers:
         - github
         - githubprb
@@ -716,45 +708,7 @@
                 credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
                 username: OSIO_USERNAME
                 password: OSIO_PASSWORD
-    builders:
-        - shell: |
-            set +e
-            set +x
-            env > jenkins-env
-            cat $creds_config_file >> jenkins-env
-            export CICO_API_KEY=$(cat ~/duffy.key )
-            # get node
-            n=1
-            while true
-            do
-                cico_output=$(cico node get -f value -c ip_address -c comment)
-                if [ $? -eq 0 ]; then
-                    read CICO_hostname CICO_ssid <<< $cico_output
-                    if  [ ! -z "$CICO_hostname" ]; then
-                        # we got hostname from cico
-                        break
-                    fi
-                    echo "'cico node get' succeed, but can't get hostname from output"
-                fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
-                    echo "giving up on 'cico node get'"
-                    exit 1
-                fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
-                n=$[$n+1]
-                sleep 60
-            done
-            echo 'Using Host' $CICO_hostname
-            set -x
-            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
-            ssh_cmd="ssh $sshopts $CICO_hostname"
-            $ssh_cmd yum -y install rsync
-            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload && /bin/bash cico_run_EE_tests.sh"
-            rtn_code=$?
-            cico node done $CICO_ssid
-            exit $rtn_code
+    <<: *job_template_defaults
 
 - job:
     name: 'devtools-test-performance-core-db'
@@ -847,10 +801,10 @@
     node: devtools
     properties:
         - github:
-            url: https://github.com/fabric8-ui/fabric8-ui
+            url: https://github.com/fabric8io/fabric8-test
     scm:
         - git:
-            url: https://github.com/fabric8-ui/fabric8-ui.git
+            url: https://github.com/fabric8io/fabric8-test.git
 
             shallow_clone: true
             branches:
@@ -898,7 +852,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload && /bin/bash cico_run_EE_tests.sh https://openshift.io"
+            $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_EE_tests.sh https://openshift.io"
             rtn_code=$?
             cico node done $CICO_ssid
             exit $rtn_code
@@ -926,6 +880,7 @@
                 - master
     wrappers:
         - generator_credentials_wrapper
+        - registry_devshift_credentials
     <<: *job_template_build_defaults
 
 - job-template:
@@ -946,7 +901,7 @@
     builders:
         - shell: |
             set -ex
-            PATH=$PATH:~/.local/bin /bin/bash ~/saasherder/fetch_and_apply.sh
+            ENVIRONMENT=production APPSEC=true PATH=$PATH:~/.local/bin /bin/bash ~/saasherder/fetch_and_apply.sh
 
 - job:
     name: 'devtools-saasherder-test-master'
@@ -1095,7 +1050,7 @@
             git_repo: fabric8-ui
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: f8ui
+            saas_git: saas-openshiftio
             timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: openshiftio
@@ -1144,6 +1099,12 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-che-tests':
+            git_organization: redhat-developer
+            git_repo: che-functional-tests
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_EE_tests.sh'
+            timeout: '20m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
             git_repo: ngx-widgets
@@ -1172,12 +1133,17 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-wit-go-benchmarks':
+            git_organization: fabric8-services
+            git_repo: fabric8-wit
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_go_benchmarks.sh'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-npm-publish-build-master':
             git_organization: fabric8-ui
             git_repo: ngx-fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: fabric8-ui-ngx-fabric8-wit
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: keycloak-deployment
@@ -1285,3 +1251,10 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-generator-build-master':
+            git_organization: openshiftio
+            git_repo: appdev-documentation
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-launchpad
+            prj_name: launchpad-preview
