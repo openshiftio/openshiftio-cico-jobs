@@ -1100,6 +1100,7 @@
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}-che-tests':
+            git_organization: redhat-developer
             git_repo: che-functional-tests
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_EE_tests.sh'
