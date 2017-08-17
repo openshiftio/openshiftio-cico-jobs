@@ -811,6 +811,7 @@
                 - master
     triggers:
         - timed: '30 * * * *'
+        - github
     wrappers:
         - credentials-binding:
             - username-password-separated:
