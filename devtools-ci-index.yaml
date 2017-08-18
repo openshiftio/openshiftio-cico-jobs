@@ -170,6 +170,15 @@
     <<: *job_template_defaults
 
 - job-template:
+    name: '{ci_project}-{git_repo}-jjb-test'
+    builders:
+    - shell: |
+        git rebase --preserve-merges origin/${{ghprbTargetBranch}}
+        {ci_cmd}
+        exit $?
+    <<: *job_template_defaults
+
+- job-template:
     name: '{ci_project}-{git_repo}-coverage'
     triggers:
       - github-pull-request:
@@ -974,7 +983,7 @@
 - project:
     name: devtools
     jobs:
-        - '{ci_project}-{git_repo}':
+        - '{ci_project}-{git_repo}-jjb-test':
             git_organization: almighty
             git_repo: almighty-jobs
             ci_project: 'devtools'
