@@ -1278,3 +1278,9 @@
         - 'devtools-test-end-to-end-{test_url}':
             test_url: prod-preview.openshift.io
             oso_token_creds: bca7a2b5-87b9-46bb-93a8-e66a05a5d7c6
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-pgbouncer
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
