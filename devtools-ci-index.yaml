@@ -975,6 +975,11 @@
     name: devtools
     jobs:
         - '{ci_project}-{git_repo}':
+            git_organization: almighty
+            git_repo: almighty-jobs
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_pr_test.sh'
+        - '{ci_project}-{git_repo}':
             git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
