@@ -846,6 +846,7 @@
             set +x
             env > jenkins-env
             cat $creds_config_file >> jenkins-env
+            echo ARTIFACT_PASS=$(cat ~/artifacts.key | tr -d '\r') >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
             n=1
@@ -875,7 +876,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_EE_tests.sh https://{test_url}"
+            $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_EE_tests.sh https://{test_url} ${{BUILD_NUMBER}}"
             rtn_code=$?
             cico node done $CICO_ssid
             exit $rtn_code
