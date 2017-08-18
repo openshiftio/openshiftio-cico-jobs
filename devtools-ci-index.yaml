@@ -183,6 +183,16 @@
       - timed: '59 23 * * 6'
     <<: *job_template_defaults
 
+- job-template:
+    name: '{ci_project}-{git_repo}-fabric8-analytics'
+    triggers:
+      - github-pull-request:
+          status-context: "ci.centos.org PR build (fabric8-analytics)"
+          org-list:
+            - fabric8-analytics
+          <<: *github_pull_request_defaults
+    <<: *job_template_defaults
+
 - job-template: &job_template_build_defaults
     name: 'job_template_build_defaults'
     description: |
