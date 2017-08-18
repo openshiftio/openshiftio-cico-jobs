@@ -192,6 +192,16 @@
       - timed: '59 23 * * 6'
     <<: *job_template_defaults
 
+- job-template:
+    name: '{ci_project}-{git_repo}-fabric8-analytics'
+    triggers:
+      - github-pull-request:
+          status-context: "ci.centos.org PR build (fabric8-analytics)"
+          org-list:
+            - fabric8-analytics
+          <<: *github_pull_request_defaults
+    <<: *job_template_defaults
+
 - job-template: &job_template_build_defaults
     name: 'job_template_build_defaults'
     description: |
@@ -1282,3 +1292,9 @@
         - 'devtools-test-end-to-end-{test_url}':
             test_url: prod-preview.openshift.io
             oso_token_creds: bca7a2b5-87b9-46bb-93a8-e66a05a5d7c6
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-pgbouncer
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
