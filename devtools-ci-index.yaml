@@ -1285,6 +1285,16 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-coverage':
+            git_repo: fabric8-auth
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            timeout: '45m'
+        - '{ci_project}-{git_repo}-build-master-coverage':
+            git_repo: fabric8-auth
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            timeout: '25m'
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: openshiftio
             git_repo: appdev-documentation
