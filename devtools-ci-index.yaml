@@ -952,7 +952,7 @@
             set +x
             env > jenkins-env
             cat $creds_config_file >> jenkins-env
-            echo ARTIFACT_PASS=$(cat ~/artifacts.key | tr -d '\r') >> jenkins-env
+            cp ~/artifacts.key .
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
             n=1
