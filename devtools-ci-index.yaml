@@ -393,6 +393,112 @@
     <<: *job_template_build_defaults
 
 - job-template:
+    name: '{ci_project}-{git_repo}-f8a-build-master'
+    wrappers:
+        - registry_devshift_credentials
+    scm:
+        - git:
+            url: https://github.com/{git_organization}/{git_repo}.git
+            shallow_clone: true
+            branches:
+                - master
+    builders:
+        - shell: |
+            # testing out the cico client
+            set +e
+            set +x
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            # get node
+            n=1
+            while true
+            do
+                cico_output=$(cico node get -f value -c ip_address -c comment)
+                if [ $? -eq 0 ]; then
+                    read CICO_hostname CICO_ssid <<< $cico_output
+                    if  [ ! -z "$CICO_hostname" ]; then
+                        # we got hostname from cico
+                        break
+                    fi
+                    echo "'cico node get' succeed, but can't get hostname from output"
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
+            echo 'Using Host' $CICO_hostname
+            set -x
+
+            env > jenkins-env
+            cat $creds_config_file >> jenkins-env
+
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd yum -y install rsync
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            $ssh_cmd -t "cd payload && {ci_cmd}"
+            rtn_code=$?
+            cico node done $CICO_ssid
+            exit $rtn_code
+        - trigger-builds:
+            - project:
+                - "devtools-f8a-master-deploy-e2e-test"
+              predefined-parameters:
+                  GIT_ORGANIZATION={git_organization}
+                  GIT_REPO={git_repo}
+                  UPSTREAM_GIT_COMMIT=$GIT_COMMIT
+                  SAAS_GIT={saas_git}
+              block: true
+    <<: *job_template_build_defaults
+
+- job-template:
+    name: '{ci_project}-f8a-master-deploy-e2e-test'
+    concurrent: false
+    parameters:
+      - string:
+          name: GIT_ORGANIZATION
+          default: fabric8-analytics
+      - string:
+          name: GIT_REPO
+      - string:
+          name: UPSTREAM_GIT_COMMIT
+      - string:
+          name: SAAS_GIT
+          default: '{saas_git}'
+      - string:
+          name: PRJ_NAME
+          default: '{prj_name}'
+      - string:
+          name: SVC_NAME
+          default: none
+    scm:
+        - git:
+            url: https://github.com/{git_organization}/{git_repo}.git
+            shallow_clone: true
+            branches:
+                - master
+    builders:
+        - shell: |
+            # Verify Job configuration
+            if [ "$SVC_NAME" == "none" -a "$SAAS_GIT" == "none" ]; then
+                echo "require either svc_name or saas_git to be set"
+                exit 1
+            fi
+
+            export GIT_COMMIT=$UPSTREAM_GIT_COMMIT
+
+            {saasherder_prepare}
+            export DEVSHIFT_TAG_LEN=7
+
+            # Deploy preview
+            {saasherder_deploy}
+    <<: *job_template_build_defaults
+
+- job-template:
     name: '{ci_project}-{git_repo}-build-che-credentials-master'
     wrappers:
         - che_credentials_wrapper
@@ -1315,4 +1421,17 @@
             git_repo: fabric8-analytics-pgbouncer
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'
+        - '{ci_project}-f8a-master-deploy-e2e-test':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-common
+            ci_project: 'devtools'
             timeout: '20m'
+            prj_name: bayesian-preview
+            saas_git: saas-analytics
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-pgbouncer
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
