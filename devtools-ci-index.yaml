@@ -447,7 +447,7 @@
         - trigger-builds:
             - project:
                 - "devtools-f8a-master-deploy-e2e-test"
-              predefined-parameters:
+              predefined-parameters: |
                   GIT_ORGANIZATION={git_organization}
                   GIT_REPO={git_repo}
                   UPSTREAM_GIT_COMMIT=$GIT_COMMIT
