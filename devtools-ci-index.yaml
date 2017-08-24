@@ -47,6 +47,7 @@
         - Katka92
         - rhopp
         - vpavlin
+        - sbryzak
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
