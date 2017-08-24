@@ -442,16 +442,23 @@
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
-            cico node done $CICO_ssid
+            # We want to reuse the node for running E2E tests,
+            # but only if we are not doomed already.
+            if [ $rtn_code -ne 0 ]; then
+                cico node done $CICO_ssid
+            fi
             exit $rtn_code
         - trigger-builds:
             - project:
                 - "devtools-f8a-master-deploy-e2e-test"
               predefined-parameters: |
-                  GIT_ORGANIZATION={git_organization}
-                  GIT_REPO={git_repo}
-                  UPSTREAM_GIT_COMMIT=$GIT_COMMIT
-                  SAAS_GIT={saas_git}
+                  GIT_ORGANIZATION="{git_organization}"
+                  UPSTREAM_GIT_COMMIT="$GIT_COMMIT"
+                  SAAS_GIT="{saas_git}"
+                  DEPLOYMENT_UNIT="{deployment_unit}"
+                  DEPLOYMENT_CONFIG="{deployment_config}"
+                  CICO_HOSTNAME="$CICO_hostname"
+                  CICO_SSID="$CICO_ssid"
               block: true
     <<: *job_template_build_defaults
 
@@ -463,8 +470,6 @@
           name: GIT_ORGANIZATION
           default: fabric8-analytics
       - string:
-          name: GIT_REPO
-      - string:
           name: UPSTREAM_GIT_COMMIT
       - string:
           name: SAAS_GIT
@@ -475,6 +480,14 @@
       - string:
           name: SVC_NAME
           default: none
+      - string:
+          name: DEPLOYMENT_UNIT
+      - string:
+          name: DEPLOYMENT_CONFIG
+      - string:
+          name: CICO_HOSTNAME
+      - string:
+          name: CICO_SSID
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
@@ -489,13 +502,26 @@
                 exit 1
             fi
 
+            env > jenkins-env
+            cat $creds_config_file >> jenkins-env
+
             export GIT_COMMIT=$UPSTREAM_GIT_COMMIT
+            export GIT_REPO=$DEPLOYMENT_UNIT
 
             {saasherder_prepare}
             export DEVSHIFT_TAG_LEN=7
-
             # Deploy preview
             {saasherder_deploy}
+
+            # Run E2E tests
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_HOSTNAME"
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_HOSTNAME:payload-tests
+            $ssh_cmd -t "cd payload-tests/integration-tests && /bin/bash cico_run_tests.sh"
+            rtn_code=$?
+            cico node done $CICO_SSID
+            exit $rtn_code
+
     <<: *job_template_build_defaults
 
 - job-template:
@@ -1435,3 +1461,5 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-analytics
+            deployment_unit: 'fabric8-analytics-pgbouncer'
+            deployment_config: 'bayesian-pgbouncer'
