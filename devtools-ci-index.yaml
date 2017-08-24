@@ -503,7 +503,6 @@
             fi
 
             env > jenkins-env
-            cat $creds_config_file >> jenkins-env
 
             export GIT_COMMIT=$UPSTREAM_GIT_COMMIT
             export GIT_REPO=$DEPLOYMENT_UNIT
@@ -513,14 +512,27 @@
             # Deploy preview
             {saasherder_deploy}
 
+            gc() {{
+                rtn_code=$?
+                if [ $rtn_code -ne 0 ]; then
+                    # Tests failed, rollback
+                    oc rollback dc/$DEPLOYMENT_CONFIG -n $PRJ_NAME
+                fi
+                cico node done $CICO_SSID || :
+                exit $rtn_code
+            }}
+            trap gc EXIT SIGINT
+            set -e
+
+            # Wait for deployment to start and then wait for it to be ready (yeah, this is pretty frafile)
+            sleep 5
+            oc logs -f dc/$DEPLOYMENT_CONFIG -n $PRJ_NAME
+
             # Run E2E tests
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_HOSTNAME"
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_HOSTNAME:payload-tests
             $ssh_cmd -t "cd payload-tests/integration-tests && /bin/bash cico_run_tests.sh"
-            rtn_code=$?
-            cico node done $CICO_SSID
-            exit $rtn_code
 
     <<: *job_template_build_defaults
 
