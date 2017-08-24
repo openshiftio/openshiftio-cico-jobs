@@ -447,18 +447,22 @@
             if [ $rtn_code -ne 0 ]; then
                 cico node done $CICO_ssid
             fi
+
+            cat > deploy-e2e-test-params << EOF
+            GIT_ORGANIZATION={git_organization}
+            UPSTREAM_GIT_COMMIT=$GIT_COMMIT
+            SAAS_GIT={saas_git}
+            DEPLOYMENT_UNIT={deployment_unit}
+            DEPLOYMENT_CONFIG={deployment_config}
+            CICO_HOSTNAME=$CICO_hostname
+            CICO_SSID=$CICO_ssid
+            EOF
+
             exit $rtn_code
         - trigger-builds:
             - project:
                 - "devtools-f8a-master-deploy-e2e-test"
-              predefined-parameters: |
-                  GIT_ORGANIZATION="{git_organization}"
-                  UPSTREAM_GIT_COMMIT="$GIT_COMMIT"
-                  SAAS_GIT="{saas_git}"
-                  DEPLOYMENT_UNIT="{deployment_unit}"
-                  DEPLOYMENT_CONFIG="{deployment_config}"
-                  CICO_HOSTNAME="$CICO_hostname"
-                  CICO_SSID="$CICO_ssid"
+              property-file: deploy-e2e-test-params
               block: true
     <<: *job_template_build_defaults
 
