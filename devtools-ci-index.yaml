@@ -517,6 +517,7 @@
             # Deploy preview
             {saasherder_deploy}
 
+            export CICO_API_KEY=$(cat ~/duffy.key )
             gc() {{
                 rtn_code=$?
                 if [ $rtn_code -ne 0 ]; then
