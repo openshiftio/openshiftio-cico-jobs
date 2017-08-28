@@ -403,6 +403,7 @@
             shallow_clone: true
             branches:
                 - master
+    skip_deploy: 0
     builders:
         - shell: |
             # testing out the cico client
@@ -445,7 +446,7 @@
             rtn_code=$?
             # We want to reuse the node for running E2E tests,
             # but only if we are not doomed already.
-            if [ $rtn_code -ne 0 ]; then
+            if [[ $rtn_code -ne 0 || {skip_deploy} -ne 0 ]]; then
                 cico node done $CICO_ssid
             fi
 
@@ -460,11 +461,16 @@
             EOF
 
             exit $rtn_code
-        - trigger-builds:
-            - project:
-                - "devtools-f8a-master-deploy-e2e-test"
-              property-file: deploy-e2e-test-params
-              block: true
+        - conditional-step:
+            condition-kind: shell
+            condition-command: |
+                [[ {skip_deploy} -eq 0 ]] && exit 0 || exit 1
+            steps:
+                - trigger-builds:
+                    - project:
+                        - "devtools-f8a-master-deploy-e2e-test"
+                      property-file: deploy-e2e-test-params
+                      block: true
     <<: *job_template_build_defaults
 
 - job-template:
