@@ -979,7 +979,7 @@
             branches:
                 - master
     triggers:
-        - timed: '30 * * * *'
+        - timed: '30  */2 * * *'
         - github
     wrappers:
         - credentials-binding:
