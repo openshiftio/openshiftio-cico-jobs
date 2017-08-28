@@ -403,6 +403,9 @@
             shallow_clone: true
             branches:
                 - master
+    skip_deploy: 0
+    deployment_units: ''
+    deployment_configs: ''
     builders:
         - shell: |
             # testing out the cico client
@@ -445,7 +448,7 @@
             rtn_code=$?
             # We want to reuse the node for running E2E tests,
             # but only if we are not doomed already.
-            if [ $rtn_code -ne 0 ]; then
+            if [[ $rtn_code -ne 0 || {skip_deploy} -ne 0 ]]; then
                 cico node done $CICO_ssid
             fi
 
@@ -460,11 +463,16 @@
             EOF
 
             exit $rtn_code
-        - trigger-builds:
-            - project:
-                - "devtools-f8a-master-deploy-e2e-test"
-              property-file: deploy-e2e-test-params
-              block: true
+        - conditional-step:
+            condition-kind: shell
+            condition-command: |
+                [[ {skip_deploy} -eq 0 ]] && exit 0 || exit 1
+            steps:
+                - trigger-builds:
+                    - project:
+                        - "devtools-f8a-master-deploy-e2e-test"
+                      property-file: deploy-e2e-test-params
+                      block: true
     <<: *job_template_build_defaults
 
 - job-template:
@@ -1585,3 +1593,29 @@
             saas_git: saas-analytics
             deployment_units: 'api'
             deployment_configs: 'bayesian-api'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-worker-base
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-worker-base
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            skip_deploy: 1
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-cvedb-s3-dump-docker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-cvedb-s3-dump-docker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            skip_deploy: 1
