@@ -1511,7 +1511,7 @@
             git_repo: fabric8-analytics-jobs
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-jobs
@@ -1520,12 +1520,13 @@
             saas_git: saas-analytics
             deployment_units: 'jobs'
             deployment_configs: 'bayesian-jobs'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: anitya-docker
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: anitya-docker
@@ -1534,12 +1535,13 @@
             saas_git: saas-analytics
             deployment_units: 'anitya'
             deployment_configs: 'bayesian-anitya'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: gremlin-docker
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'
+            timeout: '30m'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: gremlin-docker
@@ -1548,12 +1550,13 @@
             saas_git: saas-analytics
             deployment_units: 'gremlin-http'
             deployment_configs: 'bayesian-gremlin-server'
+            timeout: '30m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-stack-analysis
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-stack-analysis
@@ -1562,12 +1565,13 @@
             saas_git: saas-analytics
             deployment_units: 'kronos-pypi kronos-maven'
             deployment_configs: 'bayesian-kronos-pypi bayesian-kronos-maven'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-license-analysis
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-license-analysis
@@ -1576,12 +1580,13 @@
             saas_git: saas-analytics
             deployment_units: 'license-analysis'
             deployment_configs: 'f8a-license-analysis'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-worker
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'
+            timeout: '30m'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-worker
@@ -1590,12 +1595,13 @@
             saas_git: saas-analytics
             deployment_units: 'worker-ingestion worker-api worker-ingestion-graph-import worker-api-graph-import'
             deployment_configs: 'bayesian-worker-ingestion bayesian-worker-api bayesian-worker-ingestion-graph-import bayesian-worker-api-graph-import'
+            timeout: '30m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-server
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'
+            timeout: '30m'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-server
@@ -1604,12 +1610,13 @@
             saas_git: saas-analytics
             deployment_units: 'api'
             deployment_configs: 'bayesian-api'
+            timeout: '30m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-worker-base
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'
+            timeout: '30m'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-worker-base
@@ -1617,12 +1624,13 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-analytics
             skip_deploy: 1
+            timeout: '30m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-cvedb-s3-dump-docker
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-cvedb-s3-dump-docker
@@ -1630,3 +1638,19 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-analytics
             skip_deploy: 1
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-data-model
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-data-model
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'data-importer'
+            deployment_configs: 'bayesian-data-importer'
+            timeout: '20m'
