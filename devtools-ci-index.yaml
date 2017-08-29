@@ -382,6 +382,14 @@
                 username: DEVSHIFT_USERNAME
                 password: DEVSHIFT_PASSWORD
 
+- wrapper:
+    name: recommender_api_token
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: 2fc94f6b-dfef-49a4-a217-fe47aaeea056
+                variable: RECOMMENDER_API_TOKEN
+
 - job-template:
     name: '{ci_project}-{git_repo}-build-master'
     wrappers:
@@ -478,6 +486,8 @@
 
 - job-template:
     name: '{ci_project}-f8a-master-deploy-e2e-test'
+    wrappers:
+        - recommender_api_token
     concurrent: false
     parameters:
       - string:
