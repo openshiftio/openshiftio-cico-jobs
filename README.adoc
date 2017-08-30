@@ -20,7 +20,7 @@ whose purpose is explained in the following:
    to use CI resources assigned per project.
 - `ci_cmd`: contains the command that will be triggered by the job inside the
    repository, e.g. `/bin/bash cico_build_deploy.sh`. This command usually runs a
-   bash script named `cico_build_deploy.sh` where we can found all the logic.
+   bash script named `cico_build_deploy.sh` where we can find all the logic.
 - `svc_name`: identifies the name of the Openshift service that will be redeployed.
 - `timeout`: specifies a maximum time to complete the execution of this job.
 - `<TEMPLATE_NAME>`: this name corresponds with the name assigned to one of the
