@@ -526,7 +526,7 @@
                 exit 1
             fi
 
-            env > jenkins-env
+            env > integration-tests/jenkins-env
 
             export GIT_COMMIT=$UPSTREAM_GIT_COMMIT
 
