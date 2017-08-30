@@ -48,6 +48,7 @@
         - rhopp
         - vpavlin
         - sbryzak
+        - msrb
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
@@ -381,6 +382,14 @@
                 username: DEVSHIFT_USERNAME
                 password: DEVSHIFT_PASSWORD
 
+- wrapper:
+    name: recommender_api_token
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: 2fc94f6b-dfef-49a4-a217-fe47aaeea056
+                variable: RECOMMENDER_API_TOKEN
+
 - job-template:
     name: '{ci_project}-{git_repo}-build-master'
     wrappers:
@@ -403,6 +412,9 @@
             shallow_clone: true
             branches:
                 - master
+    skip_deploy: 0
+    deployment_units: ''
+    deployment_configs: ''
     builders:
         - shell: |
             # testing out the cico client
@@ -445,7 +457,7 @@
             rtn_code=$?
             # We want to reuse the node for running E2E tests,
             # but only if we are not doomed already.
-            if [ $rtn_code -ne 0 ]; then
+            if [[ $rtn_code -ne 0 || {skip_deploy} -ne 0 ]]; then
                 cico node done $CICO_ssid
             fi
 
@@ -453,22 +465,29 @@
             GIT_ORGANIZATION={git_organization}
             UPSTREAM_GIT_COMMIT=$GIT_COMMIT
             SAAS_GIT={saas_git}
-            DEPLOYMENT_UNIT={deployment_unit}
-            DEPLOYMENT_CONFIG={deployment_config}
+            DEPLOYMENT_UNITS={deployment_units}
+            DEPLOYMENT_CONFIGS={deployment_configs}
             CICO_HOSTNAME=$CICO_hostname
             CICO_SSID=$CICO_ssid
             EOF
 
             exit $rtn_code
-        - trigger-builds:
-            - project:
-                - "devtools-f8a-master-deploy-e2e-test"
-              property-file: deploy-e2e-test-params
-              block: true
+        - conditional-step:
+            condition-kind: shell
+            condition-command: |
+                [[ {skip_deploy} -eq 0 ]] && exit 0 || exit 1
+            steps:
+                - trigger-builds:
+                    - project:
+                        - "devtools-f8a-master-deploy-e2e-test"
+                      property-file: deploy-e2e-test-params
+                      block: true
     <<: *job_template_build_defaults
 
 - job-template:
     name: '{ci_project}-f8a-master-deploy-e2e-test'
+    wrappers:
+        - recommender_api_token
     concurrent: false
     parameters:
       - string:
@@ -486,9 +505,9 @@
           name: SVC_NAME
           default: none
       - string:
-          name: DEPLOYMENT_UNIT
+          name: DEPLOYMENT_UNITS
       - string:
-          name: DEPLOYMENT_CONFIG
+          name: DEPLOYMENT_CONFIGS
       - string:
           name: CICO_HOSTNAME
       - string:
@@ -507,31 +526,38 @@
                 exit 1
             fi
 
-            env > jenkins-env
+            env > integration-tests/jenkins-env
 
             export GIT_COMMIT=$UPSTREAM_GIT_COMMIT
-            export GIT_REPO=$DEPLOYMENT_UNIT
+
 
             {saasherder_prepare}
             export DEVSHIFT_TAG_LEN=7
-            # Deploy preview
-            {saasherder_deploy}
+            for DEPLOYMENT_UNIT in $DEPLOYMENT_UNITS; do
+                export GIT_REPO=$DEPLOYMENT_UNIT
+                # Deploy preview
+                {saasherder_deploy}
+            done
 
+            export CICO_API_KEY=$(cat ~/duffy.key )
             gc() {{
                 rtn_code=$?
-                if [ $rtn_code -ne 0 ]; then
-                    # Tests failed, rollback
-                    oc rollback dc/$DEPLOYMENT_CONFIG -n $PRJ_NAME
-                fi
+                for DEPLOYMENT_CONFIG in $DEPLOYMENT_CONFIGS; do
+                    if [ $rtn_code -ne 0 ]; then
+                        # Tests failed, rollback
+                        oc rollback dc/$DEPLOYMENT_CONFIG -n $PRJ_NAME || :
+                    fi
+                done
                 cico node done $CICO_SSID || :
                 exit $rtn_code
             }}
             trap gc EXIT SIGINT
             set -e
 
-            # Wait for deployment to start and then wait for it to be ready (yeah, this is pretty frafile)
+            # Wait for deployment to start and then wait for it to be ready (yeah, this is pretty fragile)
             sleep 5
-            oc logs -f dc/$DEPLOYMENT_CONFIG -n $PRJ_NAME
+            LAST_DC=${{DEPLOYMENT_CONFIGS##* }}
+            oc logs -f dc/$LAST_DC -n $PRJ_NAME
 
             # Run E2E tests
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
@@ -978,7 +1004,7 @@
             branches:
                 - master
     triggers:
-        - timed: '30 * * * *'
+        - timed: '30  */2 * * *'
         - github
     wrappers:
         - credentials-binding:
@@ -1478,5 +1504,153 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-analytics
-            deployment_unit: 'fabric8-analytics-pgbouncer'
-            deployment_config: 'bayesian-pgbouncer'
+            deployment_units: 'fabric8-analytics-pgbouncer'
+            deployment_configs: 'bayesian-pgbouncer'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-jobs
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-jobs
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'jobs'
+            deployment_configs: 'bayesian-jobs'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: anitya-docker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: anitya-docker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'anitya'
+            deployment_configs: 'bayesian-anitya'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: gremlin-docker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: gremlin-docker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'gremlin-http'
+            deployment_configs: 'bayesian-gremlin-server'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-stack-analysis
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-stack-analysis
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'kronos-pypi kronos-maven'
+            deployment_configs: 'bayesian-kronos-pypi bayesian-kronos-maven'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-license-analysis
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-license-analysis
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'license-analysis'
+            deployment_configs: 'f8a-license-analysis'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-worker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-worker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'worker-ingestion worker-api worker-ingestion-graph-import worker-api-graph-import'
+            deployment_configs: 'bayesian-worker-ingestion bayesian-worker-api bayesian-worker-ingestion-graph-import bayesian-worker-api-graph-import'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-server
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-server
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'api'
+            deployment_configs: 'bayesian-api'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-worker-base
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-worker-base
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            skip_deploy: 1
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-cvedb-s3-dump-docker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-cvedb-s3-dump-docker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            skip_deploy: 1
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-data-model
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-data-model
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'data-importer'
+            deployment_configs: 'bayesian-data-importer'
+            timeout: '20m'
