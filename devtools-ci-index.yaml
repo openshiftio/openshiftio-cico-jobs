@@ -1428,6 +1428,12 @@
             ci_cmd: 'echo "Nothing to build, just deploy nginx"'
             saas_git: saas-launchpad
             prj_name: launchpad-preview
+        - '{ci_project}-{git_repo}':
+            git_organization: openshiftio
+            git_repo: appdev-documentation
+            ci_project: 'devtools'
+            ci_cmd: 'CICO_LOCAL=true /bin/bash cico_build_deploy.sh'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: openshiftio
             git_repo: status-api
