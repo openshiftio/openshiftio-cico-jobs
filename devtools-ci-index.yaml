@@ -255,11 +255,6 @@
         fi
     builders:
         - shell: |
-            # Verify Job configuration
-            if [ "{svc_name}" == "none" -a "{saas_git}" == "none" ]; then
-                echo "require either svc_name or saas_git to be set"
-                exit 1
-            fi
             # testing out the cico client
             set +e
 
@@ -289,12 +284,17 @@
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
 
-            #Prepare values for deployment
-            SVC_NAME={svc_name}
-            GIT_REPO={git_repo}
-            PRJ_NAME={prj_name}
-            SAAS_GIT={saas_git}
-            {saasherder_prepare}
+            # Verify Job configuration
+            if [ "{svc_name}" == "none" -a "{saas_git}" == "none" ]; then
+                echo "Not part of SAAS"
+            else
+                #Prepare values for deployment
+                SVC_NAME={svc_name}
+                GIT_REPO={git_repo}
+                PRJ_NAME={prj_name}
+                SAAS_GIT={saas_git}
+                {saasherder_prepare}
+            fi
 
             if [ -z "$DEVSHIFT_TAG_LEN" ]; then
                 export DEVSHIFT_TAG_LEN=7
@@ -308,7 +308,12 @@
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
               #Deploy preview
-              {saasherder_deploy}
+              # Verify Job configuration
+              if [ "{svc_name}" == "none" -a "{saas_git}" == "none" ]; then
+                echo "Not part of SAAS, skipping deployment"
+              else
+                {saasherder_deploy}
+              fi
             else
               # fail mode gives us 12 hrs to debug the machine
               curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
