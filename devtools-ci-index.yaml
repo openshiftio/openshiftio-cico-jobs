@@ -49,6 +49,10 @@
         - vpavlin
         - sbryzak
         - msrb
+        - inoxx03
+        - lavernw1
+        - rhoads-zach
+        - tradej
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
