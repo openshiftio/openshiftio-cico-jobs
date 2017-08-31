@@ -1432,7 +1432,7 @@
             git_organization: openshiftio
             git_repo: appdev-documentation
             ci_project: 'devtools'
-            ci_cmd: 'CICO_LOCAL=true /bin/bash cico_build_deploy.sh'
+            ci_cmd: '/bin/bash cico_build_test.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: openshiftio
