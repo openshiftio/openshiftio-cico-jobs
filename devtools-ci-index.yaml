@@ -1009,7 +1009,9 @@
                 - master
     triggers:
         - timed: '30  */2 * * *'
-        - github
+        - reverse:
+            jobs: 'devtools-fabric8-test-build-master'
+            result: 'success'
     wrappers:
         - credentials-binding:
             - username-password-separated:
@@ -1487,6 +1489,12 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-launchpad
             prj_name: launchpad-preview
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8io
+            git_repo: fabric8-test
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '30m'
         - 'devtools-test-end-to-end-{test_url}':
             test_url: openshift.io
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
