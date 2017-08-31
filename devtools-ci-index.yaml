@@ -1503,11 +1503,11 @@
         - 'devtools-test-end-to-end-{test_url}':
             test_url: openshift.io
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
-            timeout: 90m
+            timeout: 60m
         - 'devtools-test-end-to-end-{test_url}':
             test_url: prod-preview.openshift.io
             oso_token_creds: bca7a2b5-87b9-46bb-93a8-e66a05a5d7c6
-            timeout: 90m
+            timeout: 60m
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
