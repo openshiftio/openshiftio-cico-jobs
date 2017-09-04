@@ -829,6 +829,7 @@
     name: 'devtools-build-run-che-build-master'
     wrappers:
         - che_credentials_wrapper
+        - registry_devshift_credentials
         - credentials-binding:
             - text:
                 credential-id: de793dce-5821-4182-af4f-6c7b42b5c21d
