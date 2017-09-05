@@ -49,6 +49,10 @@
         - vpavlin
         - sbryzak
         - msrb
+        - inoxx03
+        - lavernw1
+        - rhoads-zach
+        - tradej
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
@@ -251,11 +255,6 @@
         fi
     builders:
         - shell: |
-            # Verify Job configuration
-            if [ "{svc_name}" == "none" -a "{saas_git}" == "none" ]; then
-                echo "require either svc_name or saas_git to be set"
-                exit 1
-            fi
             # testing out the cico client
             set +e
 
@@ -285,12 +284,17 @@
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
 
-            #Prepare values for deployment
-            SVC_NAME={svc_name}
-            GIT_REPO={git_repo}
-            PRJ_NAME={prj_name}
-            SAAS_GIT={saas_git}
-            {saasherder_prepare}
+            # Verify Job configuration
+            if [ "{svc_name}" == "none" -a "{saas_git}" == "none" ]; then
+                echo "Not part of SAAS"
+            else
+                #Prepare values for deployment
+                SVC_NAME={svc_name}
+                GIT_REPO={git_repo}
+                PRJ_NAME={prj_name}
+                SAAS_GIT={saas_git}
+                {saasherder_prepare}
+            fi
 
             if [ -z "$DEVSHIFT_TAG_LEN" ]; then
                 export DEVSHIFT_TAG_LEN=7
@@ -304,7 +308,12 @@
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
               #Deploy preview
-              {saasherder_deploy}
+              # Verify Job configuration
+              if [ "{svc_name}" == "none" -a "{saas_git}" == "none" ]; then
+                echo "Not part of SAAS, skipping deployment"
+              else
+                {saasherder_deploy}
+              fi
             else
               # fail mode gives us 12 hrs to debug the machine
               curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
@@ -820,6 +829,7 @@
     name: 'devtools-build-run-che-build-master'
     wrappers:
         - che_credentials_wrapper
+        - registry_devshift_credentials
         - credentials-binding:
             - text:
                 credential-id: de793dce-5821-4182-af4f-6c7b42b5c21d
@@ -1005,7 +1015,9 @@
                 - master
     triggers:
         - timed: '30  */2 * * *'
-        - github
+        - reverse:
+            jobs: 'devtools-fabric8-test-build-master'
+            result: 'success'
     wrappers:
         - credentials-binding:
             - username-password-separated:
@@ -1224,6 +1236,12 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '10m'
+        - '{ci_project}-{git_repo}':
+            git_organization: openshiftio
+            git_repo: tenant-log-indirector
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'
         - '{ci_project}-fabric8-devdoc-build-master':
             git_repo: fabric8-devdoc
             ci_project: 'devtools'
@@ -1285,6 +1303,13 @@
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: fabric8-notification
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-openshiftio
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: openshiftio
+            git_repo: tenant-log-indirector
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
@@ -1428,6 +1453,12 @@
             ci_cmd: 'echo "Nothing to build, just deploy nginx"'
             saas_git: saas-launchpad
             prj_name: launchpad-preview
+        - '{ci_project}-{git_repo}':
+            git_organization: openshiftio
+            git_repo: appdev-documentation
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_test.sh'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: openshiftio
             git_repo: status-api
@@ -1477,14 +1508,20 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-launchpad
             prj_name: launchpad-preview
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8io
+            git_repo: fabric8-test
+            ci_project: 'devtools'
+            ci_cmd: 'cd ee_tests/ && /bin/bash cico_build_deploy.sh'
+            timeout: '30m'
         - 'devtools-test-end-to-end-{test_url}':
             test_url: openshift.io
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
-            timeout: 90m
+            timeout: 60m
         - 'devtools-test-end-to-end-{test_url}':
             test_url: prod-preview.openshift.io
             oso_token_creds: bca7a2b5-87b9-46bb-93a8-e66a05a5d7c6
-            timeout: 90m
+            timeout: 60m
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
