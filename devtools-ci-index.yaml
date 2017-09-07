@@ -1119,6 +1119,14 @@
             set -ex
             ENVIRONMENT=production APPSEC=true PATH=$PATH:~/.local/bin /bin/bash ~/saasherder/fetch_and_apply.sh
 
+- job-template:
+    name: '{ci_project}-{git_repo}-promote-to-prod-test'
+    builders:
+        - shell: |
+            set -ex
+            ENVIRONMENT=production PATH=$PATH:~/.local/bin DRY_RUN=true /bin/bash ~/saasherder/fetch_and_apply.sh
+    <<: *job_template_defaults
+
 - job:
     name: 'devtools-saasherder-test-master'
     defaults: global
@@ -1480,12 +1488,9 @@
         - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-launchpad
             ci_project: 'devtools'
-        - '{ci_project}-{git_repo}':
-            git_organization: openshiftio
+        - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-openshiftio
             ci_project: 'devtools'
-            ci_cmd: 'ENVIRONMENT=production PATH=$PATH:~/.local/bin DRY_RUN=true /bin/bash ~/saasherder/fetch_and_apply.sh'
-            timeout: '30m'
         - '{ci_project}-{git_repo}-build-master':
             git_repo: fabric8-auth
             ci_project: 'devtools'
