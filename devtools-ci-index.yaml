@@ -851,7 +851,7 @@
                 - master
     publishers:
         - junit:
-            results: **/target/surefire-reports/*.xml
+            results: '**/target/surefire-reports/*.xml'
             allow-empty-results: true
 
     triggers:
