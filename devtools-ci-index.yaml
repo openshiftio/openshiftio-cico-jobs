@@ -1490,6 +1490,7 @@
             ci_project: 'devtools'
         - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-openshiftio
+            git_organization: openshiftio
             ci_project: 'devtools'
         - '{ci_project}-{git_repo}-build-master':
             git_repo: fabric8-auth
