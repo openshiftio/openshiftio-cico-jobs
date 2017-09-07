@@ -851,7 +851,7 @@
                 - master
     publishers:
         - junit:
-            results: target/**/target/surefire-reports/*.xml
+            results: '**/target/surefire-reports/*.xml'
             allow-empty-results: true
 
     triggers:
@@ -894,7 +894,7 @@
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && /bin/bash cico_build.sh && /bin/bash cico_deploy.sh"
             rtn_code=$?
-            rsync -e "ssh $sshopts" -Ha --include='surefire-reports/***' --include='*/' --exclude='*' $CICO_hostname:payload/builds/fabric8-che/target/ $(pwd)/target
+            rsync -e "ssh $sshopts" -Ha --include='surefire-reports/***' --include='*/' --exclude='*' $CICO_hostname:payload/builds/fabric8-che/ $(pwd)/builds/fabric8-che
             cico node done $CICO_ssid
             exit $rtn_code
 
