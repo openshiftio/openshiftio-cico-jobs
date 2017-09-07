@@ -1480,6 +1480,11 @@
         - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-launchpad
             ci_project: 'devtools'
+        - '{ci_project}-{git_repo}':
+            git_repo: saas-openshiftio
+            ci_project: 'devtools'
+            ci_cmd: 'ENVIRONMENT=production PATH=$PATH:~/.local/bin DRY_RUN=true /bin/bash ~/saasherder/fetch_and_apply.sh'
+            timeout: '30m'
         - '{ci_project}-{git_repo}-build-master':
             git_repo: fabric8-auth
             ci_project: 'devtools'
