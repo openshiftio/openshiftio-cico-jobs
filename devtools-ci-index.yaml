@@ -1000,7 +1000,7 @@
             artifacts: ./devtools-performance-results
 
 - job-template:
-    name: 'devtools-test-end-to-end-{test_url}'
+    name: 'devtools-test-end-to-end-{test_url}-{test_suite}'
     defaults: global
     node: devtools
     properties:
@@ -1063,7 +1063,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_EE_tests.sh https://{test_url} ${{BUILD_NUMBER}}"
+            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_EE_tests.sh https://{test_url} ${{BUILD_NUMBER}} {test_suite}"
             rtn_code=$?
             if [[ $rtn_code -eq 124 ]]; then
                echo "BUILD TIMEOUT";
@@ -1525,12 +1525,24 @@
             ci_project: 'devtools'
             ci_cmd: 'cd ee_tests/ && /bin/bash cico_build_deploy.sh'
             timeout: '30m'
-        - 'devtools-test-end-to-end-{test_url}':
+        - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
+            test_suite: runTest
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             timeout: 60m
-        - 'devtools-test-end-to-end-{test_url}':
+        - 'devtools-test-end-to-end-{test_url}-{test_suite}':
+            test_url: openshift.io
+            test_suite: quickstartTest
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
+            timeout: 60m
+        - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
+            test_suite: runTest
+            oso_token_creds: bca7a2b5-87b9-46bb-93a8-e66a05a5d7c6
+            timeout: 60m
+        - 'devtools-test-end-to-end-{test_url}-{test_suite}':
+            test_url: prod-preview.openshift.io
+            test_suite: quickstartTest
             oso_token_creds: bca7a2b5-87b9-46bb-93a8-e66a05a5d7c6
             timeout: 60m
         - '{ci_project}-{git_repo}-fabric8-analytics':
