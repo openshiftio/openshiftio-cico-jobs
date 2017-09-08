@@ -1458,7 +1458,7 @@
             git_organization: openshiftio
             git_repo: launchpad-templates
             ci_project: 'devtools'
-            ci_cmd: 'echo "Nothing to build, just deploy nginx"'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-launchpad
             prj_name: launchpad-preview
         - '{ci_project}-{git_repo}':
