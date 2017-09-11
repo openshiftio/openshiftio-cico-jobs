@@ -912,6 +912,11 @@
                 credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
                 username: OSIO_USERNAME
                 password: OSIO_PASSWORD
+    publishers:
+      - archive:
+           artifacts: './target/screenshots/*.*,./target/surefire-reports/**'
+           allow-empty: true
+           fingerprint: true
     <<: *job_template_defaults
 
 - job:
