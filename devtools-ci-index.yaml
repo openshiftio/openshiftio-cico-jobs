@@ -1429,7 +1429,7 @@
             git_repo: che-dockerfiles
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_publish_images.sh'
-            timeout: '10m'
+            timeout: '40m'
             svc_name: none
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: openshiftio
