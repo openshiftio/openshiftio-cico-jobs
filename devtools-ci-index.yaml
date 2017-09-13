@@ -851,7 +851,7 @@
                 - master
     publishers:
         - junit:
-            results: target/**/target/surefire-reports/*.xml
+            results: '**/target/surefire-reports/*.xml'
             allow-empty-results: true
 
     triggers:
@@ -894,7 +894,7 @@
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && /bin/bash cico_build.sh && /bin/bash cico_deploy.sh"
             rtn_code=$?
-            rsync -e "ssh $sshopts" -Ha --include='surefire-reports/***' --include='*/' --exclude='*' $CICO_hostname:payload/builds/fabric8-che/target/ $(pwd)/target
+            rsync -e "ssh $sshopts" -Ha --include='surefire-reports/***' --include='*/' --exclude='*' $CICO_hostname:payload/builds/fabric8-che/ $(pwd)/builds/fabric8-che
             cico node done $CICO_ssid
             exit $rtn_code
 
@@ -1000,7 +1000,7 @@
             artifacts: ./devtools-performance-results
 
 - job-template:
-    name: 'devtools-test-end-to-end-{test_url}'
+    name: 'devtools-test-end-to-end-{test_url}-{test_suite}'
     defaults: global
     node: devtools
     properties:
@@ -1063,7 +1063,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_EE_tests.sh https://{test_url} ${{BUILD_NUMBER}}"
+            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_EE_tests.sh https://{test_url} ${{BUILD_NUMBER}} {test_suite}"
             rtn_code=$?
             if [[ $rtn_code -eq 124 ]]; then
                echo "BUILD TIMEOUT";
@@ -1118,6 +1118,14 @@
         - shell: |
             set -ex
             ENVIRONMENT=production APPSEC=true PATH=$PATH:~/.local/bin /bin/bash ~/saasherder/fetch_and_apply.sh
+
+- job-template:
+    name: '{ci_project}-{git_repo}-promote-to-prod-test'
+    builders:
+        - shell: |
+            set -ex
+            ENVIRONMENT=production PATH=$PATH:~/.local/bin DRY_RUN=true /bin/bash ~/saasherder/fetch_and_apply.sh
+    <<: *job_template_defaults
 
 - job:
     name: 'devtools-saasherder-test-master'
@@ -1450,7 +1458,7 @@
             git_organization: openshiftio
             git_repo: launchpad-templates
             ci_project: 'devtools'
-            ci_cmd: 'echo "Nothing to build, just deploy nginx"'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-launchpad
             prj_name: launchpad-preview
         - '{ci_project}-{git_repo}':
@@ -1479,6 +1487,18 @@
             ci_project: 'devtools'
         - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-launchpad
+            ci_project: 'devtools'
+        - '{ci_project}-{git_repo}-promote-to-prod-test':
+            git_repo: saas-openshiftio
+            git_organization: openshiftio
+            ci_project: 'devtools'
+        - '{ci_project}-{git_repo}-promote-to-prod-test':
+            git_repo: saas-analytics
+            git_organization: openshiftio
+            ci_project: 'devtools'
+        - '{ci_project}-{git_repo}-promote-to-prod-test':
+            git_repo: saas-launchpad
+            git_organization: openshiftio
             ci_project: 'devtools'
         - '{ci_project}-{git_repo}-build-master':
             git_repo: fabric8-auth
@@ -1509,17 +1529,36 @@
             saas_git: saas-launchpad
             prj_name: launchpad-preview
         - '{ci_project}-{git_repo}-build-master':
+            git_repo: fabric8-online-docs
+            git_organization: fabric8io
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-openshiftio
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8io
             git_repo: fabric8-test
             ci_project: 'devtools'
             ci_cmd: 'cd ee_tests/ && /bin/bash cico_build_deploy.sh'
             timeout: '30m'
-        - 'devtools-test-end-to-end-{test_url}':
+        - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
+            test_suite: runTest
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             timeout: 60m
-        - 'devtools-test-end-to-end-{test_url}':
+        - 'devtools-test-end-to-end-{test_url}-{test_suite}':
+            test_url: openshift.io
+            test_suite: quickstartTest
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
+            timeout: 60m
+        - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
+            test_suite: runTest
+            oso_token_creds: bca7a2b5-87b9-46bb-93a8-e66a05a5d7c6
+            timeout: 60m
+        - 'devtools-test-end-to-end-{test_url}-{test_suite}':
+            test_url: prod-preview.openshift.io
+            test_suite: quickstartTest
             oso_token_creds: bca7a2b5-87b9-46bb-93a8-e66a05a5d7c6
             timeout: 60m
         - '{ci_project}-{git_repo}-fabric8-analytics':
@@ -1690,4 +1729,19 @@
             saas_git: saas-analytics
             deployment_units: 'data-importer'
             deployment_configs: 'bayesian-data-importer'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-firehose-fetcher
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-firehose-fetcher
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'f8a-firehose-fetcher'
+            deployment_configs: 'f8a-firehose-fetcher'
             timeout: '20m'
