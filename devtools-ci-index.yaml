@@ -1219,7 +1219,7 @@
             git_repo: fabric8-ui
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '30m'
+            timeout: '50m'
         - '{ci_project}-{git_repo}':
             git_organization: openshiftio
             git_repo: openshift.io
