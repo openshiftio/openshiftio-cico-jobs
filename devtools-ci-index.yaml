@@ -773,7 +773,7 @@
 
 
 - job:
-    name: 'eclipse-che-build-dockerfiles'
+    name: 'devtools-eclipse-che-build-dockerfiles'
     wrappers:
         - che_credentials_wrapper
         - registry_devshift_credentials
@@ -837,7 +837,7 @@
             exit $rtn_code
 
 - job:
-    name: 'eclipse-che-promotion'
+    name: 'devtools-eclipse-che-promotion'
 
     parameters:
         - string:
