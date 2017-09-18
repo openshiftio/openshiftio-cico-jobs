@@ -938,11 +938,8 @@
             cico node done $CICO_ssid
             exit $rtn_code
 
-- job-template:
-    name: '{ci_project}-{git_repo}-che-tests'
-    triggers:
-        - github
-        - githubprb
+- che-functional-tests-template: &che-functional-tests-template
+    name: 'che-functional-tests-template'
     wrappers:
         - credentials-binding:
             - text:
@@ -958,6 +955,19 @@
            allow-empty: true
            fingerprint: true
     <<: *job_template_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-periodical'
+    triggers:
+        - timed: 'H H(5-15)/2 * * *'
+    <<: *che-functional-tests-template
+
+- job-template:
+    name: '{ci_project}-{git_repo}-prcheck'
+    triggers:
+        - github
+        - githubprb
+    <<: *che-functional-tests-template
 
 - job:
     name: 'devtools-test-performance-core-db'
@@ -1386,7 +1396,13 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-che-tests':
+        - '{ci_project}-{git_repo}-periodical':
+            git_organization: redhat-developer
+            git_repo: che-functional-tests
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_EE_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-prcheck':
             git_organization: redhat-developer
             git_repo: che-functional-tests
             ci_project: 'devtools'
