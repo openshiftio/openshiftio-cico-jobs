@@ -960,6 +960,11 @@
     name: '{ci_project}-{git_repo}-periodical'
     triggers:
         - timed: 'H H(5-15)/2 * * *'
+    scm:
+        - git:
+            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            branches:
+                - origin/master
     <<: *che-functional-tests-template
 
 - job-template:
