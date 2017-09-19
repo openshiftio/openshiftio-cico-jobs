@@ -938,11 +938,8 @@
             cico node done $CICO_ssid
             exit $rtn_code
 
-- job-template:
-    name: '{ci_project}-{git_repo}-che-tests'
-    triggers:
-        - github
-        - githubprb
+- che-functional-tests-template: &che-functional-tests-template
+    name: 'che-functional-tests-template'
     wrappers:
         - credentials-binding:
             - text:
@@ -958,6 +955,24 @@
            allow-empty: true
            fingerprint: true
     <<: *job_template_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-periodical'
+    triggers:
+        - timed: 'H H(5-15)/2 * * *'
+    scm:
+        - git:
+            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            branches:
+                - origin/master
+    <<: *che-functional-tests-template
+
+- job-template:
+    name: '{ci_project}-{git_repo}-prcheck'
+    triggers:
+        - github
+        - githubprb
+    <<: *che-functional-tests-template
 
 - job:
     name: 'devtools-test-performance-core-db'
@@ -1048,6 +1063,7 @@
     name: 'devtools-test-end-to-end-{test_url}-{test_suite}'
     defaults: global
     node: devtools
+    after: fabric8io-fabric8-test-build-master
     properties:
         - github:
             url: https://github.com/fabric8io/fabric8-test
@@ -1059,10 +1075,13 @@
             branches:
                 - master
     triggers:
-        - timed: '30  */2 * * *'
+        - timed: '{ee_test_start_time}'
         - reverse:
-            jobs: 'devtools-fabric8-test-build-master'
+            jobs: '{after}'
             result: 'success'
+        - reverse:
+            jobs: '{after}'
+            result: 'failure'
     wrappers:
         - credentials-binding:
             - username-password-separated:
@@ -1386,7 +1405,13 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-che-tests':
+        - '{ci_project}-{git_repo}-periodical':
+            git_organization: redhat-developer
+            git_repo: che-functional-tests
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_EE_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-prcheck':
             git_organization: redhat-developer
             git_repo: che-functional-tests
             ci_project: 'devtools'
@@ -1582,33 +1607,45 @@
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: runTest
+            after: fabric8io-fabric8-test-build-master
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
+            ee_test_start_time: '0 */2 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: quickstartTest
+            after: devtools-test-end-to-end-openshift.io-runTest
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
+            ee_test_start_time: null
             timeout: 60m
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: chequickstartTest
+            after: devtools-test-end-to-end-openshift.io-quickstartTest
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             timeout: 60m
+            ee_test_start_time: null
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: runTest
+            after: fabric8io-fabric8-test-build-master
             oso_token_creds: bca7a2b5-87b9-46bb-93a8-e66a05a5d7c6
+            ee_test_start_time: '0 */2 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: quickstartTest
+            after: devtools-test-end-to-end-prod-preview.openshift.io-runTest
             oso_token_creds: bca7a2b5-87b9-46bb-93a8-e66a05a5d7c6
             timeout: 60m
+            ee_test_start_time: null
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: chequickstartTest
+            after: devtools-test-end-to-end-prod-preview.openshift.io-chequickstartTest
             oso_token_creds: bca7a2b5-87b9-46bb-93a8-e66a05a5d7c6
             timeout: 60m
+            ee_test_start_time: null
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
@@ -1807,4 +1844,31 @@
             saas_git: saas-analytics
             deployment_units: 'stack-report-ui'
             deployment_configs: 'fabric8-analytics-stack-report-ui'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-scaler
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-scaler
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'worker-scaler'
+            deployment_configs: 'f8a-worker-scaler'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-vscode-extension
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-vscode-extension
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
