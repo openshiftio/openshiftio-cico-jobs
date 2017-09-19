@@ -1824,3 +1824,18 @@
             deployment_units: 'stack-report-ui'
             deployment_configs: 'fabric8-analytics-stack-report-ui'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-scaler
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-scaler
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'worker-scaler'
+            deployment_configs: 'f8a-worker-scaler'
+            timeout: '20m'
