@@ -1839,3 +1839,15 @@
             deployment_units: 'worker-scaler'
             deployment_configs: 'f8a-worker-scaler'
             timeout: '20m'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-vscode-extension
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-vscode-extension
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '20m'
