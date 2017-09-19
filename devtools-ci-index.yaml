@@ -1820,13 +1820,13 @@
             deployment_units: 'f8a-firehose-fetcher'
             deployment_configs: 'f8a-firehose-fetcher'
             timeout: '20m'
-        - '{ci_project}-{git_repo}':
+        - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-stack-report-ui
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-stack-report-ui
             ci_project: 'devtools'
@@ -1850,13 +1850,13 @@
             deployment_units: 'worker-scaler'
             deployment_configs: 'f8a-worker-scaler'
             timeout: '20m'
-        - '{ci_project}-{git_repo}':
+        - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-vscode-extension
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-vscode-extension
             ci_project: 'devtools'
