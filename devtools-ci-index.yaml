@@ -1190,6 +1190,13 @@
         - shell: |
             set -ex
             ENVIRONMENT=production PATH=$PATH:~/.local/bin DRY_RUN=true /bin/bash ~/saasherder/fetch_and_apply.sh
+            CONTEXTS=$(PATH=$PATH:~/.local/bin saasherder config get-contexts)
+            for c in `echo $CONTEXTS`; do
+                DIR=$(readlink -f $c-20* | tail -1)
+                for f in `ls $DIR`; do
+                    python ~/saasherder/check_image.py $DIR/$f
+                done
+            done
     <<: *job_template_defaults
 
 - job:
