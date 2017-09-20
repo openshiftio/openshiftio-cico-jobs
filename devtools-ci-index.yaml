@@ -1250,6 +1250,7 @@
               python setup.py install --user
               mkdir -p ~/saasherder/
               cp fetch_and_apply.sh ~/saasherder/fetch_and_apply.sh
+              cp check_image.py ~/saasherder/check_image.py
             else
               # fail mode gives us 12 hrs to debug the machine
               curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
