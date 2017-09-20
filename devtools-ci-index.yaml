@@ -1091,6 +1091,9 @@
             - text:
                 credential-id: "{oso_token_creds}"
                 variable: EE_TEST_OSO_TOKEN
+            - text:
+                credential-id: "{kc_token_creds}"
+                variable: EE_TEST_KC_TOKEN
     builders:
         - shell: |
             set +e
