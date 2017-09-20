@@ -53,6 +53,7 @@
         - lavernw1
         - rhoads-zach
         - tradej
+        - fridex
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
