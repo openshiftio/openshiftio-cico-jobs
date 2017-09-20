@@ -53,6 +53,7 @@
         - lavernw1
         - rhoads-zach
         - tradej
+        - fridex
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
@@ -1189,6 +1190,13 @@
         - shell: |
             set -ex
             ENVIRONMENT=production PATH=$PATH:~/.local/bin DRY_RUN=true /bin/bash ~/saasherder/fetch_and_apply.sh
+            CONTEXTS=$(PATH=$PATH:~/.local/bin saasherder config get-contexts)
+            for c in `echo $CONTEXTS`; do
+                DIR=$(readlink -f $c-20* | tail -1)
+                for f in `ls $DIR`; do
+                    python ~/saasherder/check_image.py $DIR/$f
+                done
+            done
     <<: *job_template_defaults
 
 - job:
@@ -1249,6 +1257,7 @@
               python setup.py install --user
               mkdir -p ~/saasherder/
               cp fetch_and_apply.sh ~/saasherder/fetch_and_apply.sh
+              cp check_image.py ~/saasherder/check_image.py
             else
               # fail mode gives us 12 hrs to debug the machine
               curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
@@ -1607,7 +1616,7 @@
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: runTest
-            after: fabric8io-fabric8-test-build-master
+            after: devtools-fabric8-test-build-master   
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             ee_test_start_time: '0 */2 * * *'
             timeout: 60m
@@ -1830,13 +1839,13 @@
             deployment_units: 'f8a-firehose-fetcher'
             deployment_configs: 'f8a-firehose-fetcher'
             timeout: '20m'
-        - '{ci_project}-{git_repo}':
+        - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-stack-report-ui
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-stack-report-ui
             ci_project: 'devtools'
@@ -1860,13 +1869,13 @@
             deployment_units: 'worker-scaler'
             deployment_configs: 'f8a-worker-scaler'
             timeout: '20m'
-        - '{ci_project}-{git_repo}':
+        - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-vscode-extension
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-vscode-extension
             ci_project: 'devtools'
