@@ -209,6 +209,20 @@
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
 
+- job-template:
+    name: '{ci_project}-{git_repo}-fabric8-analytics-pylint'
+    git_organization: fabric8-analytics
+    ci_project: 'devtools'
+    ci_cmd: '/bin/bash run-linter.sh'
+    timeout: '20m'
+    triggers:
+      - github-pull-request:
+          status-context: "ci.centos.org pylint run (fabric8-analytics)"
+          org-list:
+            - fabric8-analytics
+          <<: *github_pull_request_defaults
+    <<: *job_template_defaults
+
 - job-template: &job_template_build_defaults
     name: 'job_template_build_defaults'
     description: |
@@ -1781,6 +1795,8 @@
             deployment_units: 'api'
             deployment_configs: 'bayesian-api'
             timeout: '30m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-server
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-worker-base
