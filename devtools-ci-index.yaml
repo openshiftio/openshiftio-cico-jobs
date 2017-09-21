@@ -1795,6 +1795,8 @@
             deployment_units: 'api'
             deployment_configs: 'bayesian-api'
             timeout: '30m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-server
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-worker-base
