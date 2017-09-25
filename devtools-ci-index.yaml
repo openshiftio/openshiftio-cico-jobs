@@ -59,7 +59,6 @@
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
     <<: *admin_list_defaults
-    cron: '* * * * *'
     github-hooks: '{github_hooks}'
     permit-all: false
     trigger-phrase: '.*\[test\].*'
