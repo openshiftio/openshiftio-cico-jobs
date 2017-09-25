@@ -203,6 +203,7 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-fabric8-analytics'
+    github_hooks: true
     triggers:
       - github-pull-request:
           status-context: "ci.centos.org PR build (fabric8-analytics)"
@@ -214,6 +215,7 @@
 - job-template:
     name: '{ci_project}-{git_repo}-fabric8-analytics-pylint'
     git_organization: fabric8-analytics
+    github_hooks: true
     ci_project: 'devtools'
     ci_cmd: '/bin/bash run-linter.sh'
     timeout: '20m'
