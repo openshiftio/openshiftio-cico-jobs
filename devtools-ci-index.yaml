@@ -4,7 +4,7 @@
     jobdescription: "Managed by Jenkins Job Builder, do not edit manually! Update via https://github.com/almighty/almighty-jobs"
     git_organization: fabric8-services
     github_user: almighty-bot
-    github_hooks: false
+    github_hooks: true
     branch: master
 
 - admin_list_defaults: &admin_list_defaults
