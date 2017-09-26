@@ -215,7 +215,7 @@
     name: '{ci_project}-{git_repo}-fabric8-analytics-pylint'
     git_organization: fabric8-analytics
     ci_project: 'devtools'
-    ci_cmd: '/bin/bash run-linter.sh'
+    ci_cmd: '/bin/bash cico_run_pylint.sh'
     timeout: '20m'
     triggers:
       - github-pull-request:
