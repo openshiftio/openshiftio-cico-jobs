@@ -1687,6 +1687,8 @@
             timeout: '20m'
             prj_name: bayesian-preview
             saas_git: saas-analytics
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-common
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
@@ -1710,6 +1712,8 @@
             deployment_units: 'jobs'
             deployment_configs: 'bayesian-jobs'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-jobs
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: anitya-docker
@@ -1755,6 +1759,8 @@
             deployment_units: 'kronos-pypi kronos-maven'
             deployment_configs: 'bayesian-kronos-pypi bayesian-kronos-maven'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-stack-analysis
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-license-analysis
@@ -1770,6 +1776,8 @@
             deployment_units: 'license-analysis'
             deployment_configs: 'f8a-license-analysis'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-license-analysis
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-worker
@@ -1785,6 +1793,8 @@
             deployment_units: 'worker-ingestion worker-api worker-ingestion-graph-import worker-api-graph-import'
             deployment_configs: 'bayesian-worker-ingestion bayesian-worker-api bayesian-worker-ingestion-graph-import bayesian-worker-api-graph-import'
             timeout: '30m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-worker
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-server
@@ -1845,6 +1855,8 @@
             deployment_units: 'data-importer'
             deployment_configs: 'bayesian-data-importer'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-data-model
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-firehose-fetcher
@@ -1902,3 +1914,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-tagger
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-recommender
