@@ -1556,7 +1556,7 @@
             saas_git: saas-launchpad
             prj_name: launchpad-preview
         - '{ci_project}-{git_repo}':
-            git_organization: openshiftio
+            git_organization: fabric8-launch
             git_repo: appdev-documentation
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_test.sh'
