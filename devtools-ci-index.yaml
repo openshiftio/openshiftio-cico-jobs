@@ -1526,7 +1526,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             svc_name: fabric8-ui-ngx-base
         - '{ci_project}-{git_repo}-generator-build-master':
-            git_organization: openshiftio
+            git_organization: fabric8-launch
             git_repo: launchpad-frontend
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
@@ -1534,7 +1534,7 @@
             saas_git: saas-launchpad
             prj_name: launchpad-preview
         - '{ci_project}-{git_repo}-generator-build-master':
-            git_organization: openshiftio
+            git_organization: fabric8-launch
             git_repo: launchpad-backend
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
@@ -1542,14 +1542,14 @@
             saas_git: saas-launchpad
             prj_name: launchpad-preview
         - '{ci_project}-{git_repo}-generator-build-master':
-            git_organization: openshiftio
+            git_organization: fabric8-launch
             git_repo: launchpad-missioncontrol
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-launchpad
             prj_name: launchpad-preview
         - '{ci_project}-{git_repo}-generator-build-master':
-            git_organization: openshiftio
+            git_organization: fabric8-launch
             git_repo: launchpad-templates
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
