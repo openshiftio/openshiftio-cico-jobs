@@ -1619,7 +1619,7 @@
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             timeout: '25m'
         - '{ci_project}-{git_repo}-generator-build-master':
-            git_organization: openshiftio
+            git_organization: fabric8-launch
             git_repo: appdev-documentation
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
