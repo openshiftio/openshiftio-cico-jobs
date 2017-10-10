@@ -1101,7 +1101,7 @@
             groups:
               - jobs:
                     - '{after}'
-                result:
+                results:
                     - success
                     - failure
     wrappers:
