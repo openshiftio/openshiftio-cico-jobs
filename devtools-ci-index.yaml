@@ -1649,7 +1649,8 @@
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: quickstartTest
-            after: devtools-test-end-to-end-openshift.io-runTest
+#            after: devtools-test-end-to-end-openshift.io-runTest
+            after: null
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '30 */2 * * *'
@@ -1657,11 +1658,21 @@
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: chequickstartTest
-            after: devtools-test-end-to-end-openshift.io-quickstartTest
+#            after: devtools-test-end-to-end-openshift.io-quickstartTest
+            after: null
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             timeout: 60m
             ee_test_start_time: '0 1-23/2 * * *'
+        - 'devtools-test-end-to-end-{test_url}-{test_suite}':
+            test_url: openshift.io
+            test_suite: cheTest
+#            after: devtools-test-end-to-end-openshift.io-chequickstartTest
+            after: null
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
+            kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
+            timeout: 60m
+            ee_test_start_time: '30 1-23/2 * * *'
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: runTest
@@ -1673,7 +1684,8 @@
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: quickstartTest
-            after: devtools-test-end-to-end-prod-preview.openshift.io-runTest
+#            after: devtools-test-end-to-end-prod-preview.openshift.io-runTest
+            after: null
             oso_token_creds: bca7a2b5-87b9-46bb-93a8-e66a05a5d7c6
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             timeout: 60m
@@ -1681,11 +1693,21 @@
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: chequickstartTest
-            after: devtools-test-end-to-end-prod-preview.openshift.io-chequickstartTest
+#            after: devtools-test-end-to-end-prod-preview.openshift.io-chequickstartTest
+            after: null
             oso_token_creds: bca7a2b5-87b9-46bb-93a8-e66a05a5d7c6
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             timeout: 60m
             ee_test_start_time: '0 1-23/2 * * *'
+        - 'devtools-test-end-to-end-{test_url}-{test_suite}':
+            test_url: pro-preview.openshift.io
+            test_suite: cheTest
+#            after: devtools-test-end-to-end-prod-preview.openshift.io-chequickstartTest
+            after: null
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
+            kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
+            timeout: 60m
+            ee_test_start_time: '30 1-23/2 * * *'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
