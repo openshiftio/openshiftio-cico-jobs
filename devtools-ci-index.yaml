@@ -204,6 +204,8 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-fabric8-analytics'
+    wrappers:
+        - ansicolor
     triggers:
       - github-pull-request:
           status-context: "ci.centos.org PR build (fabric8-analytics)"
@@ -214,6 +216,8 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-fabric8-analytics-pylint'
+    wrappers:
+        - ansicolor
     git_organization: fabric8-analytics
     ci_project: 'devtools'
     ci_cmd: '/bin/bash cico_run_pylint.sh'
@@ -434,6 +438,7 @@
     name: '{ci_project}-{git_repo}-f8a-build-master'
     wrappers:
         - registry_devshift_credentials
+        - ansicolor
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
@@ -516,6 +521,7 @@
     name: '{ci_project}-f8a-master-deploy-e2e-test'
     wrappers:
         - recommender_api_token
+        - ansicolor
     concurrent: false
     parameters:
       - string:
