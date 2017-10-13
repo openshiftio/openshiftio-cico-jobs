@@ -418,7 +418,7 @@
                 credential-id: 2fc94f6b-dfef-49a4-a217-fe47aaeea056
                 variable: RECOMMENDER_API_TOKEN
 
-- job-template:
+- job-template: &job_template_build_master
     name: '{ci_project}-{git_repo}-build-master'
     wrappers:
         - registry_devshift_credentials
@@ -429,6 +429,10 @@
             branches:
                 - master
     <<: *job_template_build_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-{subdir}-build-master'
+    <<: *job_template_build_master
 
 - job-template:
     name: '{ci_project}-{git_repo}-f8a-build-master'
