@@ -1946,6 +1946,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-chat
+            prj_name: mattermost-preview
         - '{ci_project}-{git_repo}-{subdir}-build-master':
             git_organization: rhdt
             git_repo: chat-integrations
@@ -1953,6 +1954,7 @@
             ci_project: 'devtools'
             ci_cmd: 'cd github && /bin/bash cico_build_deploy.sh'
             saas_git: saas-chat
+            prj_name: mattermost-preview
         - '{ci_project}-{git_repo}-{subdir}-build-master':
             git_organization: rhdt
             git_repo: chat-integrations
@@ -1960,6 +1962,7 @@
             ci_project: 'devtools'
             ci_cmd: 'cd gitlab && /bin/bash cico_build_deploy.sh'
             saas_git: saas-chat
+            prj_name: mattermost-preview
         - '{ci_project}-{git_repo}-{subdir}-build-master':
             git_organization: rhdt
             git_repo: chat-integrations
@@ -1967,6 +1970,7 @@
             ci_project: 'devtools'
             ci_cmd: 'cd rssfeeds && /bin/bash cico_build_deploy.sh'
             saas_git: saas-chat
+            prj_name: mattermost-preview
         - '{ci_project}-{git_repo}-{subdir}-build-master':
             git_organization: rhdt
             git_repo: chat-integrations
@@ -1974,9 +1978,11 @@
             ci_project: 'devtools'
             ci_cmd: 'cd irc && /bin/bash cico_build_deploy.sh'
             saas_git: saas-chat
+            prj_name: mattermost-preview
         - '{ci_project}-{git_repo}-build-master':
             git_organization: rhdt
             git_repo: chat-push-proxy
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-chat
+            prj_name: mattermost-preview
