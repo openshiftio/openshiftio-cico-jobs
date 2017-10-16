@@ -1999,3 +1999,15 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-chat
             prj_name: mattermost-preview
+          - '{ci_project}-{git_repo}':
+            git_organization: fabric8-analytics
+            git_repo: vscode-osio-auth
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+         - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-analytics
+            git_repo: vscode-osio-auth
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '20m'
