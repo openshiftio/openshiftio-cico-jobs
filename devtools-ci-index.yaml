@@ -246,6 +246,7 @@
 
 - job-template: &job_template_build_defaults
     name: 'job_template_build_defaults'
+    subdir: ''
     description: |
       {jobdescription}
     node: "{ci_project}"
@@ -269,10 +270,14 @@
             PATH=$PATH:~/.local/bin/
             CONTEXT=$(echo $SAAS_GIT | sed 's/.*://')
             SAAS_GIT=$(echo $SAAS_GIT | sed 's/:.*//')
+            SAAS_SERVICE_NAME=$GIT_REPO
+            if [ "$SUBDIR" != "" ]; then
+                $SAAS_SERVICE_NAME=$SAAS_SERVICE_NAME"-"$SUBDIR
+            fi
             git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
             cd saas.git
             [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
-            export DEVSHIFT_TAG_LEN=$(saasherder --environment $SAAS_ENV get hash_length $GIT_REPO)
+            export DEVSHIFT_TAG_LEN=$(saasherder --environment $SAAS_ENV get hash_length $SAAS_SERVICE_NAME)
             cd ..
         fi
     saasherder_deploy: |
@@ -282,10 +287,10 @@
         fi
         if [ "$SAAS_GIT" != "none" ]; then
             cd saas.git
-            saasherder --environment $SAAS_ENV update hash $GIT_REPO $GIT_COMMIT
-            saasherder --environment $SAAS_ENV pull $GIT_REPO
-            saasherder --environment $SAAS_ENV template --output-dir $GIT_REPO-processed tag $GIT_REPO
-            oc apply -f $GIT_REPO-processed/$GIT_REPO.yaml -n $PRJ_NAME
+            saasherder --environment $SAAS_ENV update hash $SAAS_SERVICE_NAME $GIT_COMMIT
+            saasherder --environment $SAAS_ENV pull $SAAS_SERVICE_NAME
+            saasherder --environment $SAAS_ENV template --output-dir $GIT_REPO-processed tag $SAAS_SERVICE_NAME
+            oc apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
             rtn_code=$?
             cd ..
         fi
@@ -326,6 +331,7 @@
             else
                 #Prepare values for deployment
                 SVC_NAME={svc_name}
+                SUBDIR="{subdir}"
                 GIT_REPO={git_repo}
                 PRJ_NAME={prj_name}
                 SAAS_GIT={saas_git}
