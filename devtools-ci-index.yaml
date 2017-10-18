@@ -593,7 +593,7 @@
             {saasherder_prepare}
             export DEVSHIFT_TAG_LEN=7
             for DEPLOYMENT_UNIT in $DEPLOYMENT_UNITS; do
-                export GIT_REPO=$DEPLOYMENT_UNIT
+                export SAAS_SERVICE_NAME=$DEPLOYMENT_UNIT
                 # Deploy preview
                 {saasherder_deploy}
             done
