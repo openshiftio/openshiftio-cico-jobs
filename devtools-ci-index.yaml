@@ -940,7 +940,7 @@
             url: https://github.com/redhat-developer/rh-che.git
             shallow_clone: true
             branches:
-                - {ci_branch}
+                - '{ci_branch}'
     publishers:
         - junit:
             results: '**/target/surefire-reports/*.xml'
