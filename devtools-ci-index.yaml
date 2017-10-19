@@ -545,6 +545,35 @@
 
 - job-template:
     name: '{ci_project}-f8a-master-deploy-e2e-test'
+    publishers:
+        - email-ext:
+            recipients: pkajaba@redhat.com
+            reply-to: pkajaba@redhat.com
+            content-type: html
+            body: The build has finished
+            always: true
+            unstable: true
+            first-failure: true
+            not-built: true
+            aborted: true
+            regression: true
+            failure: true
+            second-failure: true
+            improvement: true
+            still-failing: true
+            success: true
+            fixed: true
+            still-unstable: true
+            pre-build: true
+            matrix-trigger: only-configurations
+            presend-script: "cancel=true"
+            postsend-script: "cancel=true"
+            save-output: true
+            send-to:
+                - developers
+                - requester
+                - culprits
+                - recipients
     wrappers:
         - recommender_api_token
         - ansicolor
