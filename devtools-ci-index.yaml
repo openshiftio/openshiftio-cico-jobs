@@ -916,8 +916,8 @@
             docker tag ${CHE_SERVER_STAGE_DOCKER_IMAGE} ${CHE_SERVER_PROD_DOCKER_IMAGE}
             docker push ${CHE_SERVER_PROD_DOCKER_IMAGE}
 
-- job:
-    name: 'devtools-build-run-che-build-master'
+- job-template:
+    name: 'devtools-build-run-che-build-{ci_branch}'
     wrappers:
         - che_credentials_wrapper
         - registry_devshift_credentials
@@ -939,7 +939,7 @@
             url: https://github.com/redhat-developer/rh-che.git
             shallow_clone: true
             branches:
-                - master
+                - {ci_branch}
     publishers:
         - junit:
             results: '**/target/surefire-reports/*.xml'
@@ -2028,3 +2028,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
+        - 'devtools-build-run-che-build-{ci_branch}':
+            ci_branch: master
+        - 'devtools-build-run-che-build-{ci_branch}':
+            ci_branch: multi-tenant-rh-che
