@@ -1629,6 +1629,9 @@
             git_repo: saas-openshiftio
             ci_project: 'devtools'
         - '{ci_project}-{git_repo}-promote-to-prod':
+            git_repo: saas-chat
+            ci_project: 'devtools'
+        - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-analytics
             ci_project: 'devtools'
         - '{ci_project}-{git_repo}-promote-to-prod':
