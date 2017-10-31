@@ -548,8 +548,8 @@
     name: '{ci_project}-f8a-master-deploy-e2e-test'
     publishers:
         - email-ext:
-            recipients: devtools-ci@redhat.com
-            reply-to: devtools-ci@redhat.com
+            recipients: bayesian-ci@redhat.com
+            reply-to: bayesian-ci@redhat.com
             content-type: html
             body: "The build has finished. Build URL: $BUILD_URL"
             failure: true
