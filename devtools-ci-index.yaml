@@ -130,6 +130,7 @@
         - shell: |
             # testing out the cico client
             set +e
+            cp ~/artifacts.key .
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
             n=1
