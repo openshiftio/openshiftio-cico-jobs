@@ -1756,6 +1756,8 @@
             saas_git: saas-analytics
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-common
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: fabric8-analytics-common
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
