@@ -59,6 +59,14 @@
         - jarifibrahim
         - pkajaba
         - aditya-konarde
+        - rawlingsj
+        - andrewazores
+        - neugens
+        - stooke
+        - c-koehler
+        - ebaron
+        - jiekang
+        - chrislessard
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
