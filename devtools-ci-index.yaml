@@ -56,6 +56,17 @@
         - tradej
         - fridex
         - kishansagathiya
+        - jarifibrahim
+        - pkajaba
+        - aditya-konarde
+        - rawlingsj
+        - andrewazores
+        - neugens
+        - stooke
+        - c-koehler
+        - ebaron
+        - jiekang
+        - chrislessard
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
@@ -127,6 +138,7 @@
         - shell: |
             # testing out the cico client
             set +e
+            cp ~/artifacts.key .
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
             n=1
@@ -246,6 +258,7 @@
 
 - job-template: &job_template_build_defaults
     name: 'job_template_build_defaults'
+    subdir: ''
     description: |
       {jobdescription}
     node: "{ci_project}"
@@ -269,10 +282,14 @@
             PATH=$PATH:~/.local/bin/
             CONTEXT=$(echo $SAAS_GIT | sed 's/.*://')
             SAAS_GIT=$(echo $SAAS_GIT | sed 's/:.*//')
+            SAAS_SERVICE_NAME=$GIT_REPO
+            if [ "$SUBDIR" != "" ]; then
+                $SAAS_SERVICE_NAME=$SAAS_SERVICE_NAME"-"$SUBDIR
+            fi
             git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
             cd saas.git
             [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
-            export DEVSHIFT_TAG_LEN=$(saasherder --environment $SAAS_ENV get hash_length $GIT_REPO)
+            export DEVSHIFT_TAG_LEN=$(saasherder --environment $SAAS_ENV get hash_length $SAAS_SERVICE_NAME)
             cd ..
         fi
     saasherder_deploy: |
@@ -282,10 +299,10 @@
         fi
         if [ "$SAAS_GIT" != "none" ]; then
             cd saas.git
-            saasherder --environment $SAAS_ENV update hash $GIT_REPO $GIT_COMMIT
-            saasherder --environment $SAAS_ENV pull $GIT_REPO
-            saasherder --environment $SAAS_ENV template --output-dir $GIT_REPO-processed tag $GIT_REPO
-            oc apply -f $GIT_REPO-processed/$GIT_REPO.yaml -n $PRJ_NAME
+            saasherder --environment $SAAS_ENV update hash $SAAS_SERVICE_NAME $GIT_COMMIT
+            saasherder --environment $SAAS_ENV pull $SAAS_SERVICE_NAME
+            saasherder --environment $SAAS_ENV template --output-dir $GIT_REPO-processed tag $SAAS_SERVICE_NAME
+            oc apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
             rtn_code=$?
             cd ..
         fi
@@ -326,6 +343,7 @@
             else
                 #Prepare values for deployment
                 SVC_NAME={svc_name}
+                SUBDIR="{subdir}"
                 GIT_REPO={git_repo}
                 PRJ_NAME={prj_name}
                 SAAS_GIT={saas_git}
@@ -537,6 +555,20 @@
 
 - job-template:
     name: '{ci_project}-f8a-master-deploy-e2e-test'
+    publishers:
+        - email-ext:
+            recipients: bayesian-ci@redhat.com
+            reply-to: bayesian-ci@redhat.com
+            content-type: html
+            body: "The build has finished. Build URL: $BUILD_URL"
+            failure: true
+            success: true
+            matrix-trigger: only-configurations
+            send-to:
+                - developers
+                - requester
+                - culprits
+                - recipients
     wrappers:
         - recommender_api_token
         - ansicolor
@@ -564,6 +596,8 @@
           name: CICO_HOSTNAME
       - string:
           name: CICO_SSID
+      - string:
+          name: BUILD_URL
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
@@ -586,6 +620,7 @@
             {saasherder_prepare}
             export DEVSHIFT_TAG_LEN=7
             for DEPLOYMENT_UNIT in $DEPLOYMENT_UNITS; do
+                export SAAS_SERVICE_NAME=$DEPLOYMENT_UNIT
                 export GIT_REPO=$DEPLOYMENT_UNIT
                 # Deploy preview
                 {saasherder_deploy}
@@ -908,8 +943,8 @@
             docker tag ${CHE_SERVER_STAGE_DOCKER_IMAGE} ${CHE_SERVER_PROD_DOCKER_IMAGE}
             docker push ${CHE_SERVER_PROD_DOCKER_IMAGE}
 
-- job:
-    name: 'devtools-build-run-che-build-master'
+- job-template:
+    name: 'devtools-build-run-che-build-{ci_branch}'
     wrappers:
         - che_credentials_wrapper
         - registry_devshift_credentials
@@ -931,7 +966,7 @@
             url: https://github.com/redhat-developer/rh-che.git
             shallow_clone: true
             branches:
-                - master
+                - '{ci_branch}'
     publishers:
         - junit:
             results: '**/target/surefire-reports/*.xml'
@@ -992,11 +1027,6 @@
                 credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
                 username: OSIO_USERNAME
                 password: OSIO_PASSWORD
-    publishers:
-      - archive:
-           artifacts: './target/screenshots/*.*,./target/surefire-reports/**'
-           allow-empty: true
-           fingerprint: true
     <<: *job_template_defaults
 
 - job-template:
@@ -1107,6 +1137,7 @@
     name: 'devtools-test-end-to-end-{test_url}-{test_suite}'
     defaults: global
     node: devtools
+    after: fabric8io-fabric8-test-build-master
     properties:
         - github:
             url: https://github.com/fabric8io/fabric8-test
@@ -1119,6 +1150,14 @@
                 - master
     triggers:
         - timed: '{ee_test_start_time}'
+        - build-result:
+            cron: '* * * * *'
+            groups:
+              - jobs:
+                    - '{after}'
+                results:
+                    - success
+                    - failure
     wrappers:
         - credentials-binding:
             - username-password-separated:
@@ -1601,6 +1640,9 @@
             git_repo: saas-openshiftio
             ci_project: 'devtools'
         - '{ci_project}-{git_repo}-promote-to-prod':
+            git_repo: saas-chat
+            ci_project: 'devtools'
+        - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-analytics
             ci_project: 'devtools'
         - '{ci_project}-{git_repo}-promote-to-prod':
@@ -1662,6 +1704,7 @@
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: runTest
+            after: devtools-fabric8-test-build-master   
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b 
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '0 */2 * * *'
@@ -1669,6 +1712,7 @@
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: quickstartTest
+            after: devtools-test-end-to-end-openshift.io-runTest
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '30 */2 * * *'
@@ -1676,6 +1720,7 @@
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: chequickstartTest
+            after: devtools-test-end-to-end-openshift.io-quickstartTest
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             timeout: 60m
@@ -1685,6 +1730,7 @@
             test_suite: runTest
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
+            after: fabric8io-fabric8-test-build-master
             ee_test_start_time: '0 */2 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
@@ -1692,6 +1738,7 @@
             test_suite: quickstartTest
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
+            after: devtools-test-end-to-end-prod-preview.openshift.io-runTest
             timeout: 60m
             ee_test_start_time: '30 */2 * * *'
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
@@ -1699,6 +1746,7 @@
             test_suite: chequickstartTest
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
+            after: devtools-test-end-to-end-prod-preview.openshift.io-chequickstartTest
             timeout: 60m
             ee_test_start_time: '0 1-23/2 * * *'
         - '{ci_project}-{git_repo}-fabric8-analytics':
@@ -1715,6 +1763,8 @@
             prj_name: bayesian-preview
             saas_git: saas-analytics
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-common
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-common
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -1929,13 +1979,13 @@
             deployment_units: 'worker-scaler'
             deployment_configs: 'f8a-worker-scaler'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-fabric8-analytics':
+        - '{ci_project}-{git_repo}':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-vscode-extension
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-f8a-build-master':
+        - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-vscode-extension
             ci_project: 'devtools'
@@ -1993,3 +2043,34 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-chat
             prj_name: mattermost-preview
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-analytics
+            git_repo: vscode-osio-auth
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-analytics
+            git_repo: vscode-osio-auth
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '20m'
+        - 'devtools-build-run-che-build-{ci_branch}':
+            ci_branch: master
+        - 'devtools-build-run-che-build-{ci_branch}':
+            ci_branch: multi-tenant-rh-che
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: 3scale-admin-gateway
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: 3scale-admin-gateway
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: '3scale-admin-gateway'
+            deployment_configs: '3scale-admin-gateway'
+            timeout: '20m'
