@@ -655,7 +655,7 @@
     <<: *job_template_build_defaults
 
 - job-template:
-    name: '{ci_project}-{git_repo}-build-che-credentials-master'
+    name: '{ci_project}-{git_repo}-build-che-credentials-{branch}'
     wrappers:
         - che_credentials_wrapper
         - registry_devshift_credentials
@@ -1413,7 +1413,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '10m'
-        - '{ci_project}-{git_repo}-build-che-credentials-master':
+        - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
             git_organization: redhat-developer
             git_repo: che-starter
             ci_project: 'devtools'
@@ -1444,7 +1444,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_EE_tests.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-che-credentials-master':
+        - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
             git_organization: redhat-developer
             git_repo: rh-che
             ci_project: 'devtools'
@@ -1452,7 +1452,7 @@
             ci_cmd: '/bin/bash .ci/cico_build.sh && /bin/bash .ci/cico_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-che-credentials-master':
+        - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
             git_organization: redhat-developer
             git_repo: rh-che
             ci_project: 'devtools'
