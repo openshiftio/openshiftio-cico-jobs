@@ -959,8 +959,9 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-periodical'
-    triggers:
-        - timed: 'H H(5-15)/2 * * *'
+# Temporarily disabled execution.
+#    triggers:
+#        - timed: 'H H(5-15)/2 * * *'
     scm:
         - git:
             url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
@@ -970,10 +971,11 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-prcheck'
-    triggers:
-        - github
-        - githubprb:
-            github_hooks: '{github_hooks}'
+# Temporarily disabled execution.
+#    triggers:
+#        - github
+#        - githubprb:
+#            github_hooks: '{github_hooks}'
     <<: *che-functional-tests-template
 
 - job:
