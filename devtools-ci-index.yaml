@@ -119,6 +119,18 @@
                 credential-id: 93da78ec-7785-49ab-a1ef-586424b3e94f
                 variable: creds_config_file
 
+- wrapper:
+    name: che_functional_tests_credentials_wrapper
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: de793dce-5821-4182-af4f-6c7b42b5c21d
+                variable: KEYCLOAK_TOKEN
+            - username-password-separated:
+                credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
+                username: OSIO_USERNAME
+                password: OSIO_PASSWORD
+
 - job_template_defaults: &job_template_defaults
     name: 'job_template_defaults'
     description: |
@@ -655,7 +667,7 @@
 
     <<: *job_template_build_defaults
 
-- job-template:
+- job-template: &build_che_template
     name: '{ci_project}-{git_repo}-build-che-credentials-{branch}'
     wrappers:
         - che_credentials_wrapper
@@ -723,6 +735,16 @@
             cico node done $CICO_ssid
             exit $rtn_code
     <<: *job_template_build_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-build-che-credentials-pr-check'
+    wrappers:
+        - che_functional_tests_credentials_wrapper
+        - che_credentials_wrapper
+    triggers:
+        - github-pull-request:
+            <<: *github_pull_request_defaults
+    <<: *build_che_template
 
 - job-template:
     name: '{ci_project}-{git_repo}-publish-branch'
@@ -947,14 +969,7 @@
 - che-functional-tests-template: &che-functional-tests-template
     name: 'che-functional-tests-template'
     wrappers:
-        - credentials-binding:
-            - text:
-                credential-id: de793dce-5821-4182-af4f-6c7b42b5c21d
-                variable: KEYCLOAK_TOKEN
-            - username-password-separated:
-                credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
-                username: OSIO_USERNAME
-                password: OSIO_PASSWORD
+        - che_functional_tests_credentials_wrapper
     <<: *job_template_defaults
 
 - job-template:
@@ -1455,6 +1470,16 @@
             ci_cmd: '/bin/bash .ci/cico_build.sh && /bin/bash .ci/cico_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '20m'
+
+        - '{ci_project}-{git_repo}-build-che-credentials-pr-check':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            branch: master
+            ci_cmd: '/bin/bash .ci/cico_build.sh && /bin/bash .ci/cico_run_functional_tests.sh'
+            saas_git: saas-openshiftio
+            timeout: '20m'
+
         - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
             git_organization: redhat-developer
             git_repo: rh-che
