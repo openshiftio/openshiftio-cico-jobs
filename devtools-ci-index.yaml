@@ -217,6 +217,7 @@
 - job-template:
     name: '{ci_project}-{git_repo}-fabric8-analytics'
     wrappers:
+        - registry_devshift_credentials
         - ansicolor
     triggers:
       - github-pull-request:
