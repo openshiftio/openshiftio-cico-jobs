@@ -1460,7 +1460,7 @@
             git_repo: rh-che
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .ci/cico_build.sh && /bin/bash .ci/cico_deploy.sh'
-            saas_git: saas-openshiftio
+            #saas_git: saas-openshiftio Do not deploy master branch
             timeout: '20m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
