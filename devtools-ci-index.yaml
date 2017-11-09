@@ -960,7 +960,7 @@
 - job-template:
     name: '{ci_project}-{git_repo}-periodical'
 # Temporarily disabled execution.
-#    triggers:
+    triggers:
 #        - timed: 'H H(5-15)/2 * * *'
     scm:
         - git:
@@ -972,7 +972,7 @@
 - job-template:
     name: '{ci_project}-{git_repo}-prcheck'
 # Temporarily disabled execution.
-#    triggers:
+    triggers:
 #        - github
 #        - githubprb:
 #            github_hooks: '{github_hooks}'
