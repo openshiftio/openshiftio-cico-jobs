@@ -235,9 +235,9 @@
         - ansicolor
     triggers:
       - github-pull-request:
-          status-context: "ci.centos.org PR build (fabric8-analytics)"
           org-list:
             - fabric8-analytics
+          status-context:
           success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry: `docker pull registry.devshift.net/{image_name}:SNAPSHOT-PR-$ghprbPullId`"
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
