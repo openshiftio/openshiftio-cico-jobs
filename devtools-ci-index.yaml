@@ -1307,7 +1307,7 @@
             git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
-            timeout: '45m'
+            timeout: '1h'
         - '{ci_project}-{git_repo}':
             git_repo: fabric8-devdoc
             ci_project: 'devtools'
@@ -1372,7 +1372,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             svc_name: core
-            timeout: '25m'
+            timeout: '1h'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: aslakknutsen
             git_repo: almighty-performance
