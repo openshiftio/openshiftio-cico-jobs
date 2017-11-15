@@ -745,6 +745,7 @@
         - che_functional_tests_credentials_wrapper
         - che_credentials_wrapper
     triggers:
+        - github
         - github-pull-request:
             <<: *github_pull_request_defaults
     <<: *build_che_template
