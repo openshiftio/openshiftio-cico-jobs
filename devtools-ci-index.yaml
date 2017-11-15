@@ -317,7 +317,7 @@
             cd saas.git
             saasherder --environment $SAAS_ENV update hash $SAAS_SERVICE_NAME $GIT_COMMIT
             saasherder --environment $SAAS_ENV pull $SAAS_SERVICE_NAME
-            saasherder --environment $SAAS_ENV template --output-dir $GIT_REPO-processed tag $SAAS_SERVICE_NAME
+            saasherder --environment $SAAS_ENV template --filter Route --output-dir $GIT_REPO-processed tag $SAAS_SERVICE_NAME
             oc apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
             rtn_code=$?
             cd ..
