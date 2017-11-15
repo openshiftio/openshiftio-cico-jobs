@@ -613,7 +613,7 @@
             env > integration-tests/jenkins-env
             gc() {{
                 rtn_code=$?
-                cico node done $CICO_SSID || :
+                cico node done $CICO_ssid || :
                 exit $rtn_code
             }}
             trap gc EXIT SIGINT
@@ -621,8 +621,8 @@
 
             # Run E2E tests
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
-            ssh_cmd="ssh $sshopts $CICO_HOSTNAME"
-            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_HOSTNAME:payload-tests
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload-tests
             $ssh_cmd -t "cd payload-tests/integration-tests && /bin/bash cico_run_tests.sh"
     <<: *job_template_defaults
 
