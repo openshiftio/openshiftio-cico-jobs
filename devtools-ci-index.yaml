@@ -570,6 +570,38 @@
     <<: *job_template_build_defaults
 
 - job-template:
+    name: '{ci_project}-e2e-fabric8-analytics'
+    triggers:
+      - github-pull-request:
+          status-context: "ci.centos.org PR build (fabric8-analytics)"
+          org-list:
+            - fabric8-analytics
+          <<: *github_pull_request_defaults
+    wrappers:
+        - recommender_api_token
+        - ansicolor
+    concurrent: false
+    builders:
+        - shell: |
+            env > integration-tests/jenkins-env
+
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            gc() {{
+                rtn_code=$?
+                cico node done $CICO_SSID || :
+                exit $rtn_code
+            }}
+            trap gc EXIT SIGINT
+            set -e
+
+            # Run E2E tests
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_HOSTNAME"
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_HOSTNAME:payload-tests
+            $ssh_cmd -t "cd payload-tests/integration-tests && /bin/bash cico_run_tests.sh"
+    <<: *job_template_defaults
+
+- job-template:
     name: '{ci_project}-f8a-master-deploy-e2e-test'
     publishers:
         - email-ext:
@@ -2093,3 +2125,8 @@
             deployment_units: 'api-machine-stacks'
             deployment_configs: 'f8a-api-machine-stacks'
             timeout: '20m'
+        - '{ci_project}-e2e-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-common
+            ci_project: 'devtools'
+            timeout: '30m'
