@@ -1770,7 +1770,7 @@
             after: devtools-fabric8-test-build-master   
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b 
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
-            ee_test_start_time: '0 */2 * * *'
+            ee_test_start_time: '0 */4 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
@@ -1778,7 +1778,7 @@
             after: devtools-test-end-to-end-openshift.io-runTest
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
-            ee_test_start_time: '30 */2 * * *'
+            ee_test_start_time: '30 */4 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
@@ -1787,14 +1787,14 @@
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             timeout: 60m
-            ee_test_start_time: '0 1-23/2 * * *'
+            ee_test_start_time: '0 1-23/4 * * *'
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: runTest
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
             after: fabric8io-fabric8-test-build-master
-            ee_test_start_time: '0 */2 * * *'
+            ee_test_start_time: '0 */4 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
@@ -1803,7 +1803,7 @@
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
             after: devtools-test-end-to-end-prod-preview.openshift.io-runTest
             timeout: 60m
-            ee_test_start_time: '30 */2 * * *'
+            ee_test_start_time: '30 */4 * * *'
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: chequickstartTest
@@ -1811,7 +1811,7 @@
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
             after: devtools-test-end-to-end-prod-preview.openshift.io-quickstartTest
             timeout: 60m
-            ee_test_start_time: '0 1-23/2 * * *'
+            ee_test_start_time: '0 1-23/4 * * *'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
