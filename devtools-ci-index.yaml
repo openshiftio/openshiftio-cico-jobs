@@ -68,6 +68,7 @@
         - jiekang
         - chrislessard
         - fche
+        - l0rd
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
