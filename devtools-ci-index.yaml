@@ -301,7 +301,7 @@
             SAAS_GIT=$(echo $SAAS_GIT | sed 's/:.*//')
             SAAS_SERVICE_NAME=$GIT_REPO
             if [ "$SUBDIR" != "" ]; then
-                $SAAS_SERVICE_NAME=$SAAS_SERVICE_NAME"-"$SUBDIR
+                SAAS_SERVICE_NAME=$SAAS_SERVICE_NAME"-"$SUBDIR
             fi
             git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
             cd saas.git
