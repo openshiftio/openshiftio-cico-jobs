@@ -1228,6 +1228,96 @@
            allow-empty: true
            fingerprint: true
 
+
+- job-template:
+    name: 'devtools-test-end-to-end-ts-{test_url}-{test_suite}'
+    defaults: global
+    node: devtools
+    after: fabric8io-fabric8-test-build-master
+    properties:
+        - github:
+            url: https://github.com/fabric8io/fabric8-test
+    scm:
+        - git:
+            url: https://github.com/fabric8io/fabric8-test.git
+
+            shallow_clone: true
+            branches:
+                - master
+    triggers:
+        - timed: '{ee_test_start_time}'
+        - build-result:
+            cron: '* * * * *'
+            groups:
+              - jobs:
+                    - '{after}'
+                results:
+                    - success
+                    - failure
+    wrappers:
+        - credentials-binding:
+            - username-password-separated:
+                credential-id: 9d2a233c-4350-49ab-983d-5b8d0de95f44
+                username: EE_TEST_USERNAME
+                password: EE_TEST_PASSWORD
+            - text:
+                credential-id: "{oso_token_creds}"
+                variable: EE_TEST_OSO_TOKEN
+            - text:
+                credential-id: "{kc_refresh_token_creds}"
+                variable: EE_TEST_KC_TOKEN
+    builders:
+        - shell: |
+            set +e
+            set +x
+            env > jenkins-env
+            cat $creds_config_file >> jenkins-env
+            cp ~/artifacts.key .
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            # get node
+            n=1
+            while true
+            do
+                cico_output=$(cico node get -f value -c ip_address -c comment)
+                if [ $? -eq 0 ]; then
+                    read CICO_hostname CICO_ssid <<< $cico_output
+                    if  [ ! -z "$CICO_hostname" ]; then
+                        # we got hostname from cico
+                        break
+                    fi
+                    echo "'cico node get' succeed, but can't get hostname from output"
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
+            echo 'Using Host' $CICO_hostname
+            set -x
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd yum -y install rsync
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_EE_tests_ts.sh https://{test_url} ${{BUILD_NUMBER}} {test_suite}"
+            rtn_code=$?
+            if [[ $rtn_code -eq 124 ]]; then
+               echo "BUILD TIMEOUT";
+            else
+               rsync -delete -PHva -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
+            fi
+            cico node done $CICO_ssid
+            exit $rtn_code
+    publishers:
+      - archive:
+           artifacts: './target/screenshots/*.*'
+           allow-empty: true
+           fingerprint: true
+
+
 - wrapper:
     name: generator_credentials_wrapper
     wrappers:
@@ -1765,6 +1855,14 @@
             ci_project: 'devtools'
             ci_cmd: 'cd ee_tests/ && /bin/bash cico_build_deploy.sh'
             timeout: '30m'
+        - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
+            test_url: openshift.io
+            test_suite: runTest
+            after: devtools-fabric8-test-build-master   
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b 
+            kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
+            ee_test_start_time: '0 */4 * * *'
+            timeout: 60m
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: runTest
