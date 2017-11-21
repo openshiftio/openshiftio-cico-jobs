@@ -69,6 +69,7 @@
         - chrislessard
         - fche
         - l0rd
+        - ashumilova
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
