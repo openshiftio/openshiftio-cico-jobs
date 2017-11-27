@@ -1861,7 +1861,7 @@
             after: devtools-fabric8-test-build-master   
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b 
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
-            ee_test_start_time: '0 */4 * * *'
+            ee_test_start_time: '30 1-23/4 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
