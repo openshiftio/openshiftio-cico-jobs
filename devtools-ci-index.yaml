@@ -473,6 +473,17 @@
                 credential-id: 2fc94f6b-dfef-49a4-a217-fe47aaeea056
                 variable: RECOMMENDER_API_TOKEN
 
+- wrapper:
+    name: copr_mercator_api_token
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: 9553a3e6-a315-4d6a-9a58-559271b7e39c
+                variable: COPR_LOGIN_MERCATOR
+            - text:
+                credential-id: fecaa647-2720-47f8-99d2-722cb1bce850
+                variable: COPR_TOKEN_MERCATOR
+
 - job-template: &job_template_build_master
     name: '{ci_project}-{git_repo}-build-master'
     wrappers:
@@ -1441,6 +1452,18 @@
             fi
             exit $rtn_code
 
+- job-template:
+    name: '{ci_project}-{git_repo}-copr-mercator-build-master'
+    wrappers:
+        - copr_mercator_api_token
+    scm:
+        - git:
+            url: https://github.com/{git_organization}/{git_repo}.git
+            shallow_clone: true
+            branches:
+                - master
+    <<: *job_template_build_defaults
+
 - project:
     name: devtools
     jobs:
@@ -2281,4 +2304,16 @@
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-common
             ci_project: 'devtools'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-analytics
+            git_repo: mercator-go
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-copr-mercator-build-master':
+            git_organization: fabric8-analytics
+            git_repo: mercator-go
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '30m'
