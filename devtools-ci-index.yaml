@@ -2310,10 +2310,10 @@
             git_repo: mercator-go
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
+            timeout: '40m'
         - '{ci_project}-{git_repo}-copr-mercator-build-master':
             git_organization: fabric8-analytics
             git_repo: mercator-go
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            timeout: '30m'
+            timeout: '1h'
