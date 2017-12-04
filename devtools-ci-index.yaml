@@ -1748,7 +1748,7 @@
             git_repo: keycloak-deployment
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '60m'
+            timeout: '120m'
         - '{ci_project}-{git_repo}':
             git_organization: openshiftio
             git_repo: saasherder
