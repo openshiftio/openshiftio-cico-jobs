@@ -1784,7 +1784,6 @@
             git_repo: launcher-frontend
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: launchpad-frontend
             saas_git: saas-launchpad
             prj_name: launchpad-preview
         - '{ci_project}-{git_repo}-generator-build-master':
@@ -1792,7 +1791,6 @@
             git_repo: launcher-backend
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: launchpad-backend
             saas_git: saas-launchpad
             prj_name: launchpad-preview
         - '{ci_project}-{git_repo}':
