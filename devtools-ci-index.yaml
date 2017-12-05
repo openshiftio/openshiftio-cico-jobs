@@ -1158,6 +1158,7 @@
     defaults: global
     node: devtools
     after: fabric8io-fabric8-test-build-master
+    disabled: '{obj:disabled}'
     properties:
         - github:
             url: https://github.com/fabric8io/fabric8-test
@@ -1466,6 +1467,7 @@
 
 - project:
     name: devtools
+    disabled: false
     jobs:
         - '{ci_project}-{git_repo}-jjb-test':
             git_organization: almighty
@@ -1932,6 +1934,7 @@
             after: fabric8io-fabric8-test-build-master
             ee_test_start_time: '0 */4 * * *'
             timeout: 60m
+            disabled: true
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: quickstartTest
@@ -1940,6 +1943,7 @@
             after: devtools-test-end-to-end-prod-preview.openshift.io-runTest
             timeout: 60m
             ee_test_start_time: '30 */4 * * *'
+            disabled: true
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: chequickstartTest
@@ -1948,6 +1952,7 @@
             after: devtools-test-end-to-end-prod-preview.openshift.io-quickstartTest
             timeout: 60m
             ee_test_start_time: '0 1-23/4 * * *'
+            disabled: true
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
