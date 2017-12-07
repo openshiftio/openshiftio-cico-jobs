@@ -2311,6 +2311,22 @@
             deployment_units: '3scale-admin-gateway'
             deployment_configs: 'f8a-3scale-admin-gateway'
             timeout: '20m'
+         - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: f8a-3scale-apicast-gateway
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+            image_name: 'fabric8-analytics/f8a-3scale-apicast-gateway'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: f8a-3scale-apicast-gateway
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: '3scale-apicast-gateway'
+            deployment_configs: 'f8a-3scale-apicast-gateway'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: api-machine-stacks
