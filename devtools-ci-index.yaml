@@ -1358,6 +1358,7 @@
     name: '{ci_project}-{git_repo}-promote-to-prod'
     defaults: global
     node: devtools
+    disabled: '{obj:disabled}'
     properties:
         - github:
             url: https://github.com/openshiftio/{git_repo}/
@@ -1822,15 +1823,19 @@
         - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-openshiftio
             ci_project: 'devtools'
+            disabled: true
         - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-chat
             ci_project: 'devtools'
+            disabled: true
         - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-analytics
             ci_project: 'devtools'
+            disabled: true
         - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-launchpad
             ci_project: 'devtools'
+            disabled: true
         - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-openshiftio
             git_organization: openshiftio
