@@ -1952,7 +1952,7 @@
             after: devtools-test-end-to-end-prod-preview.openshift.io-runTest
             timeout: 60m
             ee_test_start_time: '30 */4 * * *'
-            disabled: true
+            disabled: false
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: chequickstartTest
