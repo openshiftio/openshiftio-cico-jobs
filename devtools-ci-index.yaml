@@ -1154,7 +1154,7 @@
         - archive:
             artifacts: ./devtools-performance-results
 
-- job-template:
+- job-template: &job_template_end_to_end_tests_defaults
     name: 'devtools-test-end-to-end-{test_url}-{test_suite}'
     defaults: global
     node: devtools
@@ -1243,6 +1243,21 @@
            allow-empty: true
            fingerprint: true
 
+- job-template:
+    name: 'devtools-test-end-to-end-idling-{test_url}-{test_suite}'
+    wrappers:
+        - credentials-binding:
+            - username-password-separated:
+                credential-id: efb5c699-41fa-450b-835f-95c79a8a7b2e
+                username: EE_TEST_USERNAME
+                password: EE_TEST_PASSWORD
+            - text:
+                credential-id: "{oso_token_creds}"
+                variable: EE_TEST_OSO_TOKEN
+            - text:
+                credential-id: "{kc_refresh_token_creds}"
+                variable: EE_TEST_KC_TOKEN
+    <<: *job_template_end_to_end_tests_defaults
 
 - job-template:
     name: 'devtools-test-end-to-end-ts-{test_url}-{test_suite}'
@@ -1962,6 +1977,15 @@
             timeout: 60m
             ee_test_start_time: '0 1-23/4 * * *'
             disabled: true
+        - 'devtools-test-end-to-end-idling-{test_url}-{test_suite}':
+            test_url: prod-preview.openshift.io
+            test_suite: quickstartTest
+            oso_token_creds: f91e3b62-df9e-4925-b30d-7b601e6cc076
+            kc_refresh_token_creds: e445eefe-53b7-4782-b639-6dc0479079b8
+            #after: devtools-test-end-to-end-prod-preview.openshift.io-runTest
+            timeout: 60m
+            ee_test_start_time: '0 */1 * * *'
+            disabled: false
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
