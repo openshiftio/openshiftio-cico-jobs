@@ -1248,7 +1248,7 @@
     wrappers:
         - credentials-binding:
             - username-password-separated:
-                credential-id: efb5c699-41fa-450b-835f-95c79a8a7b2e
+                credential-id: f32f6ca9-5fbc-4391-b03b-20ce9f6cb575
                 username: EE_TEST_USERNAME
                 password: EE_TEST_PASSWORD
             - text:
@@ -1980,8 +1980,8 @@
         - 'devtools-test-end-to-end-idling-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: quickstartTest
-            oso_token_creds: f91e3b62-df9e-4925-b30d-7b601e6cc076
-            kc_refresh_token_creds: e445eefe-53b7-4782-b639-6dc0479079b8
+            oso_token_creds: 205e34c8-3b2f-4c1d-8110-1381f9289148
+            kc_refresh_token_creds: cca45759-9346-45cc-ad9c-39140eddbc58
             #after: devtools-test-end-to-end-prod-preview.openshift.io-runTest
             timeout: 60m
             ee_test_start_time: '0 */1 * * *'
