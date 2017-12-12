@@ -247,6 +247,19 @@
     <<: *job_template_defaults
 
 - job-template:
+    name: '{ci_project}-{git_repo}-fabric8-analytics-copr-mercator'
+    wrappers:
+        - copr_mercator_api_token
+        - ansicolor
+    triggers:
+      - github-pull-request:
+          status-context: "ci.centos.org PR (copr) build (fabric8-analytics)"
+          org-list:
+            - fabric8-analytics
+          <<: *github_pull_request_defaults
+    <<: *job_template_defaults
+
+- job-template:
     name: '{ci_project}-{git_repo}-fabric8-analytics-pylint'
     wrappers:
         - ansicolor
@@ -2384,7 +2397,7 @@
             git_repo: fabric8-analytics-common
             ci_project: 'devtools'
             timeout: '30m'
-        - '{ci_project}-{git_repo}':
+        - '{ci_project}-{git_repo}-fabric8-analytics-copr-mercator':
             git_organization: fabric8-analytics
             git_repo: mercator-go
             ci_project: 'devtools'
