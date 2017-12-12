@@ -1852,7 +1852,6 @@
         - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-launchpad
             ci_project: 'devtools'
-            disabled: true
         - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-openshiftio
             git_organization: openshiftio
