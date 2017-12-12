@@ -1843,15 +1843,12 @@
         - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-openshiftio
             ci_project: 'devtools'
-            disabled: true
         - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-chat
             ci_project: 'devtools'
-            disabled: true
         - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-analytics
             ci_project: 'devtools'
-            disabled: true
         - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-launchpad
             ci_project: 'devtools'
