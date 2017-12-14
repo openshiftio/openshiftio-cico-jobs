@@ -1928,7 +1928,7 @@
             after: devtools-fabric8-test-build-master   
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b 
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
-            ee_test_start_time: '20 */3 * * *'
+            ee_test_start_time: '30 */3 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: openshift.io
@@ -1936,7 +1936,7 @@
             after: devtools-test-end-to-end-ts-openshift.io-runTest
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b 
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
-            ee_test_start_time: '40 */3 * * *'
+            ee_test_start_time: '50 */3 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: openshift.io
@@ -1946,6 +1946,7 @@
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '55 */3 * * *'
             timeout: 60m
+            disabled: true
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: runTest
