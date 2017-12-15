@@ -1254,7 +1254,7 @@
             exit $rtn_code
     publishers:
       - archive:
-           artifacts: './target/screenshots/*.*'
+           artifacts: './ee_tests/target/screenshots/*.*'
            allow-empty: true
            fingerprint: true
 
