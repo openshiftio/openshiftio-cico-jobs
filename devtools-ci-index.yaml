@@ -488,6 +488,14 @@
                 variable: RECOMMENDER_API_TOKEN
 
 - wrapper:
+    name: recommender_api_token_prod
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
+                variable: RECOMMENDER_API_TOKEN
+
+- wrapper:
     name: copr_mercator_api_token
     wrappers:
         - credentials-binding:
@@ -653,6 +661,63 @@
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload-tests
             $ssh_cmd -t "cd payload-tests/integration-tests && /bin/bash cico_run_tests.sh"
+    <<: *job_template_defaults
+
+- job-template:
+    name: '{ci_project}-devtools-test-end-to-end-prod-fabric8-analytics'
+    triggers:
+      - timed: '@hourly'
+    wrappers:
+        - recommender_api_token_prod
+        - ansicolor
+    concurrent: false
+    builders:
+        - shell: |
+            set -x
+            export CICO_API_KEY=$(cat ~/duffy.key )
+
+            # get node
+            n=1
+            while true
+            do
+                cico_output=$(cico node get -f value -c ip_address -c comment)
+                if [ $? -eq 0 ]; then
+                    read CICO_hostname CICO_ssid <<< $cico_output
+                    if  [ ! -z "$CICO_hostname" ]; then
+                        # we got hostname from cico
+                        break
+                    fi
+                    echo "'cico node get' succeed, but can't get hostname from output"
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
+            echo 'Using Host' $CICO_hostname
+
+            # We have to point other endpoints to production too
+            F8A_API_URL={f8a_api_url}
+            
+            env > integration-tests/jenkins-env
+            gc() {{
+                rtn_code=$?
+                cico node done $CICO_ssid || :
+                exit $rtn_code
+            }}
+            trap gc EXIT SIGINT
+            set -e
+
+            # Run E2E tests
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd yum -y install rsync
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload-tests
+            $ssh_cmd -t "cd payload-tests/integration-tests && /bin/bash cico_run_tests.sh --tags=production"
     <<: *job_template_defaults
 
 - job-template:
@@ -2418,3 +2483,9 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '1h'
+        - '{ci_project}-devtools-test-end-to-end-prod-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-common
+            f8a_api_url: "https://recommender.api.openshift.io"
+            ci_project: 'devtools'
+            timeout: '30m'
