@@ -662,7 +662,7 @@
             recipients: bayesian-ci@redhat.com
             reply-to: bayesian-ci@redhat.com
             content-type: html
-            body: "The build has finished. Build URL: $BUILD_URL"
+            body: The build has finished. Build URL $BUILD_URL
             failure: true
             success: true
             matrix-trigger: only-configurations
