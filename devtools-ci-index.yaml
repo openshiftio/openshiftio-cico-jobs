@@ -1551,6 +1551,12 @@
             timeout: '10m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-services
+            git_repo: fabric8-toggles-service
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'            
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-services
             git_repo: fabric8-notification
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
@@ -1644,7 +1650,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
-            timeout: '10m'
+            timeout: '10m'            
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: fabric8-tenant-che-migration
