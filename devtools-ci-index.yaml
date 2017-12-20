@@ -2146,7 +2146,7 @@
             git_repo: gremlin-docker
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '30m'
+            timeout: '1h'
             image_name: 'bayesian/gremlin'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -2156,7 +2156,7 @@
             saas_git: saas-analytics
             deployment_units: 'gremlin-http'
             deployment_configs: 'bayesian-gremlin-http'
-            timeout: '30m'
+            timeout: '1h'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-stack-analysis
