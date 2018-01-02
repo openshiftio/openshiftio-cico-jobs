@@ -1593,7 +1593,7 @@
             git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
-            timeout: '1h'
+            timeout: '90m'
         - '{ci_project}-{git_repo}':
             git_repo: fabric8-devdoc
             ci_project: 'devtools'
