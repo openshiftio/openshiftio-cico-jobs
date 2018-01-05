@@ -527,7 +527,7 @@
     wrappers:
         - credentials-binding:
             - text:
-                credential-id: de0940f2-f31f-4186-85e2-37d42bddcf5b
+                credential-id: a08f984d-b9f9-4ba8-afa1-4aff10b6da6d
                 variable: RECOMMENDER_API_TOKEN
 
 - wrapper:
