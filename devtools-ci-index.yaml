@@ -743,7 +743,7 @@
 
             # We have to point other endpoints to production too
             F8A_API_URL={f8a_api_url}
-            
+
             env > integration-tests/jenkins-env
             gc() {{
                 rtn_code=$?
@@ -1660,7 +1660,7 @@
             git_repo: fabric8-toggles-service
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'            
+            timeout: '10m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-services
             git_repo: fabric8-notification
@@ -1756,7 +1756,14 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
-            timeout: '10m'            
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-services
+            git_repo: fabric8-toggles-service
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-openshiftio
+            timeout: '10m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: fabric8-tenant-che-migration
@@ -2037,15 +2044,15 @@
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: runTest
-            after: devtools-fabric8-test-build-master   
-            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b 
+            after: devtools-fabric8-test-build-master
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '15 */3 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: quickstartTest
-            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b 
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '35 */3 * * *'
             timeout: 60m
@@ -2053,14 +2060,14 @@
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: chequickstartTest
-            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b 
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '45 */3 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: runTest
-            after: devtools-fabric8-test-build-master   
+            after: devtools-fabric8-test-build-master
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
             ee_test_start_time: '15 */3 * * *'
@@ -2083,8 +2090,8 @@
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: runTest
-            after: devtools-fabric8-test-build-master   
-            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b 
+            after: devtools-fabric8-test-build-master
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '0 */4 * * *'
             timeout: 60m
