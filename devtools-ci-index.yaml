@@ -264,6 +264,37 @@
     <<: *job_template_defaults
 
 - job-template:
+    name: '{ci_project}-{git_repo}-fabric8-hdd'
+    image_name: 'MISSING_IMAGE_NAME'
+    wrappers:
+        - registry_devshift_credentials
+        - ansicolor
+    triggers:
+      - github-pull-request:
+          status-context: "ci.centos.org PR build (fabric8-hdd)"
+          org-list:
+            - fabric8-hdd
+          success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry: `docker pull registry.devshift.net/{image_name}:SNAPSHOT-PR-$ghprbPullId`"
+          <<: *github_pull_request_defaults
+    <<: *job_template_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-fabric8-hdd-eslint'
+    wrappers:
+        - ansicolor
+    git_organization: fabric8-hdd
+    ci_project: 'devtools'
+    ci_cmd: '/bin/bash cico_run_eslint.sh'
+    timeout: '20m'
+    triggers:
+      - github-pull-request:
+          status-context: "ci.centos.org eslint run (fabric8-hdd)"
+          org-list:
+            - fabric8-hdd
+          <<: *github_pull_request_defaults
+    <<: *job_template_defaults
+
+- job-template:
     name: '{ci_project}-{git_repo}-fabric8-analytics-pylint'
     wrappers:
         - ansicolor
@@ -2243,6 +2274,22 @@
             timeout: '30m'
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-server
+        - '{ci_project}-{git_repo}-fabric8-hdd':
+            git_organization: fabric8-hdd
+            git_repo: supervisor
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '30m'
+            image_name: 'fabric8-hdd/openshift-hdd-supervisor'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-hdd
+            git_repo: supervisor
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-hdd
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-fabric8-hdd-eslint':
+            git_repo: supervisor
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-worker-base
