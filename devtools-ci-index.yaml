@@ -742,7 +742,7 @@
             echo 'Using Host' $CICO_hostname
 
             # We have to point other endpoints to production too
-            F8A_API_URL={f8a_api_url}
+            export F8A_API_URL={f8a_api_url}
 
             env > integration-tests/jenkins-env
             gc() {{
