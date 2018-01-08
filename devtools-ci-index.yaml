@@ -1984,6 +1984,9 @@
         - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-launchpad
             ci_project: 'devtools'
+        - '{ci_project}-{git_repo}-promote-to-prod':
+            git_repo: saas-hdd
+            ci_project: 'devtools'
         - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-openshiftio
             git_organization: openshiftio
@@ -1998,6 +2001,10 @@
             ci_project: 'devtools'
         - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-chat
+            git_organization: openshiftio
+            ci_project: 'devtools'
+        - '{ci_project}-{git_repo}-promote-to-prod-test':
+            git_repo: saas-hdd
             git_organization: openshiftio
             ci_project: 'devtools'
         - '{ci_project}-{git_repo}-build-master':
