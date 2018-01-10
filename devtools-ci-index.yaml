@@ -765,19 +765,10 @@
 - job-template:
     name: '{ci_project}-f8a-master-deploy-e2e-test'
     publishers:
-        - email-ext:
+        - email:
             recipients: bayesian-ci@redhat.com
-            reply-to: bayesian-ci@redhat.com
-            content-type: html
-            body: "The build has finished. Build URL: $BUILD_URL"
-            failure: true
-            success: true
-            matrix-trigger: only-configurations
-            send-to:
-                - developers
-                - requester
-                - culprits
-                - recipients
+            notify-every-unstable-build: true
+            send-to-individuals: true
     wrappers:
         - recommender_api_token
         - ansicolor
