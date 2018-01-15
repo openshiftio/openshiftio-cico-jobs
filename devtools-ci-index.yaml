@@ -76,6 +76,8 @@
         - gastaldi
         - edewit
         - jarifibrahim
+        - Preeticp
+        - anmolbabu
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
@@ -260,6 +262,37 @@
           status-context: "ci.centos.org PR (copr) build (fabric8-analytics)"
           org-list:
             - fabric8-analytics
+          <<: *github_pull_request_defaults
+    <<: *job_template_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-fabric8-hdd'
+    image_name: 'MISSING_IMAGE_NAME'
+    wrappers:
+        - registry_devshift_credentials
+        - ansicolor
+    triggers:
+      - github-pull-request:
+          status-context: "ci.centos.org PR build (fabric8-hdd)"
+          org-list:
+            - fabric8-hdd
+          success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry: `docker pull registry.devshift.net/{image_name}:SNAPSHOT-PR-$ghprbPullId`"
+          <<: *github_pull_request_defaults
+    <<: *job_template_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-fabric8-hdd-eslint'
+    wrappers:
+        - ansicolor
+    git_organization: fabric8-hdd
+    ci_project: 'devtools'
+    ci_cmd: '/bin/bash cico_run_eslint.sh'
+    timeout: '20m'
+    triggers:
+      - github-pull-request:
+          status-context: "ci.centos.org eslint run (fabric8-hdd)"
+          org-list:
+            - fabric8-hdd
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
 
@@ -496,7 +529,7 @@
     wrappers:
         - credentials-binding:
             - text:
-                credential-id: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
+                credential-id: a08f984d-b9f9-4ba8-afa1-4aff10b6da6d
                 variable: RECOMMENDER_API_TOKEN
 
 - wrapper:
@@ -711,8 +744,8 @@
             echo 'Using Host' $CICO_hostname
 
             # We have to point other endpoints to production too
-            F8A_API_URL={f8a_api_url}
-            
+            export F8A_API_URL={f8a_api_url}
+
             env > integration-tests/jenkins-env
             gc() {{
                 rtn_code=$?
@@ -733,19 +766,10 @@
 - job-template:
     name: '{ci_project}-f8a-master-deploy-e2e-test'
     publishers:
-        - email-ext:
+        - email:
             recipients: bayesian-ci@redhat.com
-            reply-to: bayesian-ci@redhat.com
-            content-type: html
-            body: "The build has finished. Build URL: $BUILD_URL"
-            failure: true
-            success: true
-            matrix-trigger: only-configurations
-            send-to:
-                - developers
-                - requester
-                - culprits
-                - recipients
+            notify-every-unstable-build: true
+            send-to-individuals: true
     wrappers:
         - recommender_api_token
         - ansicolor
@@ -1149,12 +1173,20 @@
     <<: *che-functional-tests-template
 
 - job-template:
-    name: '{ci_project}-{git_repo}-prcheck'
-# Temporarily disabled execution.
+    name: '{ci_project}-{git_repo}-prcheck-{test_url}'
     triggers:
-#        - github
-#        - githubprb:
-#            github_hooks: '{github_hooks}'
+        - github
+        - githubprb:
+            github_hooks: '{github_hooks}'
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: "{oso_token_creds}"
+                variable: KEYCLOAK_TOKEN
+            - username-password-separated:
+                credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
+                username: OSIO_USERNAME
+                password: OSIO_PASSWORD
     <<: *che-functional-tests-template
 
 - job:
@@ -1629,7 +1661,7 @@
             git_repo: fabric8-toggles-service
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'            
+            timeout: '10m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-services
             git_repo: fabric8-notification
@@ -1645,6 +1677,12 @@
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-services
             git_repo: fabric8-admin-proxy
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-services
+            git_repo: fabric8-oso-proxy
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '10m'
@@ -1725,7 +1763,14 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
-            timeout: '10m'            
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-services
+            git_repo: fabric8-toggles-service
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-openshiftio
+            timeout: '10m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: fabric8-tenant-che-migration
@@ -1735,6 +1780,13 @@
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: fabric8-admin-proxy
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-openshiftio
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-services
+            git_repo: fabric8-oso-proxy
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
@@ -1788,12 +1840,22 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_EE_tests.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-prcheck':
+        - '{ci_project}-{git_repo}-prcheck-{test_url}':
             git_organization: redhat-developer
             git_repo: che-functional-tests
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_EE_tests.sh'
+            test_url: 'openshift.io'
             timeout: '20m'
+            oso_token_creds: de793dce-5821-4182-af4f-6c7b42b5c21d
+        - '{ci_project}-{git_repo}-prcheck-{test_url}':
+            git_organization: redhat-developer
+            git_repo: che-functional-tests
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_EE_tests.sh config_prod_preview'
+            test_url: 'prod-preview.openshift.io'
+            timeout: '20m'
+            oso_token_creds: 1e0bbb30-cddd-4b6f-bc61-bb4ebd2706e5
         - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
             git_organization: redhat-developer
             git_repo: rh-che
@@ -1946,6 +2008,9 @@
         - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-launchpad
             ci_project: 'devtools'
+        - '{ci_project}-{git_repo}-promote-to-prod':
+            git_repo: saas-hdd
+            ci_project: 'devtools'
         - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-openshiftio
             git_organization: openshiftio
@@ -1960,6 +2025,10 @@
             ci_project: 'devtools'
         - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-chat
+            git_organization: openshiftio
+            ci_project: 'devtools'
+        - '{ci_project}-{git_repo}-promote-to-prod-test':
+            git_repo: saas-hdd
             git_organization: openshiftio
             ci_project: 'devtools'
         - '{ci_project}-{git_repo}-build-master':
@@ -2006,31 +2075,54 @@
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: runTest
-            after: devtools-fabric8-test-build-master   
-            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b 
+            after: devtools-fabric8-test-build-master
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '15 */3 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: quickstartTest
-            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b 
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '35 */3 * * *'
             timeout: 60m
+            disabled: true
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: chequickstartTest
-            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b 
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
-            ee_test_start_time: '55 */3 * * *'
+            ee_test_start_time: '45 */3 * * *'
+            timeout: 60m
+        - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
+            test_url: prod-preview.openshift.io
+            test_suite: runTest
+            after: devtools-fabric8-test-build-master
+            oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
+            kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
+            ee_test_start_time: '15 */3 * * *'
+            timeout: 60m
+        - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
+            test_url: prod-preview.openshift.io
+            test_suite: quickstartTest
+            oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
+            kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
+            ee_test_start_time: '35 */3 * * *'
             timeout: 60m
             disabled: true
+        - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
+            test_url: prod-preview.openshift.io
+            test_suite: chequickstartTest
+            oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
+            kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
+            ee_test_start_time: '45 */3 * * *'
+            timeout: 60m
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: runTest
-            after: devtools-fabric8-test-build-master   
-            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b 
+            after: devtools-fabric8-test-build-master
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '0 */4 * * *'
             timeout: 60m
@@ -2043,6 +2135,7 @@
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '0 */2 * * *'
             timeout: 60m
+            disabled: true
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: chequickstartTest
@@ -2060,7 +2153,6 @@
             after: fabric8io-fabric8-test-build-master
             ee_test_start_time: '0 */4 * * *'
             timeout: 60m
-            disabled: true
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: quickstartTest
@@ -2069,7 +2161,7 @@
             after: devtools-test-end-to-end-prod-preview.openshift.io-runTest
             timeout: 60m
             ee_test_start_time: '30 */4 * * *'
-            disabled: false
+            disabled: true
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: chequickstartTest
@@ -2078,7 +2170,6 @@
             after: devtools-test-end-to-end-prod-preview.openshift.io-quickstartTest
             timeout: 60m
             ee_test_start_time: '0 1-23/4 * * *'
-            disabled: true
         - 'devtools-test-end-to-end-idling-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: quickstartTest
@@ -2087,7 +2178,6 @@
             #after: devtools-test-end-to-end-prod-preview.openshift.io-runTest
             timeout: 60m
             ee_test_start_time: '0 */1 * * *'
-            disabled: false
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
@@ -2134,22 +2224,6 @@
             git_repo: fabric8-analytics-jobs
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-jobs
-        - '{ci_project}-{git_repo}-fabric8-analytics':
-            git_organization: fabric8-analytics
-            git_repo: anitya-docker
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
-            image_name: 'bayesian/anitya-server'
-        - '{ci_project}-{git_repo}-f8a-build-master':
-            git_organization: fabric8-analytics
-            git_repo: anitya-docker
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-analytics
-            deployment_units: 'anitya'
-            deployment_configs: 'bayesian-anitya'
-            timeout: '20m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: gremlin-docker
@@ -2204,6 +2278,24 @@
             git_repo: fabric8-analytics-license-analysis
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
+            git_repo: f8a-server-backbone
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+            image_name: 'fabric8-analytics/f8a-server-backbone'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: f8a-server-backbone
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'api-backbone'
+            deployment_configs: 'f8a-server-backbone'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: f8a-server-backbone
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
             git_repo: fabric8-analytics-worker
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
@@ -2238,6 +2330,25 @@
             timeout: '30m'
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-server
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: fabric8-analytics-server
+        - '{ci_project}-{git_repo}-fabric8-hdd':
+            git_organization: fabric8-hdd
+            git_repo: supervisor
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '30m'
+            image_name: 'fabric8-hdd/openshift-hdd-supervisor'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-hdd
+            git_repo: supervisor
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-hdd
+            timeout: '30m'
+            prj_name: hdd-preview
+        - '{ci_project}-{git_repo}-fabric8-hdd-eslint':
+            git_repo: supervisor
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-worker-base
@@ -2300,6 +2411,8 @@
             deployment_configs: 'bayesian-data-importer'
             timeout: '20m'
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-data-model
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-data-model
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
@@ -2454,8 +2567,8 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-analytics
-            deployment_units: '3scale-admin-gateway'
-            deployment_configs: 'f8a-3scale-admin-gateway'
+            deployment_units: 'f8a-3scale-connect-api'
+            deployment_configs: 'f8a-3scale-connect-api'
             timeout: '20m'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
