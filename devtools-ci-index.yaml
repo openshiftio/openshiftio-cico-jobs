@@ -10,76 +10,76 @@
 - admin_list_defaults: &admin_list_defaults
     name: 'admin_list_defaults'
     admin-list:
-        - kbsingh
-        - aslakknutsen
-        - kwk
-        - sbose78
-        - tsmaeder
-        - maxandersen
-        - bartoszmajsak
-        - pmuir
-        - pranavgore09
-        - baijum
-        - DhritiShikhar
-        - joshuawilson
-        - Ritsyy
-        - sanbornsen
-        - nimishamukherjee
-        - SMahil
-        - xcoulon
+        - aditya-konarde
+        - akurinnoy
         - alexeykazakov
-        - michaelkleinhenz
-        - ppitonak
-        - ldimaggi
-        - VineetReynolds
-        - hectorj2f
-        - ibuziuk
-        - debloper
-        - vikram-raj
-        - dlabrecq
-        - dgutride
-        - mindreeper2420
-        - invincibleJai
+        - andrewazores
+        - anmolbabu
+        - aptmac
         - arunkumars08
-        - fabric8cd
-        - mharpur
+        - ashumilova
+        - aslakknutsen
+        - baijum
+        - bartoszmajsak
+        - c-koehler
+        - chrislessard
         - corinnekrych
+        - debloper
+        - dgutride
+        - DhritiShikhar
+        - dlabrecq
+        - ebaron
+        - edewit
+        - fabric8cd
+        - fche
+        - fridex
+        - gastaldi
+        - hectorj2f
+        - hferentschik
+        - ibuziuk
+        - inoxx03
+        - invincibleJai
+        - jarifibrahim
+        - jarifibrahim
+        - jiekang
+        - joshuawilson
         - jstrachan
         - Katka92
-        - rhopp
-        - vpavlin
-        - sbryzak
-        - msrb
-        - inoxx03
-        - lavernw1
-        - rhoads-zach
-        - tradej
-        - fridex
+        - kbsingh
         - kishansagathiya
-        - jarifibrahim
-        - pkajaba
-        - aditya-konarde
-        - rawlingsj
-        - andrewazores
-        - neugens
-        - stooke
-        - c-koehler
-        - ebaron
-        - jiekang
-        - chrislessard
-        - fche
+        - kwk
         - l0rd
-        - ashumilova
-        - akurinnoy
-        - hferentschik
-        - surajssd
-        - gastaldi
-        - edewit
-        - jarifibrahim
+        - lavernw1
+        - ldimaggi
+        - maxandersen
+        - mharpur
+        - michaelkleinhenz
+        - mindreeper2420
+        - msrb
+        - neugens
+        - nimishamukherjee
+        - pkajaba
+        - pmuir
+        - ppitonak
+        - pranavgore09
         - Preeticp
-        - anmolbabu
+        - rawlingsj
+        - rhoads-zach
+        - rhopp
+        - Ritsyy
+        - sanbornsen
+        - sbose78
+        - sbryzak
         - ScrewTSW
-        - aptmac
+        - SMahil
+        - stooke
+        - surajssd
+        - tradej
+        - tsmaeder
+        - vikram-raj
+        - VineetReynolds
+        - vpavlin
+        - xcoulon
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
