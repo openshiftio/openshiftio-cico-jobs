@@ -2080,14 +2080,14 @@
             after: devtools-fabric8-test-build-master
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
-            ee_test_start_time: '15 */3 * * *'
+            ee_test_start_time: '5 */3 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: quickstartTest
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
-            ee_test_start_time: '35 */3 * * *'
+            ee_test_start_time: '30 */3 * * *'
             timeout: 60m
             disabled: true
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
@@ -2095,7 +2095,7 @@
             test_suite: chequickstartTest
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
-            ee_test_start_time: '45 */3 * * *'
+            ee_test_start_time: '55 */3 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
@@ -2103,14 +2103,14 @@
             after: devtools-fabric8-test-build-master
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
-            ee_test_start_time: '15 */3 * * *'
+            ee_test_start_time: '5 */3 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: quickstartTest
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
-            ee_test_start_time: '35 */3 * * *'
+            ee_test_start_time: '30 */3 * * *'
             timeout: 60m
             disabled: true
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
@@ -2118,7 +2118,7 @@
             test_suite: chequickstartTest
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
-            ee_test_start_time: '45 */3 * * *'
+            ee_test_start_time: '55 */3 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-{test_url}-{test_suite}':
             test_url: openshift.io
