@@ -1955,7 +1955,6 @@
             ci_cmd: '/bin/bash .ci/cico_build.sh && /bin/bash .ci/cico_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '20m'
-
         - '{ci_project}-{git_repo}-build-che-credentials-pr-check':
             git_organization: redhat-developer
             git_repo: rh-che
@@ -1964,11 +1963,11 @@
             ci_cmd: '/bin/bash .ci/cico_build.sh && /bin/bash .ci/cico_run_functional_tests.sh'
             saas_git: saas-openshiftio
             timeout: '20m'
-
         - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
             git_organization: redhat-developer
             git_repo: rh-che
             ci_project: 'devtools'
+            branch: single-user-rh-che
             ci_cmd: '/bin/bash .ci/cico_build.sh && /bin/bash .ci/cico_deploy.sh'
             #saas_git: saas-openshiftio Do not deploy master branch
             timeout: '20m'
