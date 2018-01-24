@@ -2175,7 +2175,7 @@
             test_suite: quickstartTest
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
-            ee_test_start_time: '30 4-23/4 * * *'
+            ee_test_start_time: '5 5-23/4 * * *'
             timeout: 60m
             disabled: true
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
@@ -2183,7 +2183,7 @@
             test_suite: chequickstartTest
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
-            ee_test_start_time: '55 4-23/4 * * *'
+            ee_test_start_time: '5 6-23/4 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
@@ -2198,7 +2198,7 @@
             test_suite: quickstartTest
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
-            ee_test_start_time: '30 4-23/4 * * *'
+            ee_test_start_time: '5 5-23/4 * * *'
             timeout: 60m
             disabled: true
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
@@ -2206,7 +2206,7 @@
             test_suite: chequickstartTest
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
-            ee_test_start_time: '55 4-23/4 * * *'
+            ee_test_start_time: '5 6-23/4 * * *'
             timeout: 60m
         - 'devtools-test-end-to-end-ts-{test_url}-{quickstart_name}':
             test_url: openshift.io
@@ -2816,3 +2816,4 @@
             f8a_api_url: "https://recommender.api.openshift.io"
             ci_project: 'devtools'
             timeout: '30m'
+
