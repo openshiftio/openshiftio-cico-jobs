@@ -1951,7 +1951,7 @@
             git_organization: redhat-developer
             git_repo: rh-che
             ci_project: 'devtools'
-            branch: multi-tenant-rh-che
+            branch: master
             ci_cmd: '/bin/bash .ci/cico_build.sh && /bin/bash .ci/cico_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '20m'
@@ -2816,3 +2816,4 @@
             f8a_api_url: "https://recommender.api.openshift.io"
             ci_project: 'devtools'
             timeout: '30m'
+
