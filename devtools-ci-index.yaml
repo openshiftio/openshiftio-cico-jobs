@@ -2816,4 +2816,9 @@
             f8a_api_url: "https://recommender.api.openshift.io"
             ci_project: 'devtools'
             timeout: '30m'
-
+        - '{ci_project}-{git_repo}':
+            git_organization: rhdt
+            git_repo: error-tracking
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_test.sh'
+            timeout: '10m'
