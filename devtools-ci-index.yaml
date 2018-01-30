@@ -1930,13 +1930,13 @@
             git_organization: redhat-developer
             git_repo: che-functional-tests
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_EE_tests.sh'
+            ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}-prcheck-{test_url}':
             git_organization: redhat-developer
             git_repo: che-functional-tests
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_EE_tests.sh'
+            ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh'
             test_url: 'openshift.io'
             timeout: '20m'
             oso_token_creds: de793dce-5821-4182-af4f-6c7b42b5c21d
@@ -1944,7 +1944,7 @@
             git_organization: redhat-developer
             git_repo: che-functional-tests
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_EE_tests.sh config_prod_preview'
+            ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh ./cico/config_prod_preview'
             test_url: 'prod-preview.openshift.io'
             timeout: '20m'
             oso_token_creds: 1e0bbb30-cddd-4b6f-bc61-bb4ebd2706e5
