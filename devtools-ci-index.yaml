@@ -1403,7 +1403,7 @@
     <<: *job_template_end_to_end_tests_defaults
 
 - job-template:
-    name: 'devtools-test-end-to-end-ts-{test_url}-{test_suite}'
+    name: 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}'
     defaults: global
     node: devtools
     after: fabric8io-fabric8-test-build-master
@@ -1493,7 +1493,7 @@
            fingerprint: true
 
 - job-template:
-    name: 'devtools-test-end-to-end-ts-{test_url}-{quickstart_name}'
+    name: 'devtools-test-e2e-{test_url}-{quickstart_name}-{cluster}'
     defaults: global
     node: devtools
     after: fabric8io-fabric8-test-build-master
@@ -2192,154 +2192,196 @@
             ci_project: 'devtools'
             ci_cmd: 'cd ee_tests/ && /bin/bash cico_build_deploy.sh'
             timeout: '30m'
-        - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}':
             test_url: openshift.io
-            test_suite: runTest
+            test_suite: smoketest
+            cluster: cluster-one
             after: devtools-fabric8-test-build-master
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '5 4-23/4 * * *'
             timeout: 60m
-        - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}':
             test_url: openshift.io
-            test_suite: quickstartTest
+            test_suite: analyticstest
+            cluster: cluster-one
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '5 5-23/4 * * *'
             timeout: 60m
-            disabled: true
-        - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}':
             test_url: openshift.io
-            test_suite: chequickstartTest
+            test_suite: chetest
+            cluster: cluster-one
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '5 6-23/4 * * *'
             timeout: 60m
-        - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}':
+            test_url: openshift.io
+            test_suite: smoketest
+            cluster: cluster-two
+            after: devtools-fabric8-test-build-master
+            oso_token_creds: e9a32e1e-0a38-4a96-896f-a266e1428cf9
+            kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
+            ee_test_start_time: '5 4-23/4 * * *'
+            timeout: 60m
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}':
+            test_url: openshift.io
+            test_suite: analyticstest
+            cluster: cluster-two
+            oso_token_creds: e9a32e1e-0a38-4a96-896f-a266e1428cf9
+            kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
+            ee_test_start_time: '5 5-23/4 * * *'
+            timeout: 60m
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}':
+            test_url: openshift.io
+            test_suite: chetest
+            cluster: cluster-two
+            oso_token_creds: e9a32e1e-0a38-4a96-896f-a266e1428cf9
+            kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
+            ee_test_start_time: '5 6-23/4 * * *'
+            timeout: 60m
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}':
             test_url: prod-preview.openshift.io
-            test_suite: runTest
+            test_suite: smoketest
+            cluster: cluster-one
             after: devtools-fabric8-test-build-master
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
             ee_test_start_time: '5 4-23/4 * * *'
             timeout: 60m
-        - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}':
             test_url: prod-preview.openshift.io
-            test_suite: quickstartTest
+            test_suite: analyticstest
+            cluster: cluster-one
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
             ee_test_start_time: '5 5-23/4 * * *'
             timeout: 60m
             disabled: true
-        - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}':
             test_url: prod-preview.openshift.io
-            test_suite: chequickstartTest
+            test_suite: chetest
+            cluster: cluster-one
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
             ee_test_start_time: '5 6-23/4 * * *'
             timeout: 60m
-        - 'devtools-test-end-to-end-ts-{test_url}-{quickstart_name}':
+        - 'devtools-test-e2e-{test_url}-{quickstart_name}-{cluster}':
             test_url: openshift.io
-            test_suite: runTest
+            test_suite: smoketest
+            cluster: cluster-one
             release_strategy: release
             quickstart_name: vertxHttp
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '0 0 * * *'
             timeout: 60m
-        - 'devtools-test-end-to-end-ts-{test_url}-{quickstart_name}':
+        - 'devtools-test-e2e-{test_url}-{quickstart_name}-{cluster}':
             test_url: openshift.io
-            test_suite: runTest
+            test_suite: smoketest
+            cluster: cluster-one
             release_strategy: releaseStageApproveAndPromote
             quickstart_name: vertxHealth
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '30 0 * * *'
             timeout: 60m
-        - 'devtools-test-end-to-end-ts-{test_url}-{quickstart_name}':
+        - 'devtools-test-e2e-{test_url}-{quickstart_name}-{cluster}':
             test_url: openshift.io
-            test_suite: runTest
+            test_suite: smoketest
+            cluster: cluster-one
             release_strategy: releaseAndStage
             quickstart_name: SpringBootHttp
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '0 1 * * *'
             timeout: 60m
-        - 'devtools-test-end-to-end-ts-{test_url}-{quickstart_name}':
+        - 'devtools-test-e2e-{test_url}-{quickstart_name}-{cluster}':
             test_url: openshift.io
-            test_suite: runTest
+            test_suite: smoketest
+            cluster: cluster-one
             release_strategy: releaseStageApproveAndPromote
             quickstart_name: SpringBootHealth
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '30 1 * * *'
             timeout: 60m
-        - 'devtools-test-end-to-end-ts-{test_url}-{quickstart_name}':
+        - 'devtools-test-e2e-{test_url}-{quickstart_name}-{cluster}':
             test_url: openshift.io
-            test_suite: runTest
+            test_suite: smoketest
+            cluster: cluster-one
             release_strategy: releaseStageApproveAndPromote
             quickstart_name: SwarmHttp
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '0 2 * * *'
             timeout: 60m
-        - 'devtools-test-end-to-end-ts-{test_url}-{quickstart_name}':
+        - 'devtools-test-e2e-{test_url}-{quickstart_name}-{cluster}':
             test_url: openshift.io
-            test_suite: runTest
+            test_suite: smoketest
+            cluster: cluster-one
             release_strategy: releaseStageApproveAndPromote
             quickstart_name: SwarmHealth
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '30 2 * * *'
             timeout: 60m
-        - 'devtools-test-end-to-end-ts-{test_url}-{quickstart_name}':
+        - 'devtools-test-e2e-{test_url}-{quickstart_name}-{cluster}':
             test_url: prod-preview.openshift.io
-            test_suite: runTest
+            test_suite: smoketest
+            cluster: cluster-one
             release_strategy: release
             quickstart_name: vertxHttp
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
             ee_test_start_time: '0 0 * * *'
             timeout: 60m
-        - 'devtools-test-end-to-end-ts-{test_url}-{quickstart_name}':
+        - 'devtools-test-e2e-{test_url}-{quickstart_name}-{cluster}':
             test_url: prod-preview.openshift.io
-            test_suite: runTest
+            test_suite: smoketest
+            cluster: cluster-one
             release_strategy: releaseStageApproveAndPromote
             quickstart_name: vertxHealth
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
             ee_test_start_time: '30 0 * * *'
             timeout: 60m
-        - 'devtools-test-end-to-end-ts-{test_url}-{quickstart_name}':
+        - 'devtools-test-e2e-{test_url}-{quickstart_name}-{cluster}':
             test_url: prod-preview.openshift.io
-            test_suite: runTest
+            test_suite: smoketest
+            cluster: cluster-one
             release_strategy: releaseAndStage
             quickstart_name: SpringBootHttp
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
             ee_test_start_time: '0 1 * * *'
             timeout: 60m
-        - 'devtools-test-end-to-end-ts-{test_url}-{quickstart_name}':
+        - 'devtools-test-e2e-{test_url}-{quickstart_name}-{cluster}':
             test_url: prod-preview.openshift.io
-            test_suite: runTest
+            test_suite: smoketest
+            cluster: cluster-one
             release_strategy: releaseStageApproveAndPromote
             quickstart_name: SpringBootHealth
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
             ee_test_start_time: '30 1 * * *'
             timeout: 60m
-        - 'devtools-test-end-to-end-ts-{test_url}-{quickstart_name}':
+        - 'devtools-test-e2e-{test_url}-{quickstart_name}-{cluster}':
             test_url: prod-preview.openshift.io
-            test_suite: runTest
+            test_suite: smoketest
+            cluster: cluster-one
             release_strategy: releaseStageApproveAndPromote
             quickstart_name: SwarmHttp
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
             ee_test_start_time: '0 2 * * *'
             timeout: 60m
-        - 'devtools-test-end-to-end-ts-{test_url}-{quickstart_name}':
+        - 'devtools-test-e2e-{test_url}-{quickstart_name}-{cluster}':
             test_url: prod-preview.openshift.io
-            test_suite: runTest
+            test_suite: smoketest
+            cluster: cluster-one
             release_strategy: releaseStageApproveAndPromote
             quickstart_name: SwarmHealth
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
