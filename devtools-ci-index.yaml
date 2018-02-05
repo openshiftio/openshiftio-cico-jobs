@@ -820,6 +820,13 @@
 
             export GIT_COMMIT=$UPSTREAM_GIT_COMMIT
 
+            # What's the current deployment revision?
+            export LAST_DC=${{DEPLOYMENT_CONFIGS##* }}
+            LAST_DC_REVISION=$(oc get dc/$LAST_DC -n $PRJ_NAME |grep $LAST_DC | awk '{{ print $2 }}')
+            if [ -z "$LAST_DC_REVISION" ]; then
+                # First deployment
+                LAST_DC_REVISION=0
+            fi
 
             {saasherder_prepare}
             export DEVSHIFT_TAG_LEN=7
@@ -845,9 +852,17 @@
             trap gc EXIT SIGINT
             set -e
 
-            # Wait for deployment to start and then wait for it to be ready (yeah, this is pretty fragile)
-            sleep 5
-            LAST_DC=${{DEPLOYMENT_CONFIGS##* }}
+            # Wait for the new deployment to begin
+            for i in `seq 30`; do
+                CURRENT_DC_REVISION=$(oc get dc/$LAST_DC -n $PRJ_NAME |grep $LAST_DC | awk '{{ print $2 }}') || :
+                if [ ${{CURRENT_DC_REVISION:-0}} -gt $LAST_DC_REVISION ]; then
+                    echo "The new deployment has started."
+                    break
+                fi
+                echo "The new deployment hasn't started yet."
+                sleep 5
+            done
+            # Wait for the new deployment to be ready
             oc logs -f dc/$LAST_DC -n $PRJ_NAME
 
             # Run E2E tests
