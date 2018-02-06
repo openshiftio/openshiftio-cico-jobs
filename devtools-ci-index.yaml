@@ -215,6 +215,8 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}'
+    wrappers:
+        - registry_devshift_credentials
     <<: *job_template_defaults
 
 - job-template:
