@@ -1477,7 +1477,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_EE_tests_ts.sh https://{test_url} ${{BUILD_NUMBER}} {test_suite}"
+            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_EE_tests_ts.sh https://{test_url} ${{BUILD_NUMBER}} {test_suite} {gh_username} {quickstart_name}"
             rtn_code=$?
             if [[ $rtn_code -eq 124 ]]; then
                echo "BUILD TIMEOUT";
@@ -2195,6 +2195,7 @@
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: runTest
+            quickstart_name: vertxHttp
             after: devtools-fabric8-test-build-master
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
@@ -2203,6 +2204,7 @@
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: quickstartTest
+            quickstart_name: SpringBootHealth
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '5 5-23/4 * * *'
@@ -2211,6 +2213,7 @@
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: openshift.io
             test_suite: chequickstartTest
+            quickstart_name: vertxHttp
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '5 6-23/4 * * *'
@@ -2218,6 +2221,7 @@
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: runTest
+            quickstart_name: vertxHttp
             after: devtools-fabric8-test-build-master
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
@@ -2226,6 +2230,7 @@
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: quickstartTest
+            quickstart_name: SpringBootHealth
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
             ee_test_start_time: '5 5-23/4 * * *'
@@ -2234,6 +2239,7 @@
         - 'devtools-test-end-to-end-ts-{test_url}-{test_suite}':
             test_url: prod-preview.openshift.io
             test_suite: chequickstartTest
+            quickstart_name: vertxHttp
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
             ee_test_start_time: '5 6-23/4 * * *'
