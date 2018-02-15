@@ -2226,7 +2226,7 @@
             cluster: cluster-two
             after: devtools-fabric8-test-build-master
             osio_creds: e9a32e1e-0a38-4a96-896f-a266e1428cf9
-            oso_token_creds: e9a32e1e-0a38-4a96-896f-a266e1428cf9
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '5 4-23/4 * * *'
             timeout: 60m
@@ -2235,7 +2235,7 @@
             test_suite: analyticstest
             cluster: cluster-two
             osio_creds: e9a32e1e-0a38-4a96-896f-a266e1428cf9
-            oso_token_creds: e9a32e1e-0a38-4a96-896f-a266e1428cf9
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '5 5-23/4 * * *'
             timeout: 60m
@@ -2244,7 +2244,7 @@
             test_suite: chetest
             cluster: cluster-two
             osio_creds: e9a32e1e-0a38-4a96-896f-a266e1428cf9
-            oso_token_creds: e9a32e1e-0a38-4a96-896f-a266e1428cf9
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
             ee_test_start_time: '5 6-23/4 * * *'
             timeout: 60m
