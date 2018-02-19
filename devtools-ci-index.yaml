@@ -880,6 +880,7 @@
     wrappers:
         - che_credentials_wrapper
         - registry_devshift_credentials
+        - che_functional_tests_credentials_wrapper
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
