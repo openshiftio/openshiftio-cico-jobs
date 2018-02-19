@@ -2474,6 +2474,7 @@
             oso_token_creds: 205e34c8-3b2f-4c1d-8110-1381f9289148
             kc_refresh_token_creds: cca45759-9346-45cc-ad9c-39140eddbc58
             #after: devtools-test-end-to-end-prod-preview.openshift.io-runTest
+            disabled: true
             timeout: 60m
             ee_test_start_time: '0 */1 * * *'
         - '{ci_project}-{git_repo}-fabric8-analytics':
