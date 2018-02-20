@@ -2496,3 +2496,9 @@
             f8a_api_url: "https://recommender.api.openshift.io"
             ci_project: 'devtools'
             timeout: '30m'
+        - '{ci_project}-{git_repo}-snapshot':
+            git_organization: fabric8-ui
+            git_repo: fabric8-planner
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '50m'
