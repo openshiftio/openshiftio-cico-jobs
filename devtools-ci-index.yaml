@@ -270,6 +270,21 @@
     <<: *job_template_defaults
 
 - job-template:
+    name: '{ci_project}-{git_repo}-f8planner-snapshot'
+    image_name: 'MISSING_IMAGE_NAME'
+    wrappers:
+        - registry_devshift_credentials
+        - ansicolor
+    triggers:
+      - github-pull-request:
+          status-context: "ci.centos.org PR build (fabric8-planner)"
+          org-list:
+            - fabric8-planner
+          success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry: `docker pull registry.devshift.net/{image_name}:SNAPSHOT-PR-$ghprbPullId`."
+          <<: *github_pull_request_defaults
+    <<: *job_template_defaults
+
+- job-template:
     name: '{ci_project}-{git_repo}-fabric8-analytics-copr-mercator'
     wrappers:
         - copr_mercator_api_token
@@ -2899,7 +2914,7 @@
             saas_git: saas-errortracking
             prj_name: sentry-preview
             timeout: '20m'
-        - '{ci_project}-{git_repo}-snapshot':
+        - '{ci_project}-{git_repo}-f8planner-snapshot':
             git_organization: fabric8-ui
             git_repo: fabric8-planner
             ci_project: 'devtools'
