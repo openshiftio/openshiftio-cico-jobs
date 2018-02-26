@@ -603,6 +603,7 @@
     wrappers:
         - registry_devshift_credentials
         - ansicolor
+        - recommender_api_token_prod
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
