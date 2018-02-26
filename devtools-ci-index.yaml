@@ -1757,12 +1757,6 @@
             timeout: '30m'
             github_hooks: true
         - '{ci_project}-{git_repo}':
-            git_organization: fabric8io
-            git_repo: fabric8-forker
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'
-        - '{ci_project}-{git_repo}':
             git_organization: fabric8-services
             git_repo: fabric8-tenant
             ci_project: 'devtools'
@@ -1848,13 +1842,6 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master':
-            git_organization: fabric8io
-            git_repo: fabric8-forker
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: f8forker
-            timeout: '10m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: fabric8-tenant
