@@ -277,7 +277,9 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-f8planner'
-    image_name: 'MISSING_IMAGE_NAME'
+    REGISTRY: 'MISSING_REGISTRY'
+    IMAGE_REPO: 'MISSING_IMAGE_REPO'
+    TAG: 'MISSING_TAG'
     wrappers:
         - registry_devshift_credentials
         - ansicolor
