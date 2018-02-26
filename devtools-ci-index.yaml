@@ -42,7 +42,7 @@
         - jarifibrahim
         - jiekang
         - joshuawilson
-        - jstrachan
+        - jyasveer
         - Katka92
         - kbsingh
         - kishansagathiya
@@ -64,7 +64,6 @@
         - ppitonak
         - pranavgore09
         - Preeticp
-        - rawlingsj
         - rhoads-zach
         - rhopp
         - Ritsyy
@@ -229,6 +228,13 @@
     name: '{ci_project}-{git_repo}'
     wrappers:
         - registry_devshift_credentials
+    <<: *job_template_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-prcheck'
+    wrappers:
+        - registry_devshift_credentials
+        - che_functional_tests_credentials_wrapper-prod-preview.openshift.io
     <<: *job_template_defaults
 
 - job-template:
@@ -1939,7 +1945,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}':
+        - '{ci_project}-{git_repo}-prcheck':
             git_organization: redhat-developer
             git_repo: che-starter
             ci_project: 'devtools'
