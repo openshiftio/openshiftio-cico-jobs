@@ -2774,6 +2774,8 @@
             git_repo: fabric8-analytics-tagger
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-recommender
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: fabric8-analytics-recommender
         - '{ci_project}-{git_repo}-build-master':
             git_organization: rhdt
             git_repo: chat
