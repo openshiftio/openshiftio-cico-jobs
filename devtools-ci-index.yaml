@@ -2748,6 +2748,13 @@
             deployment_units: 'worker-scaler'
             deployment_configs: 'f8a-worker-scaler'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-gemini-server
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+            image_name: 'fabric8-analytics/f8a-gemini-server'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-vscode-extension
