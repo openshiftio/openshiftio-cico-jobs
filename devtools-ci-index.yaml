@@ -158,6 +158,7 @@
       {jobdescription}
     node: "{ci_project}"
     concurrent: true
+    beforeGetNode: ""
     properties:
         - github:
             url: https://github.com/{git_organization}/{git_repo}/
@@ -171,6 +172,7 @@
         - shell: |
             # testing out the cico client
             set +e
+            {beforeGetNode}
             cp ~/artifacts.key .
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
@@ -347,6 +349,7 @@
             - fabric8-analytics
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
+    
 
 - job-template:
     name: '{ci_project}-{git_repo}-fabric8-analytics-pydoc'
@@ -1230,6 +1233,46 @@
             github_hooks: '{github_hooks}'
     <<: *che-functional-tests-template
 
+- job-template:
+    name: '{ci_project}-{git_repo}-after-rh-che-build-{test_url}'
+    triggers:
+        - build-result:
+            cron: '* * * * *'
+            groups:
+              - jobs:
+                    - 'devtools-rh-che-build-che-credentials-master'
+                results:
+                    - success
+                    - failure
+    beforeGetNode: |
+        #Wait for correct rh-che version to be deployed & running on prod-preview
+        isPodRunning () (
+            echo "Getting status of pod with image tag $IMAGE_TAG"
+            STATUS=`oc get pod -l app=che -o json -n dsaas-preview | jq -r ".items[] | select (.spec.containers[0].image | contains(\"IMAGE_TAG\")).status.phase"`
+            echo "Status is $STATUS"
+            if [ $STATUS = "Running" ]; then
+                return 0
+            fi
+            return 1
+        )
+        IMAGE_TAG=$(git ls-remote https://github.com/redhat-developer/rh-che.git master|cut -c1-7) #get image tag
+        TIMEOUT=60 #wait for ~ two minutes
+        CURRENT_TIME=0
+        while true
+        do
+            if [ $CURRENT_TIME -ge $TIMEOUT ]; then 
+                echo "Timeout reached"
+                exit 1
+            fi
+            if isPodRunning; then
+                break
+            fi
+            echo "Pod with IMAGE_TAG=$IMAGE_TAG is not running. CURRENT_TIME=$CURRENT_TIME"
+            sleep 5
+            CURRENT_TIME=$((CURRENT_TIME+5))
+        done
+    <<: *che-functional-tests-template
+
 - job:
     name: 'devtools-test-performance-core-db'
     defaults: global
@@ -1964,6 +2007,13 @@
             test_url: 'openshift.io'
             timeout: '20m'
         - '{ci_project}-{git_repo}-prcheck-{test_url}':
+            git_organization: redhat-developer
+            git_repo: che-functional-tests
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh ./cico/config_prod_preview'
+            test_url: 'prod-preview.openshift.io'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-after-rh-che-build-{test_url}':
             git_organization: redhat-developer
             git_repo: che-functional-tests
             ci_project: 'devtools'
