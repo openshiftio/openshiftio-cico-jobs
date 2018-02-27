@@ -852,29 +852,30 @@
             export GIT_COMMIT=$UPSTREAM_GIT_COMMIT
 
             # What's the current deployment revision?
-            export LAST_DC=${{DEPLOYMENT_CONFIGS##* }}
-            LAST_DC_REVISION=$(oc get dc/$LAST_DC -n $PRJ_NAME |grep $LAST_DC | awk '{{ print $2 }}')
-            if [ -z "$LAST_DC_REVISION" ]; then
+            export DC_NAME=${{DEPLOYMENT_CONFIGS##* }}
+            DC_REVISION=$(oc get dc/$DC_NAME -n $PRJ_NAME |grep $DC_NAME | awk '{{ print $2 }}')
+            if [ -z "$DC_REVISION" ]; then
                 # First deployment
-                LAST_DC_REVISION=0
+                DC_REVISION=0
             fi
 
+            # Deploy
             {saasherder_prepare}
             export DEVSHIFT_TAG_LEN=7
             for DEPLOYMENT_UNIT in $DEPLOYMENT_UNITS; do
                 export SAAS_SERVICE_NAME=$DEPLOYMENT_UNIT
                 export GIT_REPO=$DEPLOYMENT_UNIT
-                # Deploy preview
                 {saasherder_deploy}
             done
 
             export CICO_API_KEY=$(cat ~/duffy.key )
+            # Register rollback routine
             gc() {{
                 rtn_code=$?
                 for DEPLOYMENT_CONFIG in $DEPLOYMENT_CONFIGS; do
                     if [ $rtn_code -ne 0 ]; then
-                        # Tests failed, rollback
-                        oc rollback dc/$DEPLOYMENT_CONFIG -n $PRJ_NAME || :
+                        # Failure, rollback
+                        oc rollback dc/$DEPLOYMENT_CONFIG -n $PRJ_NAME --to-version=$DC_REVISION || :
                     fi
                 done
                 cico node done $CICO_SSID || :
@@ -884,19 +885,37 @@
             set -e
 
             # Wait for the new deployment to begin
+            # First wait for OpenShift to register the new deployment
             for i in `seq 30`; do
-                CURRENT_DC_REVISION=$(oc get dc/$LAST_DC -n $PRJ_NAME |grep $LAST_DC | awk '{{ print $2 }}') || :
-                if [ ${{CURRENT_DC_REVISION:-0}} -gt $LAST_DC_REVISION ]; then
-                    echo "The new deployment has started."
+                NEW_DC_REVISION=$(oc get dc/$DC_NAME -n $PRJ_NAME |grep $DC_NAME | awk '{{ print $2 }}') || :
+                if [ ${{NEW_DC_REVISION:-0}} -gt $DC_REVISION ]; then
+                    echo "The new deployment has been created."
                     break
                 fi
-                echo "The new deployment hasn't started yet."
+                echo "The new deployment hasn't been created yet."
                 sleep 5
             done
-            # Wait for the new deployment to be ready
-            oc logs -f dc/$LAST_DC -n $PRJ_NAME
+            if [ ! ${{NEW_DC_REVISION:-0}} -gt $DC_REVISION ]; then
+                exit 1
+            fi
 
-            # Run E2E tests
+            # Wait for the new deployment to actually begin
+            (
+                for i in `seq 30`; do
+                    export DEPLOY_POD_NAME=${{DC_NAME}}-${{NEW_DC_REVISION}}-deploy
+                    DEPLOYMENT_STATE=$(oc get pod/${{DEPLOY_POD_NAME}} -n $PRJ_NAME |grep ${{DEPLOY_POD_NAME}} |awk '{{ print $3 }}') || :
+                    if [ ${{DEPLOYMENT_STATE:-Pending}} == "Running" ]; then
+                        echo "The new deployment has started."
+                        exit 0
+                    fi
+                    echo "The new deployment hasn't started yet."
+                    sleep 5
+                done; exit 1
+            )
+            # And finally wait for the new deployment to be ready
+            oc logs -f dc/$DC_NAME -n $PRJ_NAME
+
+            # Now is the time to run E2E tests
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_HOSTNAME"
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_HOSTNAME:payload-tests
