@@ -284,7 +284,7 @@
           status-context: "ci.centos.org PR build (fabric8-planner)"
           org-list:
             - fabric8-planner
-          success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry: Run `docker run -e PROXY_PASS_URL=\"https://api.free-stg.openshift.com\" -p 8080:8080 ${REGISTRY}/${IMAGE_REPO}:${TAG}`."
+          success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry: Run `docker run -e PROXY_PASS_URL=\"https://api.free-stg.openshift.com\" -p 8080:8080 {REGISTRY}/{IMAGE_REPO}:{TAG}`."
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
 
