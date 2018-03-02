@@ -382,13 +382,16 @@
     svc_name: none
     prj_name: dsaas-preview
     saas_git: none
+    saas_service_name: none
     saasherder_prepare: |
         if [ "$SAAS_GIT" != "none" ]; then
             SAAS_ENV=staging
             PATH=$PATH:~/.local/bin/
             CONTEXT=$(echo $SAAS_GIT | sed 's/.*://')
             SAAS_GIT=$(echo $SAAS_GIT | sed 's/:.*//')
-            SAAS_SERVICE_NAME=$GIT_REPO
+            if [[ -z "$SAAS_SERVICE_NAME" || "$SAAS_SERVICE_NAME" == "none" ]]; then
+                SAAS_SERVICE_NAME=$GIT_REPO
+            fi
             if [ "$SUBDIR" != "" ]; then
                 SAAS_SERVICE_NAME=$SAAS_SERVICE_NAME"-"$SUBDIR
             fi
@@ -974,6 +977,7 @@
             GIT_REPO={git_repo}
             PRJ_NAME={prj_name}
             SAAS_GIT={saas_git}
+            SAAS_SERVICE_NAME={saas_service_name}
             {saasherder_prepare}
 
             if [ -z "$DEVSHIFT_TAG_LEN" ]; then
