@@ -1228,6 +1228,7 @@
         - github
         - githubprb:
             github_hooks: '{github_hooks}'
+            status-context: 'ci.centos.org PR check on {test_url}'
     <<: *che-functional-tests-template
 
 - job:
