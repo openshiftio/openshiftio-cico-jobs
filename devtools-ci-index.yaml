@@ -2038,6 +2038,15 @@
             git_organization: redhat-developer
             git_repo: rh-che
             ci_project: 'devtools'
+            branch: rh-che6
+            ci_cmd: '/bin/bash .ci/cico_build.sh && /bin/bash .ci/cico_deploy.sh'
+            saas_git: saas-openshiftio
+            saas_service_name: rh-che6
+            timeout: '30m'    
+        - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
             branch: master
             ci_cmd: '/bin/bash .ci/cico_build.sh && /bin/bash .ci/cico_deploy.sh'
             saas_git: saas-openshiftio
