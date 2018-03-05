@@ -273,9 +273,7 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-f8planner'
-    REGISTRY: 'MISSING_REGISTRY'
-    IMAGE_REPO: 'MISSING_IMAGE_REPO'
-    TAG: 'MISSING_TAG'
+    image_name: 'MISSING_IMAGE'
     wrappers:
         - registry_devshift_credentials
         - ansicolor
@@ -284,7 +282,7 @@
           status-context: "ci.centos.org PR build (fabric8-planner)"
           org-list:
             - fabric8-planner
-          success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry: Run `docker run -e PROXY_PASS_URL=\"https://api.free-stg.openshift.com\" -p 8080:8080 {REGISTRY}/{IMAGE_REPO}:{TAG}`."
+          success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry: Run `docker run -e PROXY_PASS_URL=\"https://api.free-stg.openshift.com\" -p 8080:8080 {image_name}`."
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
 
