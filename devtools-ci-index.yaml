@@ -1607,12 +1607,15 @@
            fingerprint: true
 
 - wrapper:
-    name: generator_credentials_wrapper
+    name: fabric8_launcher_credentials_wrapper
     wrappers:
         - credentials-binding:
             - text:
                 credential-id: 061479ee-de4a-4fb0-b752-7b86659ba3ca
                 variable: GENERATOR_DOCKER_HUB_PASSWORD
+            - file:
+                credential-id: f1d24e18-8f80-4284-9198-d44a713d17b4
+                variable: FABRIC8_LAUNCHER_CREDENTIALS
 
 - job-template:
     name: '{ci_project}-{git_repo}-generator-build-master'
@@ -1623,8 +1626,16 @@
             branches:
                 - master
     wrappers:
-        - generator_credentials_wrapper
+        - fabric8_launcher_credentials_wrapper
         - registry_devshift_credentials
+    <<: *job_template_build_defaults
+
+- job-template:
+    name: 'devtools-launcher-backend'
+    wrappers:
+        - registry_devshift_credentials
+        - ansicolor
+        - fabric8_launcher_credentials_wrapper
     <<: *job_template_build_defaults
 
 - job-template:
@@ -2159,7 +2170,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-launchpad
             prj_name: launchpad-preview
-        - '{ci_project}-{git_repo}':
+        - 'devtools-launcher-backend':
             git_organization: fabric8-launcher
             git_repo: launcher-backend
             ci_project: 'devtools'
@@ -3059,4 +3070,3 @@
             git_repo: fabric8-test
             ci_project: 'devtools'
             timeout: '30m'
-
