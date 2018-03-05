@@ -1636,7 +1636,7 @@
         - registry_devshift_credentials
         - ansicolor
         - fabric8_launcher_credentials_wrapper
-    <<: *job_template_build_defaults
+    <<: *job_template_defaults
 
 - job-template:
     name: 'devtools-test-end-to-end-{test_url}-planner-api-test'
