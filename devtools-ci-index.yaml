@@ -2738,6 +2738,8 @@
             timeout: '30m'
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-worker
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: fabric8-analytics-worker
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-server
