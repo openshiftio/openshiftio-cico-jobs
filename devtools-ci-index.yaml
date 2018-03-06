@@ -2236,7 +2236,7 @@
             git_repo: launcher-backend
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
+            timeout: '60m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-launcher
             git_repo: launcher-documentation
