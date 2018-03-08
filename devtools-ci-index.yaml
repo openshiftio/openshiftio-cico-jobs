@@ -2022,6 +2022,8 @@
             git_repo: fabric8-tenant-che-migration
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-openshiftio
+            saas_service_name: che-tenant-maintainer
             timeout: '10m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
