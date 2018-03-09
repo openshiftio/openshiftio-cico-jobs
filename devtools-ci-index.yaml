@@ -2711,8 +2711,8 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-analytics
-            deployment_units: 'gremlin-http'
-            deployment_configs: 'bayesian-gremlin-http'
+            deployment_units: 'gremlin-http gremlin-http-ingestion'
+            deployment_configs: 'bayesian-gremlin-http bayesian-gremlin-httpingestion'
             timeout: '1h'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
