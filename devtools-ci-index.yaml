@@ -1703,7 +1703,7 @@
       - credentials-binding:
         - text:
             credential-id: 1b1d24cc-7bf5-46dc-a112-657de8f1388c
-            EE_TEST_OSIO_TOKEN: Token
+            variable: EE_TEST_OSIO_TOKEN
     scm:
       - git:
             url: https://github.com/{git_organization}/{git_repo}.git
