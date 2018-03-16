@@ -2793,7 +2793,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-analytics
             deployment_units: 'worker-ingestion worker-api worker-priority worker-ingestion-graph-import worker-api-graph-import worker-priority-graph-import worker-api-dispatcher worker-ingestion-dispatcher worker-priority-dispatcher'
-            deployment_configs: 'bayesian-worker-ingestion bayesian-worker-api bayesian-worker-priority bayesian-worker-ingestion-graph-import bayesian-worker-api-graph-import bayesian-worker-priority-graph-import bayesian-worker-ingestion-dispatcher bayesian-worker-api-dispacher bayesian-worker-priority-dispacher'
+            deployment_configs: 'bayesian-worker-ingestion bayesian-worker-api bayesian-worker-priority bayesian-worker-ingestion-graph-import bayesian-worker-api-graph-import bayesian-worker-priority-graph-import bayesian-worker-ingestion-dispatcher bayesian-worker-api-dispatcher bayesian-worker-priority-dispatcher'
             timeout: '30m'
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-worker
