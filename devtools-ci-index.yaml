@@ -1966,19 +1966,6 @@
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             svc_name: core
             timeout: '3h'
-        - '{ci_project}-{git_repo}-build-master':
-            git_organization: aslakknutsen
-            git_repo: almighty-performance
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: aslak-almighty-perf
-            timeout: '20m'
-        - '{ci_project}-{git_repo}':
-            git_organization: aslakknutsen
-            git_repo: almighty-performance
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'
         - '{ci_project}-{git_repo}-npm-publish-build-master':
             git_organization: fabric8-ui
             git_repo: fabric8-ui
