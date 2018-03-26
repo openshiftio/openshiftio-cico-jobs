@@ -25,7 +25,7 @@ from jenkins_jobs.builder import Builder
 
 JENKINS_JOBS_URL = 'https://ci.centos.org/view/Devtools/api/python'
 DEVTOOLS_URL = 'https://raw.githubusercontent.com/openshiftio/openshiftio-cico-jobs/master/devtools-ci-index.yaml'
-
+UNTRACKED_JOBS = set(['devtools-jjb-service'])
 
 def get_devtools_jobs(devtools_fp):
     builder = Builder("None", None, None, None, plugins_list={})
@@ -57,8 +57,8 @@ def main():
     devtools_jobs = get_devtools_jobs(devtools_fp)
     jenkins_jobs = get_jenkins_jobs(JENKINS_JOBS_URL)
 
-    devtools_not_jenkins = set(devtools_jobs) - set(jenkins_jobs)
-    jenkins_not_devtools = set(jenkins_jobs) - set(devtools_jobs)
+    devtools_not_jenkins = set(devtools_jobs) - set(jenkins_jobs) - UNTRACKED_JOBS
+    jenkins_not_devtools = set(jenkins_jobs) - set(devtools_jobs) - UNTRACKED_JOBS
 
     diff = {}
     if devtools_not_jenkins:
