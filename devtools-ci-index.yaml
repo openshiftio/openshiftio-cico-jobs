@@ -3132,3 +3132,20 @@
             git_repo: fabric8-test
             ci_project: 'devtools'
             timeout: '30m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-api-gateway
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+            image_name: 'fabric8-analytics/f8a-api-gateway'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-api-gateway
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'api-gateway'
+            deployment_configs: 'f8a-api-gateway'
+            timeout: '20m'
+        
