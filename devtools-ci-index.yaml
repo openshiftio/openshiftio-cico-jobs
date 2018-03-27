@@ -1239,9 +1239,10 @@
     name: '{ci_project}-{git_repo}-prcheck-{test_url}'
     triggers:
         - github
-        - githubprb:
+        - github-pull-request:
             github_hooks: '{github_hooks}'
             status-context: 'ci.centos.org PR check on {test_url}'
+            <<: *github_pull_request_defaults
     <<: *che-functional-tests-template
 
 - job-template:
