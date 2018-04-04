@@ -160,6 +160,36 @@
                 username: OSIO_USERNAME
                 password: OSIO_PASSWORD
 
+- wrapper:
+    name: rh_che_automation_credentials_wrapper_dev.rdu2c.fabric8.io
+    wrappers:
+        - credentials-binding:
+            - username-password-separated:
+                credential-id: 2aef0e89-40a6-4dd6-8104-fd1f81656e5d
+                username: RH_CHE_AUTOMATION_RDU2C_USERNAME
+                password: RH_CHE_AUTOMATION_RDU2C_PASSWORD
+
+- wrapper:
+    name: rh_che_automation_credentials_wrapper_prod-preview.openshift.io
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: d8e23ea1-7f30-40c4-816f-50fc91ebfa6f
+                variable: KEYCLOAK_TOKEN
+            - username-password-separated:
+                credential-id: 79f2b240-e87e-4216-ba88-6b3431bceb2f
+                username: RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME
+                password: RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD
+
+- wrapper:
+    name: rh_che_automation_credentials_wrapper_dockerhub
+    wrappers:
+        - credentials-binding:
+            - username-password-separated:
+                credential-id: 458034f1-cdda-4066-bca9-d06c3dee3282
+                username: RH_CHE_AUTOMATION_DOCKERHUB_USERNAME
+                password: RH_CHE_AUTOMATION_DOCKERHUB_PASSWORD
+
 - job_template_defaults: &job_template_defaults
     name: 'job_template_defaults'
     description: |
@@ -1229,6 +1259,23 @@
             docker tag ${CHE_SERVER_STAGE_DOCKER_IMAGE} ${CHE_SERVER_PROD_DOCKER_IMAGE}
             docker push ${CHE_SERVER_PROD_DOCKER_IMAGE}
 
+- rh-che-automation-temaplate: &rh-che-automation-template
+    name: 'rh-che-automation-template'
+    wrappers:
+        - rh_che_automation_credentials_wrapper_dev.rdu2c.fabric8.io
+        - rh_che_automation_credentials_wrapper_prod-preview.openshift.io
+        - rh_che_automation_credentials_wrapper_dockerhub
+    <<: *job_template_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-rh-che-prcheck-{test_url}'
+    triggers:
+        - github
+        - githubprb:
+            github_hooks: '{github_hooks}'
+            status-context: 'ci.centos.org PR check on {git_repo} {test_url}'
+    <<: *rh-che-automation-template
+
 - che-functional-tests-template: &che-functional-tests-template
     name: 'che-functional-tests-template'
     wrappers:
@@ -2120,6 +2167,13 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-rh-che-prcheck-{test_url}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash ./.ci/cico_build_and_deploy_custom_rh-che.sh'
+            test_url: 'dev.rdu2c.fabric8.io'
+            timeout: '60m'
         - '{ci_project}-{git_repo}-prcheck-{test_url}':
             git_organization: redhat-developer
             git_repo: che-functional-tests
