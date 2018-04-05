@@ -315,8 +315,16 @@
     name: '{ci_project}-{git_repo}-f8planner'
     image_name: 'MISSING_IMAGE'
     wrappers:
-        - registry_devshift_credentials
-        - ansicolor
+      - credentials-binding:
+        - text:
+            credential-id: 270c316a-5343-4b61-9d1f-e506038c08cd
+            variable: REFRESH_TOKEN
+        - username-password-separated:
+            credential-id: 17c4ae0f-80d2-4cce-be76-8fd67c83d97f
+            username: USERNAME
+            password: PASSWORD
+      - registry_devshift_credentials
+      - ansicolor
     triggers:
       - github-pull-request:
           status-context: "ci.centos.org PR build (fabric8-planner)"
