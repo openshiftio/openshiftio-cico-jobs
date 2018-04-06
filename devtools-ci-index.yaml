@@ -1,7 +1,7 @@
 - defaults:
     name: global
     timeout: '15m'
-    jobdescription: "Managed by Jenkins Job Builder, do not edit manually! Update via https://github.com/almighty/almighty-jobs"
+    jobdescription: "Managed by Jenkins Job Builder, do not edit manually! Update via https://github.com/openshiftio/openshiftio-cico-jobs"
     git_organization: fabric8-services
     github_user: almighty-bot
     github_hooks: true
@@ -393,7 +393,7 @@
             - fabric8-analytics
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
-    
+
 
 - job-template:
     name: '{ci_project}-{git_repo}-fabric8-analytics-pydoc'
@@ -1267,7 +1267,7 @@
             docker tag ${CHE_SERVER_STAGE_DOCKER_IMAGE} ${CHE_SERVER_PROD_DOCKER_IMAGE}
             docker push ${CHE_SERVER_PROD_DOCKER_IMAGE}
 
-- rh-che-automation-temaplate: &rh-che-automation-template
+- rh-che-automation-template: &rh-che-automation-template
     name: 'rh-che-automation-template'
     wrappers:
         - rh_che_automation_credentials_wrapper_dev.rdu2c.fabric8.io
@@ -1327,7 +1327,7 @@
         CURRENT_TIME=0
         while true
         do
-            if [ $CURRENT_TIME -ge $TIMEOUT ]; then 
+            if [ $CURRENT_TIME -ge $TIMEOUT ]; then
                 echo "Timeout reached"
                 exit 1
             fi
@@ -1779,7 +1779,7 @@
             else
                 echo "Not a PR build, using master"
             fi
-            cat $FABRIC8_LAUNCHER_CREDENTIALS >> launcher-env-template.sh            
+            cat $FABRIC8_LAUNCHER_CREDENTIALS >> launcher-env-template.sh
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload \
             && /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
@@ -1794,7 +1794,7 @@
                     curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
                 fi
             fi
-            exit $rtn_code        
+            exit $rtn_code
     <<: *job_template_defaults
 
 - job-template:
@@ -1849,7 +1849,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload-tests
-            $ssh_cmd -t "cd payload-tests/EE_API_automation && /bin/bash cico_run_EE_tests.sh" 
+            $ssh_cmd -t "cd payload-tests/EE_API_automation && /bin/bash cico_run_EE_tests.sh"
             rtn_code=$?
             cico node done $CICO_ssid
             exit $rtn_code
@@ -2211,7 +2211,7 @@
             ci_cmd: '/bin/bash .ci/cico_build.sh && /bin/bash .ci/cico_deploy.sh'
             saas_git: saas-openshiftio
             saas_service_name: rh-che6
-            timeout: '30m'    
+            timeout: '30m'
         - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
             git_organization: redhat-developer
             git_repo: rh-che
@@ -2316,7 +2316,7 @@
             git_repo: launcher-booster-catalog
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'            
+            timeout: '20m'
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: fabric8-launcher
             git_repo: launcher-frontend
@@ -3213,4 +3213,3 @@
             deployment_units: 'api-gateway'
             deployment_configs: 'f8a-api-gateway'
             timeout: '20m'
-        
