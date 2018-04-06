@@ -148,13 +148,24 @@
             - file:
                 credential-id: 93da78ec-7785-49ab-a1ef-586424b3e94f
                 variable: creds_config_file
-
 - wrapper:
-    name: che_functional_tests_credentials_wrapper-openshift.io
+    name: che_functional_tests_credentials_wrapper-periodical-prod-preview.openshift.io
     wrappers:
         - credentials-binding:
             - text:
-                credential-id: "de793dce-5821-4182-af4f-6c7b42b5c21d"
+                credential-id: 45e975d5-003b-401b-96c3-be9c5117f164
+                variable: KEYCLOAK_TOKEN
+            - username-password-separated:
+                credential-id: cdd2512c-3c7c-425b-bc21-119fcba85855
+                username: OSIO_USERNAME
+                password: OSIO_PASSWORD
+
+- wrapper:
+    name: che_functional_tests_credentials_wrapper-prcheck-openshift.io
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: de793dce-5821-4182-af4f-6c7b42b5c21d
                 variable: KEYCLOAK_TOKEN
             - username-password-separated:
                 credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
@@ -162,11 +173,11 @@
                 password: OSIO_PASSWORD
 
 - wrapper:
-    name: che_functional_tests_credentials_wrapper-prod-preview.openshift.io
+    name: che_functional_tests_credentials_wrapper-prcheck-prod-preview.openshift.io
     wrappers:
         - credentials-binding:
             - text:
-                credential-id: "1e0bbb30-cddd-4b6f-bc61-bb4ebd2706e5"
+                credential-id: 1e0bbb30-cddd-4b6f-bc61-bb4ebd2706e5
                 variable: KEYCLOAK_TOKEN
             - username-password-separated:
                 credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
@@ -286,7 +297,7 @@
     name: '{ci_project}-{git_repo}-prcheck'
     wrappers:
         - registry_devshift_credentials
-        - che_functional_tests_credentials_wrapper-prod-preview.openshift.io
+        - che_functional_tests_credentials_wrapper-prcheck-prod-preview.openshift.io
     <<: *job_template_defaults
 
 - job-template:
@@ -1034,7 +1045,7 @@
     wrappers:
         - che_credentials_wrapper
         - registry_devshift_credentials
-        - che_functional_tests_credentials_wrapper-prod-preview.openshift.io
+        - che_functional_tests_credentials_wrapper-prcheck-prod-preview.openshift.io
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
@@ -1360,17 +1371,27 @@
             status-context: 'ci.centos.org PR check on {git_repo} {test_url}'
     <<: *rh-che-automation-template
 
+
 - che-functional-tests-template: &che-functional-tests-template
     name: 'che-functional-tests-template'
     wrappers:
-        - che_functional_tests_credentials_wrapper-{test_url}
-    concurrent: false
+        - che_functional_tests_credentials_wrapper-{type}-{test_url}
     <<: *job_template_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-periodical-{test_url}'
+    triggers:
+        - timed: 'H 2,14 * * *'
+    scm:
+        - git:
+            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            branches:
+                - origin/master
+    <<: *che-functional-tests-template
 
 - job-template:
     name: '{ci_project}-{git_repo}-prcheck-{test_url}'
     triggers:
-        - github
         - github-pull-request:
             github_hooks: '{github_hooks}'
             status-context: 'ci.centos.org PR check on {test_url}'
@@ -2197,6 +2218,7 @@
             ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh'
             test_url: 'openshift.io'
             timeout: '20m'
+            type: 'prcheck'
         - '{ci_project}-{git_repo}-prcheck-{test_url}':
             git_organization: redhat-developer
             git_repo: che-functional-tests
@@ -2204,6 +2226,7 @@
             ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh ./cico/config_prod_preview'
             test_url: 'prod-preview.openshift.io'
             timeout: '20m'
+            type: 'prcheck'
         - '{ci_project}-{git_repo}-after-rh-che-build-{test_url}':
             git_organization: redhat-developer
             git_repo: che-functional-tests
@@ -2211,6 +2234,15 @@
             ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh ./cico/config_prod_preview'
             test_url: 'prod-preview.openshift.io'
             timeout: '20m'
+            type: 'prcheck'
+        - '{ci_project}-{git_repo}-periodical-{test_url}':
+            git_organization: redhat-developer
+            git_repo: che-functional-tests
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh ./cico/config_prod_preview'
+            test_url: 'prod-preview.openshift.io'
+            timeout: '20m'
+            type: 'periodical'
         - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
             git_organization: redhat-developer
             git_repo: rh-che
