@@ -331,8 +331,8 @@
       - github-pull-request:
           status-context: "ci.centos.org PR build (fabric8-planner)"
           org-list:
-            - fabric8-planner
-          success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry: Run `docker run -e PROXY_PASS_URL=\"https://api.free-stg.openshift.com\" -p 8080:8080 {image_name}`."
+            - fabric8-ui
+          success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry. Run `docker run -p 5000:8080 {image_name}:SNAPSHOT-PR-$ghprbPullId` and visit `http://localhost:5000` to access it."
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
 
@@ -3192,6 +3192,7 @@
             git_repo: fabric8-planner
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
+            image_name: fabric8-ui/fabric8-planner
             timeout: '50m'
         - 'devtools-test-end-to-end-{test_url}-planner-api-test':
             test_url: openshift.io
