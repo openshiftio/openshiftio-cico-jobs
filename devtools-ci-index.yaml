@@ -2073,6 +2073,12 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '20m'
+        - '{ci_project}-{git_repo}-npm-publish-build-master':
+            git_organization: fabric8-ui
+            git_repo: fabric8-planner
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '1h'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: openshiftio
             git_repo: openshift.io
