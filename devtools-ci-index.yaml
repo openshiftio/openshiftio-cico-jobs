@@ -2830,6 +2830,26 @@
             git_repo: f8a-server-backbone
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-npm-insights
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+            image_name: 'fabric8-analytics/f8a-chester'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-npm-insights
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'f8a-chester'
+            deployment_configs: 'f8a-chester'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-npm-insights
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: fabric8-analytics-npm-insights
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
             git_repo: fabric8-analytics-worker
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
