@@ -3252,3 +3252,7 @@
             deployment_units: 'api-gateway'
             deployment_configs: 'f8a-api-gateway'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-api-gateway
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: fabric8-analytics-api-gateway
