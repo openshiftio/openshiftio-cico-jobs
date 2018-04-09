@@ -1539,7 +1539,6 @@
     name: 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}'
     defaults: global
     node: devtools
-    after: fabric8io-fabric8-test-build-master
     gh_username: osiotestmachine
     properties:
         - github:
