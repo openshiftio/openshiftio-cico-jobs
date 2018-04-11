@@ -542,16 +542,7 @@
             # RHEL build
 
             if [ -n "{extra_target}" ]; then
-                cico_node_output=$(get_cico_node)
-                [ "$?" != "0" ] && exit 1
-
-                read CICO_hostname CICO_ssid <<< $cico_node_output
-
-                ssh_cmd="ssh $sshopts $CICO_hostname"
-
-                $ssh_cmd yum -y install rsync
-                rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-                $ssh_cmd -t "cd payload && TARGET=\"{extra_target}\" DOCKER_REGISTRY=\"$DOCKER_REGISTRY_RHEL\" {ci_cmd}"
+                $ssh_cmd -t "cd payload && TARGET=\"{extra_target}\" {ci_cmd}"
                 rtn_code=$?
 
                 if [ "$rtn_code" != "0" ]; then
