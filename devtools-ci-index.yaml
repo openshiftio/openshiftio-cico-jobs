@@ -3020,3 +3020,9 @@
             git_repo: fabric8-analytics-api-gateway
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-api-gateway
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-launcher
+            git_repo: ngx-launcher
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '30m'
