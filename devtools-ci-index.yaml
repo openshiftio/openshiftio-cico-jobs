@@ -464,38 +464,42 @@
             rtn_code=$?
             cd ..
         fi
+    extra_target: ""
     builders:
         - shell: |
             # testing out the cico client
             set +e
 
             export CICO_API_KEY=$(cat ~/duffy.key )
-            # get node
-            n=1
-            while true
-            do
-                cico_output=$(cico node get -f value -c ip_address -c comment)
-                if [ $? -eq 0 ]; then
-                    read CICO_hostname CICO_ssid <<< $cico_output
-                    if  [ ! -z "$CICO_hostname" ]; then
-                        # we got hostname from cico
-                        break
+
+            get_cico_node() {{
+                # get node
+                n=1
+                while true
+                do
+                    cico_output=$(cico node get -f value -c ip_address -c comment)
+                    if [ $? -eq 0 ]; then
+                        read CICO_hostname CICO_ssid <<< $cico_output
+                        if  [ ! -z "$CICO_hostname" ]; then
+                            # we got hostname from cico
+                            break
+                        fi
+                        echo "'cico node get' succeed, but can't get hostname from output" >&2
                     fi
-                    echo "'cico node get' succeed, but can't get hostname from output"
-                fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
-                    echo "giving up on 'cico node get'"
-                    exit 1
-                fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
-                n=$[$n+1]
-                sleep 60
-            done
-            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
-            ssh_cmd="ssh $sshopts $CICO_hostname"
+                    if [ $n -gt 5 ]; then
+                        # give up after 5 tries
+                        echo "giving up on 'cico node get'" >&2
+                        return 1
+                    fi
+                    echo "'cico node get' failed, trying again in 60s ($n/5)" >&2
+                    n=$[$n+1]
+                    sleep 60
+                done
+                echo "$CICO_hostname" "$CICO_ssid"
+            }}
 
             # Verify Job configuration
+
             if [ "{svc_name}" == "none" -a "{saas_git}" == "none" ]; then
                 echo "Not part of SAAS"
             else
@@ -512,24 +516,49 @@
                 export DEVSHIFT_TAG_LEN=7
             fi
 
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+
             env > jenkins-env
+
+            # CentOS build
+
+            cico_node_output=$(get_cico_node)
+            [ "$?" != "0" ] && exit 1
+
+            read CICO_hostname CICO_ssid <<< $cico_node_output
+
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
-            if [ $rtn_code -eq 0 ]; then
-              cico node done $CICO_ssid
-              #Deploy preview
-              # Verify Job configuration
-              if [ "{svc_name}" == "none" -a "{saas_git}" == "none" ]; then
-                echo "Not part of SAAS, skipping deployment"
-              else
-                {saasherder_deploy}
-              fi
-            else
-              # fail mode gives us 12 hrs to debug the machine
+
+            if [ "$rtn_code" != "0" ]; then
               curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
+              exit $rtn_code
             fi
+
+            # RHEL build
+
+            if [ -n "{extra_target}" ]; then
+                $ssh_cmd -t "cd payload && TARGET=\"{extra_target}\" {ci_cmd}"
+                rtn_code=$?
+
+                if [ "$rtn_code" != "0" ]; then
+                    curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
+                    exit $rtn_code
+                fi
+            fi
+
+            #Deploy preview
+            # Verify Job configuration
+            if [ "{svc_name}" == "none" -a "{saas_git}" == "none" ]; then
+                echo "Not part of SAAS, skipping deployment"
+            else
+                {saasherder_deploy}
+            fi
+
             exit $rtn_code
 
 - job-template: &job_template_publish_branch_defaults
@@ -2320,6 +2349,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}':
             git_repo: fabric8-auth
             ci_project: 'devtools'
