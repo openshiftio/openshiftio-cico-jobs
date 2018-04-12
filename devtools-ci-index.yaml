@@ -3055,4 +3055,10 @@
             git_repo: ngx-launcher
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '30m'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-launcher
+            git_repo: ngx-launcher
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '20m'
