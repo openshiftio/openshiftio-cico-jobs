@@ -130,6 +130,14 @@
                 variable: FABRIC8CD_GH_TOKEN
 
 - wrapper:
+    name: fabric8-planner-test-token
+    wrappers:
+      - credentials-binding:
+        - text:
+            credential-id: 270c316a-5343-4b61-9d1f-e506038c08cd
+            variable: REFRESH_TOKEN
+
+- wrapper:
     name: che_credentials_wrapper
     wrappers:
         - credentials-binding:
@@ -1114,6 +1122,7 @@
     node: "{ci_project}"
     wrappers:
             - npm-build-deliver-creds
+            - fabric8-planner-test-token
             - registry_devshift_credentials
     properties:
         - github:
