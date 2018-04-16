@@ -2258,6 +2258,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
             saas_git: saas-openshiftio
+            extra_target: rhel
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
             git_repo: ngx-base
