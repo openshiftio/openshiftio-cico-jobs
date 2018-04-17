@@ -399,7 +399,7 @@
     <<: *job_template_defaults
 
 - job-template:
-    name: '{ci_project}-{git_repo}-build-test-image'
+    name: '{ci_project}-fabric8-wit'
     wrappers:
       - registry_devshift_credentials
     triggers:
@@ -2141,7 +2141,7 @@
             git_repo: openshiftio-cico-jobs
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_pr_test.sh'
-        - '{ci_project}-{git_repo}-build-test-image':
+        - '{ci_project}-fabric8-wit':
             git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
