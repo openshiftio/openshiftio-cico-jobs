@@ -1331,6 +1331,7 @@
     name: 'che-functional-tests-template'
     wrappers:
         - che_functional_tests_credentials_wrapper-{test_url}
+    concurrent: false
     <<: *job_template_defaults
 
 - job-template:
