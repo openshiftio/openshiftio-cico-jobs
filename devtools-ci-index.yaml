@@ -316,6 +316,10 @@
     wrappers:
         - registry_devshift_credentials
         - ansicolor
+    properties:
+      - *job_template_defaults_github
+      - build-discarder:
+          num-to-keep: 30
     triggers:
       - github-pull-request:
           status-context: "ci.centos.org PR build (fabric8-analytics)"
@@ -400,6 +404,10 @@
     ci_project: 'devtools'
     ci_cmd: '/bin/bash cico_run_pylint.sh'
     timeout: '20m'
+    properties:
+      - *job_template_defaults_github
+      - build-discarder:
+          num-to-keep: 30
     triggers:
       - github-pull-request:
           status-context: "ci.centos.org pylint run (fabric8-analytics)"
@@ -408,13 +416,16 @@
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
 
-
 - job-template:
     name: '{ci_project}-{git_repo}-fabric8-analytics-pydoc'
     git_organization: fabric8-analytics
     ci_project: 'devtools'
     ci_cmd: '/bin/bash cico_run_pydoc.sh'
     timeout: '20m'
+    properties:
+      - *job_template_defaults_github
+      - build-discarder:
+          num-to-keep: 30
     triggers:
       - github-pull-request:
           status-context: "ci.centos.org check-style run (fabric8-analytics)"
