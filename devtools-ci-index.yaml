@@ -2297,6 +2297,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-launchpad
             prj_name: launchpad-preview
+            extra_target: rhel
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-launcher
             git_repo: launcher-frontend
@@ -2398,6 +2399,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-launchpad
             prj_name: launchpad-preview
+            extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
             git_repo: fabric8-online-docs
             git_organization: fabric8io
