@@ -2012,6 +2012,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-build-master-coverage':
             git_repo: fabric8-wit
             ci_project: 'devtools'
@@ -2045,6 +2046,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '10m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: fabric8-notification
@@ -2052,6 +2054,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '10m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: fabric8-toggles
@@ -2059,6 +2062,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '10m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: fabric8-toggles-service
@@ -2066,6 +2070,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '10m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: che-tenant-maintainer
@@ -2081,6 +2086,7 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '10m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: fabric8-oso-proxy
@@ -2088,18 +2094,21 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '10m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
             git_repo: fabric8-jenkins-idler
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
             git_repo: fabric8-jenkins-proxy
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
             timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}':
             git_repo: fabric8-jenkins-proxy
             ci_project: 'devtools'
@@ -2237,6 +2246,7 @@
             timeout: '50m'
             saas_git: saas-openshiftio:keycloak
             prj_name: dsaas-keycloak-preview
+            extra_target: rhel
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-services
             git_repo: keycloak-deployment
