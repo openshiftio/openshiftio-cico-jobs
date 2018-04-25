@@ -1031,6 +1031,7 @@
             shallow_clone: true
             branches:
                 - '{branch}'
+    extra_target: ""
     builders:
         - shell: |
             # testing out the cico client
@@ -1080,7 +1081,27 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+
             $ssh_cmd -t "cd payload && {ci_cmd}"
+            rtn_code=$?
+
+            if [ "$rtn_code" != "0" ]; then
+                curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
+                exit $rtn_code
+            fi
+
+            # RHEL build
+
+            if [ -n "{extra_target}" ]; then
+                $ssh_cmd -t "cd payload && TARGET=\"{extra_target}\" {ci_cmd}"
+                rtn_code=$?
+
+                if [ "$rtn_code" != "0" ]; then
+                    curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
+                    exit $rtn_code
+                fi
+            fi
+
             rtn_code=$?
             if [ $rtn_code -eq 0 ]; then
                 #Deploy preview
