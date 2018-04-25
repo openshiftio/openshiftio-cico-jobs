@@ -1380,6 +1380,7 @@
 
 - rh-che-automation-template: &rh-che-automation-template
     name: 'rh-che-automation-template'
+    concurrent: false
     wrappers:
         - registry_devshift_credentials
         - rh_che_automation_credentials_wrapper_dev.rdu2c.fabric8.io
