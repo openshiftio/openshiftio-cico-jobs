@@ -1093,7 +1093,7 @@
             # RHEL build
 
             if [ -n "{extra_target}" ]; then
-                $ssh_cmd -t "cd payload && TARGET=\"{extra_target}\" {ci_cmd}"
+                $ssh_cmd -t "cd payload && export TARGET=\"{extra_target}\" && {ci_cmd}"
                 rtn_code=$?
 
                 if [ "$rtn_code" != "0" ]; then
