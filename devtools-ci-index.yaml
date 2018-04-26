@@ -2207,6 +2207,7 @@
             saas_git: saas-openshiftio
             saas_service_name: rh-che6
             timeout: '30m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
             git_organization: redhat-developer
             git_repo: rh-che
