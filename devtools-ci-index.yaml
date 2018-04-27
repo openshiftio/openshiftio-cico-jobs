@@ -2641,6 +2641,7 @@
             deployment_units: 'gremlin-http gremlin-http-ingestion'
             deployment_configs: 'bayesian-gremlin-http bayesian-gremlin-httpingestion'
             timeout: '1h'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-stack-analysis
