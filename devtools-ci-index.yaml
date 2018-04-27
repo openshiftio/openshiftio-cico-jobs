@@ -2698,6 +2698,7 @@
             deployment_units: 'api-backbone'
             deployment_configs: 'f8a-server-backbone'
             timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: f8a-server-backbone
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
