@@ -2794,6 +2794,7 @@
             saas_git: saas-analytics
             skip_deploy: 1
             timeout: '30m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-stack-analysis-base
