@@ -2750,6 +2750,7 @@
             deployment_units: 'api'
             deployment_configs: 'bayesian-api'
             timeout: '30m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-server
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
