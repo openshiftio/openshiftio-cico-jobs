@@ -703,6 +703,7 @@
     skip_deploy: 0
     deployment_units: ''
     deployment_configs: ''
+    extra_target: ''
     builders:
         - shell: |
             # testing out the cico client
@@ -743,6 +744,13 @@
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
+
+            # RHEL build
+            if [[ $rtn_code -eq 0 && -n "{extra_target}" ]]; then
+                $ssh_cmd -t "cd payload && TARGET=\"{extra_target}\" {ci_cmd}"
+                rtn_code=$?
+            fi
+
             # We want to reuse the node for running E2E tests,
             # but only if we are not doomed already.
             if [[ $rtn_code -ne 0 || {skip_deploy} -ne 0 ]]; then
