@@ -2596,6 +2596,7 @@
             saas_git: saas-analytics
             deployment_units: 'fabric8-analytics-pgbouncer'
             deployment_configs: 'bayesian-pgbouncer'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-jobs
