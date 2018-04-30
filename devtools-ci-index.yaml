@@ -120,14 +120,11 @@
     wrappers:
         - credentials-binding:
             - text:
-                credential-id: a9450b57-2492-4c47-9bd1-cabf87f74bb1
+                credential-id: ca93a149-7f35-4be4-b1bf-c6cb2ed83c34
                 variable: GH_TOKEN
             - text:
-                credential-id: f8f7db1d-87c8-4f64-bae7-584142e44f8e
+                credential-id: dea94aec-467e-4363-9578-3a3a2d0009e6
                 variable: NPM_TOKEN
-            - text:
-                credential-id: ca93a149-7f35-4be4-b1bf-c6cb2ed83c34
-                variable: FABRIC8CD_GH_TOKEN
 
 - wrapper:
     name: fabric8-planner-test-token
