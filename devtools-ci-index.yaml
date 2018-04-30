@@ -2864,6 +2864,7 @@
             deployment_units: 'f8a-firehose-fetcher'
             deployment_configs: 'f8a-firehose-fetcher'
             timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-stack-report-ui
