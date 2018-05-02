@@ -3045,6 +3045,7 @@
             deployment_units: 'f8a-3scale-connect-api'
             deployment_configs: 'f8a-3scale-connect-api'
             timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: api-machine-stacks
