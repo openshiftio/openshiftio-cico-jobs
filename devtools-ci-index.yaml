@@ -2721,6 +2721,7 @@
             deployment_units: 'f8a-npm-insights'
             deployment_configs: 'f8a-npm-insights'
             timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-npm-insights
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
