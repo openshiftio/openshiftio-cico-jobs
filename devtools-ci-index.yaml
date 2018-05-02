@@ -2613,6 +2613,7 @@
             deployment_units: 'jobs'
             deployment_configs: 'bayesian-jobs'
             timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-jobs
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
@@ -2660,6 +2661,7 @@
             deployment_units: 'kronos-pypi kronos-maven'
             deployment_configs: 'bayesian-kronos-pypi bayesian-kronos-maven'
             timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-stack-analysis
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
