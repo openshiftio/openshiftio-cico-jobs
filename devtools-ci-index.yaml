@@ -2680,6 +2680,7 @@
             deployment_units: 'license-analysis'
             deployment_configs: 'f8a-license-analysis'
             timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-license-analysis
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
