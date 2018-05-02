@@ -161,14 +161,26 @@
                 password: OSIO_PASSWORD
 
 - wrapper:
+    name: che_functional_tests_credentials_wrapper-mergeCheck-prod-preview.openshift.io-2a
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: 058ecc2b-e95e-40e7-8de6-a1e788c4ccce
+                variable: KEYCLOAK_TOKEN
+            - username-password-separated:
+                credential-id: 850d91eb-4a35-4691-a679-3e48b963c6f5
+                username: OSIO_USERNAME
+                password: OSIO_PASSWORD
+
+- wrapper:
     name: che_functional_tests_credentials_wrapper-periodical-prod-preview.openshift.io-free-stg
     wrappers:
         - credentials-binding:
             - text:
-                credential-id: 1e0bbb30-cddd-4b6f-bc61-bb4ebd2706e5
+                credential-id: 60bf228a-e858-4ae3-94fb-7e73fa7d52d9
                 variable: KEYCLOAK_TOKEN
             - username-password-separated:
-                credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
+                credential-id: f9b7e98d-2ba0-40c3-8454-2475a064e216
                 username: OSIO_USERNAME
                 password: OSIO_PASSWORD
 
@@ -198,7 +210,7 @@
                 password: OSIO_PASSWORD
 
 - wrapper:
-    name: che_functional_tests_credentials_wrapper-prcheck-prod-preview.openshift.io-free-stg
+    name: che_functional_tests_credentials_wrapper-prcheck-prod-preview.openshift.io-2a
     wrappers:
         - credentials-binding:
             - text:
@@ -322,7 +334,7 @@
     name: '{ci_project}-{git_repo}-prcheck'
     wrappers:
         - registry_devshift_credentials
-        - che_functional_tests_credentials_wrapper-prcheck-prod-preview.openshift.io-free-stg
+        - che_functional_tests_credentials_wrapper-periodical-prod-preview.openshift.io-free-stg
     <<: *job_template_defaults
 
 - job-template:
@@ -1070,7 +1082,7 @@
     wrappers:
         - che_credentials_wrapper
         - registry_devshift_credentials
-        - che_functional_tests_credentials_wrapper-prcheck-prod-preview.openshift.io-free-stg
+        - che_functional_tests_credentials_wrapper-periodical-prod-preview.openshift.io-free-stg
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
@@ -2254,7 +2266,7 @@
             test_url: 'prod-preview.openshift.io'
             timeout: '20m'
             type: 'prcheck'
-            cluster: 'free-stg'
+            cluster: '2a'
         - '{ci_project}-{git_repo}-after-rh-che-build-{test_url}':
             git_organization: redhat-developer
             git_repo: che-functional-tests
@@ -2262,8 +2274,8 @@
             ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh ./cico/config_prod_preview'
             test_url: 'prod-preview.openshift.io'
             timeout: '20m'
-            type: 'prcheck'
-            cluster: 'free-stg'
+            type: 'mergeCheck'
+            cluster: '2a'
         - '{ci_project}-{git_repo}-periodical-{test_url}-{cluster}':
             git_organization: redhat-developer
             git_repo: che-functional-tests
