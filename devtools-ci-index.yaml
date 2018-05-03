@@ -2926,6 +2926,7 @@
             deployment_units: 'stack-report-ui'
             deployment_configs: 'fabric8-analytics-stack-report-ui'
             timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-scaler
