@@ -2888,6 +2888,7 @@
             deployment_units: 'data-importer'
             deployment_configs: 'bayesian-data-importer'
             timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-data-model
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
