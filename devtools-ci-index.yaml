@@ -2570,6 +2570,44 @@
             disabled: true
             timeout: 60m
             ee_test_start_time: '0 */1 * * *'
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}':
+            test_url: openshift.io
+            test_suite: logintest
+            cluster: cluster-1a
+            after: devtools-fabric8-test-build-master
+            osio_creds: 48966098-532e-42b1-ac2a-d6a3db6f06f3
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
+            kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
+            ee_test_start_time: '*/15 * * * *'
+            timeout: 5m
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}':
+            test_url: openshift.io
+            test_suite: smoketest
+            cluster: cluster-1a
+            osio_creds: 48966098-532e-42b1-ac2a-d6a3db6f06f3
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
+            kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
+            ee_test_start_time: '5 1-23/6 * * *'
+            timeout: 60m
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}':
+            test_url: openshift.io
+            test_suite: logintest
+            cluster: cluster-1b
+            after: devtools-fabric8-test-build-master
+            osio_creds: 35afd1c4-b52d-4738-becc-5bb81ec750a1
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
+            kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
+            ee_test_start_time: '*/15 * * * *'
+            timeout: 5m
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}':
+            test_url: openshift.io
+            test_suite: smoketest
+            cluster: cluster-1b
+            osio_creds: 35afd1c4-b52d-4738-becc-5bb81ec750a1
+            oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
+            kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
+            ee_test_start_time: '5 1-23/6 * * *'
+            timeout: 60m
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
