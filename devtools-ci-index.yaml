@@ -1613,6 +1613,7 @@
     node: devtools
     after: fabric8io-fabric8-test-build-master
     gh_username: osiotestmachine
+    feature_level: ''
     properties:
         - github:
             url: https://github.com/fabric8io/fabric8-test
@@ -1682,7 +1683,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_EE_tests_ts.sh https://{test_url} ${{BUILD_NUMBER}} {test_suite}"
+            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_EE_tests_ts.sh https://{test_url} ${{BUILD_NUMBER}} {test_suite} '' '' '' {feature_level}"
             rtn_code=$?
             if [[ $rtn_code -eq 124 ]]; then
                echo "BUILD TIMEOUT";
@@ -2464,6 +2465,7 @@
             test_url: openshift.io
             test_suite: smoketest
             cluster: cluster-one
+            feature_level: beta
             osio_creds: 9d2a233c-4350-49ab-983d-5b8d0de95f44
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
@@ -2501,6 +2503,7 @@
             test_url: openshift.io
             test_suite: smoketest
             cluster: cluster-two
+            feature_level: beta
             osio_creds: e9a32e1e-0a38-4a96-896f-a266e1428cf9
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
@@ -2538,6 +2541,7 @@
             test_url: prod-preview.openshift.io
             test_suite: smoketest
             cluster: cluster-one
+            feature_level: beta
             osio_creds: 9d2a233c-4350-49ab-983d-5b8d0de95f44
             oso_token_creds: 60ae2fd0-5ab0-4a12-bf75-6a81ab1b915f
             kc_refresh_token_creds: a75af77c-1137-4ea2-9690-968848b0334e
@@ -2585,6 +2589,7 @@
             test_url: openshift.io
             test_suite: smoketest
             cluster: cluster-1a
+            feature_level: beta
             osio_creds: 48966098-532e-42b1-ac2a-d6a3db6f06f3
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
@@ -2604,6 +2609,7 @@
             test_url: openshift.io
             test_suite: smoketest
             cluster: cluster-1b
+            feature_level: beta
             osio_creds: 35afd1c4-b52d-4738-becc-5bb81ec750a1
             oso_token_creds: de0940f2-f31f-4186-85e2-37d42bddcf5b
             kc_refresh_token_creds: 807b706e-c54f-48d5-be93-56525cf499f0
