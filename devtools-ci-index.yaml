@@ -1997,7 +1997,7 @@
             git_repo: fabric8-tenant
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'
+            timeout: '30m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-services
             git_repo: fabric8-toggles-service
