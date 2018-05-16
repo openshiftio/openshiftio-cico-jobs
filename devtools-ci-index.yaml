@@ -3134,3 +3134,11 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: arquillian
+            git_repo: ike-prow-plugins
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-errortracking
+            prj_name: ike-prow-plugins
+            timeout: '25m'
