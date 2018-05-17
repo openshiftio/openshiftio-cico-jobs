@@ -3142,3 +3142,4 @@
             saas_git: saas-errortracking
             prj_name: ike-prow-plugins
             timeout: '25m'
+            extra_target: rhel
