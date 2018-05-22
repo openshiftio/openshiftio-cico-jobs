@@ -691,6 +691,37 @@
     <<: *job_template_build_master
 
 - job-template:
+    name: '{ci_project}-{git_repo}-ike-build-master'
+    saasherder_prepare: |
+        SAAS_ENV=staging
+        PATH=$PATH:~/.local/bin/
+        CONTEXT=$(echo $SAAS_GIT | sed 's/.*://')
+        SAAS_GIT=$(echo $SAAS_GIT | sed 's/:.*//')
+        git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
+        cd saas.git
+        [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
+
+        if [ "$(saasherder --environment $SAAS_ENV get hash_length|sort -u|wc -l)" != "1" ]; then
+            echo "In the ike-prow-plugins context all the tag lengths should be the same"
+            exit 1
+        fi
+
+        export DEVSHIFT_TAG_LEN=$(saasherder --environment $SAAS_ENV get hash_length|head -n1)
+        cd ..
+
+    saasherder_deploy: |
+        cd saas.git
+        for SAAS_SERVICE_NAME in $(saasherder --environment $SAAS_ENV get-services); do
+            saasherder --environment $SAAS_ENV update hash $SAAS_SERVICE_NAME $GIT_COMMIT
+            saasherder --environment $SAAS_ENV pull $SAAS_SERVICE_NAME
+            saasherder --environment $SAAS_ENV template --filter Route --output-dir $GIT_REPO-processed tag $SAAS_SERVICE_NAME
+            oc apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
+        done
+        rtn_code=$?
+        cd ..
+    <<: *job_template_build_master
+
+- job-template:
     name: '{ci_project}-{git_repo}-f8a-build-master'
     wrappers:
         - registry_devshift_credentials
@@ -3155,13 +3186,13 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-ike-build-master':
             git_organization: arquillian
             git_repo: ike-prow-plugins
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-errortracking
-            prj_name: ike-prow-plugins
+            saas_git: saas-errortracking:ike-prow-plugins
+            prj_name: sentry-preview
             timeout: '25m'
             extra_target: rhel
         - '{ci_project}-{git_repo}':
