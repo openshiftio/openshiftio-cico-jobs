@@ -1732,6 +1732,94 @@
            allow-empty: true
            fingerprint: true
 
+- job-template:
+    name: 'devtools-test-booster-{test_url}-{test_suite}-{quickstart_name}-{cluster}'
+    defaults: global
+    node: devtools
+    after: fabric8io-fabric8-test-build-master
+    gh_username: osiotestmachine
+    properties:
+        - github:
+            url: https://github.com/fabric8io/fabric8-test
+    scm:
+        - git:
+            url: https://github.com/fabric8io/fabric8-test.git
+
+            shallow_clone: true
+            branches:
+                - master
+    triggers:
+        - timed: '{ee_test_start_time}'
+        - build-result:
+            cron: '* * * * *'
+            groups:
+              - jobs:
+                    - '{after}'
+                results:
+                    - success
+                    - failure
+    wrappers:
+        - credentials-binding:
+            - username-password-separated:
+                credential-id: "{osio_creds}"
+                username: OSIO_USERNAME
+                password: OSIO_PASSWORD
+            - username-password-separated:
+                credential-id: "{github_creds}"
+                username: GITHUB_USERNAME
+                password: GITHUB_PASSWORD
+    builders:
+        - shell: |
+            set +e
+            set +x
+            export EE_TEST_GITHUB_USERNAME="{gh_username}"
+            env > jenkins-env
+            cat $creds_config_file >> jenkins-env
+            cp ~/artifacts.key .
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            # get node
+            n=1
+            while true
+            do
+                cico_output=$(cico node get -f value -c ip_address -c comment)
+                if [ $? -eq 0 ]; then
+                    read CICO_hostname CICO_ssid <<< $cico_output
+                    if  [ ! -z "$CICO_hostname" ]; then
+                        # we got hostname from cico
+                        break
+                    fi
+                    echo "'cico node get' succeed, but can't get hostname from output"
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
+            echo 'Using Host' $CICO_hostname
+            set -x
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd yum -y install rsync
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_EE_tests_ts.sh https://{test_url} ${{BUILD_NUMBER}} {test_suite} {gh_username} {quickstart_name} {release_strategy}"
+            rtn_code=$?
+            if [[ $rtn_code -eq 124 ]]; then
+               echo "BUILD TIMEOUT";
+            else
+               rsync -delete -PHva -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
+            fi
+            cico node done $CICO_ssid
+            exit $rtn_code
+    publishers:
+      - archive:
+           artifacts: './target/screenshots/*.*'
+           allow-empty: true
+           fingerprint: true
+
 - wrapper:
     name: fabric8_launcher_credentials_wrapper
     wrappers:
@@ -2469,6 +2557,28 @@
             ci_project: 'devtools'
             ci_cmd: 'cd ee_tests/ && /bin/bash cico_build_deploy.sh'
             timeout: '30m'
+        - 'devtools-test-booster-{test_url}-{test_suite}-{quickstart_name}-{cluster}':
+            test_url: openshift.io
+            test_suite: smoketest
+            cluster: cluster-one
+            release_strategy: releaseStageApproveAndPromote
+            quickstart_name: vertxHealth
+            after: devtools-fabric8-test-build-master
+            osio_creds: ac385fcd-749c-4ca9-85db-20d7cd23740c
+            github_creds: 5582c6ef-7541-4de2-932d-088c3af5afc3
+            ee_test_start_time: '5 0-23/4 * * *'
+            timeout: 60m
+        - 'devtools-test-booster-{test_url}-{test_suite}-{quickstart_name}-{cluster}':
+            test_url: prod-preview.openshift.io
+            test_suite: smoketest
+            cluster: cluster-one
+            release_strategy: releaseStageApproveAndPromote
+            quickstart_name: vertxHealth
+            after: devtools-fabric8-test-build-master
+            osio_creds: fde63931-6bfc-4c00-ade4-e3cac99ba374
+            github_creds: 5582c6ef-7541-4de2-932d-088c3af5afc3
+            ee_test_start_time: '5 0-23/4 * * *'
+            timeout: 60m
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}':
             test_url: openshift.io
             test_suite: logintest
