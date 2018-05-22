@@ -3160,7 +3160,7 @@
             git_repo: ike-prow-plugins
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-errortracking
+            saas_git: saas-errortracking:ike-prow-plugins
             prj_name: ike-prow-plugins
             timeout: '25m'
             extra_target: rhel
