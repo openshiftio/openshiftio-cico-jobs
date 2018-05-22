@@ -3164,3 +3164,15 @@
             prj_name: ike-prow-plugins
             timeout: '25m'
             extra_target: rhel
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-dependency-editor
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-npm-publish-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-dependency-editor
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '20m'
