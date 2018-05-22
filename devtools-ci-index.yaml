@@ -3165,8 +3165,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-
-
         - '{ci_project}-{git_repo}-ike-build-master':
             git_organization: arquillian
             git_repo: ike-prow-plugins
