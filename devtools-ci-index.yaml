@@ -2437,11 +2437,13 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            discarder_days: 30
         - '{ci_project}-{git_repo}-coverage':
             git_repo: fabric8-auth
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             timeout: '45m'
+            discarder_days: 30
         - '{ci_project}-{git_repo}-build-master-coverage':
             git_repo: fabric8-auth
             ci_project: 'devtools'
