@@ -1642,6 +1642,80 @@
     <<: *job_template_end_to_end_tests_defaults
 
 - job-template:
+    name: 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}'
+    defaults: global
+    node: devtools
+    timeout: 60m
+    zabbix_enabled: ''
+    properties:
+        - github:
+            url: https://github.com/fabric8io/fabric8-test
+    scm:
+        - git:
+            url: https://github.com/fabric8io/fabric8-test.git
+            shallow_clone: true
+            branches:
+                - master
+    triggers:
+        - timed: '{ee_test_start_time}'
+    wrappers:
+        - credentials-binding:
+            - username-password-separated:
+                credential-id: "{osio_creds}"
+                username: OSIO_USERNAME
+                password: OSIO_PASSWORD
+    builders:
+        - shell: |
+            set +e
+            set +x
+            export OSIO_CLUSTER="{cluster}"
+            export OSIO_URL="https://{test_url}"
+            export TEST_SUITE="{test_suite}"
+            export FEATURE_LEVEL="{feature_level}"
+            export ZABBIX_ENABLED="{zabbix_enabled}"
+            env > jenkins-env
+            cat $creds_config_file >> jenkins-env
+            cp ~/artifacts.key .
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            # get node
+            n=1
+            while true
+            do
+                cico_output=$(cico node get -f value -c ip_address -c comment)
+                if [ $? -eq 0 ]; then
+                    read CICO_hostname CICO_ssid <<< $cico_output
+                    if  [ ! -z "$CICO_hostname" ]; then
+                        # we got hostname from cico
+                        break
+                    fi
+                    echo "'cico node get' succeed, but can't get hostname from output"
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
+            echo 'Using Host' $CICO_hostname
+            set -x
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd yum -y install rsync
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_e2e_tests.sh"
+            rtn_code=$?
+            if [[ $rtn_code -eq 124 ]]; then
+               echo "BUILD TIMEOUT";
+            else
+               rsync -delete -PHva -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
+            fi
+            cico node done $CICO_ssid
+            exit $rtn_code
+
+- job-template:
     name: 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}'
     defaults: global
     node: devtools
@@ -2469,6 +2543,98 @@
             ci_project: 'devtools'
             ci_cmd: 'cd ee_tests/ && /bin/bash cico_build_deploy.sh'
             timeout: '30m'
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: openshift.io
+            test_suite: logintest
+            cluster: us-east-1a
+            feature_level: released
+            osio_creds: 48966098-532e-42b1-ac2a-d6a3db6f06f3
+            ee_test_start_time: '0-59/15 * * * *'
+            timeout: 5m
+            zabbix_enabled: false
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: openshift.io
+            test_suite: smoketest
+            cluster: us-east-1a
+            feature_level: released
+            osio_creds: 48966098-532e-42b1-ac2a-d6a3db6f06f3
+            ee_test_start_time: '5 0-23/4 * * *'
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: openshift.io
+            test_suite: smoketest
+            cluster: us-east-1a
+            feature_level: beta
+            osio_creds: 9f21878c-cbde-4e5a-85a6-76ea996df4ab
+            ee_test_start_time: '35 0-23/4 * * *'
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: openshift.io
+            test_suite: logintest
+            cluster: us-east-1b
+            feature_level: released
+            osio_creds: 35afd1c4-b52d-4738-becc-5bb81ec750a1
+            ee_test_start_time: '4-59/15 * * * *'
+            timeout: 5m
+            zabbix_enabled: false
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: openshift.io
+            test_suite: smoketest
+            cluster: us-east-1b
+            feature_level: released
+            osio_creds: 35afd1c4-b52d-4738-becc-5bb81ec750a1
+            ee_test_start_time: '5 1-23/4 * * *'
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: openshift.io
+            test_suite: smoketest
+            cluster: us-east-1b
+            feature_level: beta
+            osio_creds: f4077726-de5d-4593-982f-3b04478347e7
+            ee_test_start_time: '35 1-23/4 * * *'
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: openshift.io
+            test_suite: logintest
+            cluster: us-east-2
+            feature_level: released
+            osio_creds: 452db931-6cb0-465e-addd-1620df4fe428
+            ee_test_start_time: '8-59/15 * * * *'
+            timeout: 5m
+            zabbix_enabled: false
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: openshift.io
+            test_suite: smoketest
+            cluster: us-east-2
+            feature_level: released
+            osio_creds: 452db931-6cb0-465e-addd-1620df4fe428
+            ee_test_start_time: '5 2-23/4 * * *'
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: openshift.io
+            test_suite: smoketest
+            cluster: us-east-2
+            feature_level: beta
+            osio_creds: f2109fcc-4053-44bd-bdc5-a129d5b38c27
+            ee_test_start_time: '35 2-23/4 * * *'
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: openshift.io
+            test_suite: logintest
+            cluster: us-east-2a
+            feature_level: released
+            osio_creds: 9cfb97b8-1569-4cd4-9497-a7ede45e7cd6
+            ee_test_start_time: '12-59/15 * * * *'
+            timeout: 5m
+            zabbix_enabled: false
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: openshift.io
+            test_suite: smoketest
+            cluster: us-east-2a
+            feature_level: released
+            osio_creds: 9cfb97b8-1569-4cd4-9497-a7ede45e7cd6
+            ee_test_start_time: '5 3-23/4 * * *'
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: openshift.io
+            test_suite: smoketest
+            cluster: us-east-2a
+            feature_level: beta
+            osio_creds: f98e38e7-2c3d-49d0-8a7d-06d6e79719b7
+            ee_test_start_time: '35 3-23/4 * * *'
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}':
             test_url: openshift.io
             test_suite: logintest
