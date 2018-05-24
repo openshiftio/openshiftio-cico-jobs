@@ -2366,7 +2366,7 @@
             git_organization: redhat-developer
             git_repo: rh-che
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash ./.ci/cico_build_and_deploy_custom_rh-che.sh'
+            ci_cmd: '/bin/bash TARGET="rhel" PR_CHECK_BUILD="true" ./.ci/cico_rhche_prcheck.sh'
             test_url: 'dev.rdu2c.fabric8.io'
             timeout: '60m'
         - '{ci_project}-{git_repo}-prcheck-{test_url}-{cluster}':
