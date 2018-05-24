@@ -35,6 +35,11 @@ JJB_URL = 'https://raw.githubusercontent.com/openshiftio/openshiftio-cico-jobs/m
 UNTRACKED_JOBS = set(['devtools-jjb-service'])
 
 def get_jjb_jobs(index_raw):
+    """
+    Returns an array with job names. +index_raw+ can be a URL or a path.
+    This method uses the actual jenkins_jobs builder package to process the jobs.
+    """
+
     if index_raw.startswith('http'):
         index_fp = urllib2.urlopen(index_raw)
     else:
@@ -51,6 +56,9 @@ def get_jjb_jobs(index_raw):
     return [job.name for job in builder.parser.xml_jobs]
 
 def get_jenkins_jobs(url):
+    """
+    Returns an array with job names. It connects to jenkins to get the list of jobs.
+    """
     jenkins_jobs = ast.literal_eval(urllib2.urlopen(url).read())
 
     return [job['name'] for job in jenkins_jobs['jobs']]
