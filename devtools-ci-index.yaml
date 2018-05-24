@@ -2153,6 +2153,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '50m'
+            discarder_days: 30
         - '{ci_project}-{git_repo}':
             git_organization: openshiftio
             git_repo: openshift.io
@@ -3402,6 +3403,7 @@
             ci_cmd: '/bin/bash cico_run_tests.sh'
             image_name: fabric8-ui/fabric8-planner
             timeout: '50m'
+            discarder_days: 30
         - 'devtools-test-end-to-end-{test_url}-planner-api-test':
             test_url: openshift.io
             git_organization: fabric8io
