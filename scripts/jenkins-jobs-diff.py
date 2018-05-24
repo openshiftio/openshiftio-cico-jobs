@@ -6,10 +6,15 @@ This script prints the difference between the jobs defined in devtools cico yaml
 
 Usage:
 
-    ./jenkins-jobs-diff.py [jjb_index]
+    ./jenkins-jobs-diff.py [new_index] [old_index]
 
-If jjb_index is not supplied, it will connect to JJB_URL. Note that
-jjb_file can be a URL (make sure it's RAW in case of GH) or a path.
+If new_index is not supplied, it will connect use the current version of the index:
+https://github.com/openshiftio/openshiftio-cico-jobs/blob/master/devtools-ci-index.yaml
+
+Note that the index be a URL (make sure it's RAW in case of GH) or a path.
+
+If old_index is not supplied, it will query jenkins for the list of defined
+jobs. If it is supplied, it can be a URL or a path.
 
 Requirements:
 
@@ -29,44 +34,61 @@ JENKINS_JOBS_URL = 'https://ci.centos.org/view/Devtools/api/python'
 JJB_URL = 'https://raw.githubusercontent.com/openshiftio/openshiftio-cico-jobs/master/devtools-ci-index.yaml'
 UNTRACKED_JOBS = set(['devtools-jjb-service'])
 
-def get_jjb_jobs(jjb_fp):
+def get_jjb_jobs(index_raw):
+    """
+    Returns an array with job names. +index_raw+ can be a URL or a path.
+    This method uses the actual jenkins_jobs builder package to process the jobs.
+    """
+
+    if index_raw.startswith('http'):
+        index_fp = urllib2.urlopen(index_raw)
+    else:
+        index_fp = open(index_raw, 'r')
+
     builder = Builder("None", None, None, None, plugins_list={})
 
-    builder.load_files(jjb_fp)
+    builder.load_files(index_fp)
     builder.parser.expandYaml()
     builder.parser.generateXML()
 
+    index_fp.close()
+
     return [job.name for job in builder.parser.xml_jobs]
 
-
 def get_jenkins_jobs(url):
+    """
+    Returns an array with job names. It connects to jenkins to get the list of jobs.
+    """
     jenkins_jobs = ast.literal_eval(urllib2.urlopen(url).read())
 
     return [job['name'] for job in jenkins_jobs['jobs']]
 
-
 def main():
-    if len(sys.argv) > 1:
-        jjb_index = sys.argv[1]
+    old_index_yaml = None
+
+    if len(sys.argv) == 2:
+        new_index_yaml = sys.argv[1]
+    elif len(sys.argv) == 3:
+        new_index_yaml = sys.argv[1]
+        old_index_yaml = sys.argv[2]
     else:
-        jjb_index = JJB_URL
+        new_index_yaml = JJB_URL
 
-    if jjb_index.startswith('http'):
-        jjb_fp = urllib2.urlopen(jjb_index)
+    new_jobs_list = get_jjb_jobs(new_index_yaml)
+
+    if old_index_yaml:
+        old_jobs_list = get_jjb_jobs(old_index_yaml)
     else:
-        jjb_fp = open(jjb_index, 'r')
+        old_jobs_list = get_jenkins_jobs(JENKINS_JOBS_URL)
 
-    jjb_jobs = get_jjb_jobs(jjb_fp)
-    jenkins_jobs = get_jenkins_jobs(JENKINS_JOBS_URL)
-
-    jjb_not_jenkins = set(jjb_jobs) - set(jenkins_jobs) - UNTRACKED_JOBS
-    jenkins_not_jjb = set(jenkins_jobs) - set(jjb_jobs) - UNTRACKED_JOBS
+    new_jobs = set(new_jobs_list) - set(old_jobs_list) - UNTRACKED_JOBS
+    removed_jobs = set(old_jobs_list) - set(new_jobs_list) - UNTRACKED_JOBS
 
     diff = {}
-    if jjb_not_jenkins:
-        diff["in_jjb_not_in_jenkins"] = list(jjb_not_jenkins)
-    if jenkins_not_jjb:
-        diff["in_jenkins_not_in_jjb"] = list(jenkins_not_jjb)
+    if new_jobs:
+        diff["new_jobs"] = list(new_jobs)
+    if removed_jobs:
+        diff["removed_jobs"] = list(removed_jobs)
 
     if os.environ.get('OUTPUT') == "json":
         print json.dumps(diff)

@@ -51,9 +51,8 @@ JOB_DIFF=$(scripts/jenkins-jobs-diff.py $JJB_INDEX 2>/dev/null)
 echo
 echo "JOB_DIFF:"
 echo "$JOB_DIFF"
-echo
 
-if echo "$JOB_DIFF" | grep -q 'in_jenkins_not_in_jjb'; then
+if echo "$JOB_DIFF" | grep -q 'removed_jobs'; then
     echo
     echo "====================================================================="
     echo "ERROR: Found jobs defined in jenkins but not in the devtools jjb index."
