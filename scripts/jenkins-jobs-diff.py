@@ -6,10 +6,15 @@ This script prints the difference between the jobs defined in devtools cico yaml
 
 Usage:
 
-    ./jenkins-jobs-diff.py [new_index_yaml]
+    ./jenkins-jobs-diff.py [new_index] [old_index]
 
-If new_index_yaml is not supplied, it will connect to JJB_URL. Note that
-jjb_file can be a URL (make sure it's RAW in case of GH) or a path.
+If new_index is not supplied, it will connect use the current version of the index:
+https://github.com/openshiftio/openshiftio-cico-jobs/blob/master/devtools-ci-index.yaml
+
+Note that the index be a URL (make sure it's RAW in case of GH) or a path.
+
+If old_index is not supplied, it will query jenkins for the list of defined
+jobs. If it is supplied, it can be a URL or a path.
 
 Requirements:
 
