@@ -6,9 +6,9 @@ This script prints the difference between the jobs defined in devtools cico yaml
 
 Usage:
 
-    ./jenkins-jobs-diff.py [jjb_index]
+    ./jenkins-jobs-diff.py [new_index_yaml]
 
-If jjb_index is not supplied, it will connect to JJB_URL. Note that
+If new_index_yaml is not supplied, it will connect to JJB_URL. Note that
 jjb_file can be a URL (make sure it's RAW in case of GH) or a path.
 
 Requirements:
@@ -47,26 +47,26 @@ def get_jenkins_jobs(url):
 
 def main():
     if len(sys.argv) > 1:
-        jjb_index = sys.argv[1]
+        new_index_yaml = sys.argv[1]
     else:
-        jjb_index = JJB_URL
+        new_index_yaml = JJB_URL
 
-    if jjb_index.startswith('http'):
-        jjb_fp = urllib2.urlopen(jjb_index)
+    if new_index_yaml.startswith('http'):
+        new_index = urllib2.urlopen(new_index_yaml)
     else:
-        jjb_fp = open(jjb_index, 'r')
+        new_index = open(new_index_yaml, 'r')
 
-    jjb_jobs = get_jjb_jobs(jjb_fp)
-    jenkins_jobs = get_jenkins_jobs(JENKINS_JOBS_URL)
+    new_jobs_list = get_jjb_jobs(new_index)
+    old_jobs_list = get_jenkins_jobs(JENKINS_JOBS_URL)
 
-    jjb_not_jenkins = set(jjb_jobs) - set(jenkins_jobs) - UNTRACKED_JOBS
-    jenkins_not_jjb = set(jenkins_jobs) - set(jjb_jobs) - UNTRACKED_JOBS
+    new_jobs = set(new_jobs_list) - set(old_jobs_list) - UNTRACKED_JOBS
+    removed_jobs = set(old_jobs_list) - set(new_jobs_list) - UNTRACKED_JOBS
 
     diff = {}
-    if jjb_not_jenkins:
-        diff["in_jjb_not_in_jenkins"] = list(jjb_not_jenkins)
-    if jenkins_not_jjb:
-        diff["in_jenkins_not_in_jjb"] = list(jenkins_not_jjb)
+    if new_jobs:
+        diff["new_jobs"] = list(new_jobs)
+    if removed_jobs:
+        diff["removed_jobs"] = list(removed_jobs)
 
     if os.environ.get('OUTPUT') == "json":
         print json.dumps(diff)
