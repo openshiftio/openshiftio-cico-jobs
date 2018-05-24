@@ -29,35 +29,44 @@ JENKINS_JOBS_URL = 'https://ci.centos.org/view/Devtools/api/python'
 JJB_URL = 'https://raw.githubusercontent.com/openshiftio/openshiftio-cico-jobs/master/devtools-ci-index.yaml'
 UNTRACKED_JOBS = set(['devtools-jjb-service'])
 
-def get_jjb_jobs(jjb_fp):
+def get_jjb_jobs(index_raw):
+    if index_raw.startswith('http'):
+        index_fp = urllib2.urlopen(index_raw)
+    else:
+        index_fp = open(index_raw, 'r')
+
     builder = Builder("None", None, None, None, plugins_list={})
 
-    builder.load_files(jjb_fp)
+    builder.load_files(index_fp)
     builder.parser.expandYaml()
     builder.parser.generateXML()
 
-    return [job.name for job in builder.parser.xml_jobs]
+    index_fp.close()
 
+    return [job.name for job in builder.parser.xml_jobs]
 
 def get_jenkins_jobs(url):
     jenkins_jobs = ast.literal_eval(urllib2.urlopen(url).read())
 
     return [job['name'] for job in jenkins_jobs['jobs']]
 
-
 def main():
-    if len(sys.argv) > 1:
+    old_index_yaml = None
+
+    if len(sys.argv) == 2:
         new_index_yaml = sys.argv[1]
+    elif len(sys.argv) == 3:
+        new_index_yaml = sys.argv[1]
+        old_index_yaml = sys.argv[2]
     else:
         new_index_yaml = JJB_URL
 
-    if new_index_yaml.startswith('http'):
-        new_index = urllib2.urlopen(new_index_yaml)
-    else:
-        new_index = open(new_index_yaml, 'r')
+    new_jobs_list = get_jjb_jobs(new_index_yaml)
 
-    new_jobs_list = get_jjb_jobs(new_index)
-    old_jobs_list = get_jenkins_jobs(JENKINS_JOBS_URL)
+    if old_index_yaml:
+        old_jobs_list = get_jjb_jobs(old_index_yaml)
+    else:
+        old_jobs_list = get_jenkins_jobs(JENKINS_JOBS_URL)
 
     new_jobs = set(new_jobs_list) - set(old_jobs_list) - UNTRACKED_JOBS
     removed_jobs = set(old_jobs_list) - set(new_jobs_list) - UNTRACKED_JOBS
