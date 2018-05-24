@@ -2853,8 +2853,10 @@
             saas_git: saas-analytics
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-common
+            discarder_days: 30
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-common
+            discarder_days: 30
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
@@ -3003,6 +3005,7 @@
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '30m'
             image_name: 'bayesian/cucos-worker'
+            discarder_days: 30
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-worker
@@ -3015,6 +3018,7 @@
             extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-worker
+            discarder_days: 30
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-worker
         - '{ci_project}-{git_repo}-fabric8-analytics':
@@ -3024,6 +3028,7 @@
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '30m'
             image_name: 'bayesian/bayesian-api'
+            discarder_days: 30
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-server
@@ -3036,8 +3041,10 @@
             extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-server
+            discarder_days: 30
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-server
+            discarder_days: 30
         - '{ci_project}-{git_repo}-fabric8-hdd':
             git_organization: fabric8-hdd
             git_repo: supervisor
