@@ -177,10 +177,10 @@
     wrappers:
         - credentials-binding:
             - text:
-                credential-id: 60bf228a-e858-4ae3-94fb-7e73fa7d52d9
+                credential-id: 1e0bbb30-cddd-4b6f-bc61-bb4ebd2706e5
                 variable: KEYCLOAK_TOKEN
             - username-password-separated:
-                credential-id: f9b7e98d-2ba0-40c3-8454-2475a064e216
+                credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
                 username: OSIO_USERNAME
                 password: OSIO_PASSWORD
 
@@ -214,10 +214,10 @@
     wrappers:
         - credentials-binding:
             - text:
-                credential-id: 1e0bbb30-cddd-4b6f-bc61-bb4ebd2706e5
+                credential-id: 60bf228a-e858-4ae3-94fb-7e73fa7d52d9
                 variable: KEYCLOAK_TOKEN
             - username-password-separated:
-                credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
+                credential-id: f9b7e98d-2ba0-40c3-8454-2475a064e216
                 username: OSIO_USERNAME
                 password: OSIO_PASSWORD
 
