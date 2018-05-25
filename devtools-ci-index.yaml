@@ -696,6 +696,15 @@
                 password: DEVSHIFT_PASSWORD
 
 - wrapper:
+    name: quay_credentials
+    wrappers:
+        - credentials-binding:
+            - username-password-separated:
+                credential-id: 59d1d5c5-1367-4b3e-a5cc-26846a1ea80b
+                username: QUAY_USERNAME
+                password: QUAY_PASSWORD
+
+- wrapper:
     name: recommender_api_token
     wrappers:
         - credentials-binding:
@@ -726,6 +735,7 @@
     name: '{ci_project}-{git_repo}-build-master'
     wrappers:
         - registry_devshift_credentials
+        - quay_credentials
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
