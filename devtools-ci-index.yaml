@@ -399,17 +399,6 @@
     <<: *job_template_defaults
 
 - job-template:
-    name: '{ci_project}-fabric8-wit'
-    wrappers:
-      - registry_devshift_credentials
-    triggers:
-      - github-pull-request:
-          status-context: "ci.centos.org PR build (fabric8-wit)"
-          success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry. Run `docker pull registry.devshift.net/fabric8-services/fabric8-wit:SNAPSHOT-PR-$ghprbPullId` to get it."
-          <<: *github_pull_request_defaults
-    <<: *job_template_defaults
-
-- job-template:
     name: '{ci_project}-{git_repo}-fabric8-analytics-copr-mercator'
     wrappers:
         - copr_mercator_api_token
@@ -2141,7 +2130,7 @@
             git_repo: openshiftio-cico-jobs
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_pr_test.sh'
-        - '{ci_project}-fabric8-wit':
+        - '{ci_project}-{git_repo}':
             git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
