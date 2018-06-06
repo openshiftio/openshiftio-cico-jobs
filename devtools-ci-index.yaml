@@ -8,6 +8,13 @@
     branch: master
     discarder_days: -1
     discarder_num: -1
+    dump_env: |
+        python -c "
+        import os
+        import pipes
+        for k,v in os.environ.items():
+            print '{{}}={{}}'.format(k,pipes.quote(v))
+        " > jenkins-env
 
 - admin_list_defaults: &admin_list_defaults
     name: 'admin_list_defaults'
@@ -302,7 +309,7 @@
             done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
-            env > jenkins-env
+            {dump_env}
             $ssh_cmd yum -y install rsync
             if [ -n "${{ghprbTargetBranch}}" ]; then
                 git rebase --preserve-merges origin/${{ghprbTargetBranch}}
@@ -581,7 +588,7 @@
 
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
 
-            env > jenkins-env
+            {dump_env}
 
             # CentOS build
 
@@ -671,7 +678,7 @@
             done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
-            env > jenkins-env
+            {dump_env}
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             $ssh_cmd -t "cd payload && {ci_cmd}"
@@ -827,7 +834,7 @@
             echo 'Using Host' $CICO_hostname
             set -x
 
-            env > jenkins-env
+            {dump_env}
             cat $creds_config_file >> jenkins-env
 
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
@@ -913,7 +920,9 @@
             done
             echo 'Using Host' $CICO_hostname
 
-            env > integration-tests/jenkins-env
+            {dump_env}
+            mv jenkins-env integration-tests/jenkins-env
+
             gc() {{
                 rtn_code=$?
                 cico node done $CICO_ssid || :
@@ -976,7 +985,9 @@
             # We have to point other endpoints to production too
             export F8A_API_URL={f8a_api_url}
 
-            env > integration-tests/jenkins-env
+            {dump_env}
+            mv jenkins-env integration-tests/jenkins-env
+
             gc() {{
                 rtn_code=$?
                 cico node done $CICO_ssid || :
@@ -1043,7 +1054,8 @@
                 exit 1
             fi
 
-            env > integration-tests/jenkins-env
+            {dump_env}
+            mv jenkins-env integration-tests/jenkins-env
 
             export GIT_COMMIT=$UPSTREAM_GIT_COMMIT
 
@@ -1174,7 +1186,7 @@
             if [ -z "$DEVSHIFT_TAG_LEN" ]; then
                 export DEVSHIFT_TAG_LEN=7
             fi
-            env > jenkins-env
+            {dump_env}
             cat $creds_config_file >> jenkins-env
 
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
@@ -1315,7 +1327,7 @@
             done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
-            env > jenkins-env
+            {dump_env}
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && {ci_cmd}"
@@ -1363,7 +1375,7 @@
             # testing out the cico client
             set +e
             set +x
-            env > jenkins-env
+            {dump_env}
             cat $creds_config_file >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
@@ -1565,7 +1577,7 @@
         - shell: |
             set +e
             set +x
-            env > jenkins-env
+            {dump_env}
             cat $creds_config_file >> jenkins-env
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
@@ -1648,7 +1660,7 @@
             set +e
             set +x
             export EE_TEST_GITHUB_USERNAME="{gh_username}"
-            env > jenkins-env
+            {dump_env}
             cat $creds_config_file >> jenkins-env
             cp ~/artifacts.key .
             export CICO_API_KEY=$(cat ~/duffy.key )
@@ -1727,7 +1739,7 @@
             export TEST_SUITE="{test_suite}"
             export FEATURE_LEVEL="{feature_level}"
             export ZABBIX_ENABLED="{zabbix_enabled}"
-            env > jenkins-env
+            {dump_env}
             cat $creds_config_file >> jenkins-env
             cp ~/artifacts.key .
             export CICO_API_KEY=$(cat ~/duffy.key )
@@ -1828,7 +1840,7 @@
             done
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
-            env > jenkins-env
+            {dump_env}
             $ssh_cmd yum -y install rsync
             if [ -n "${{ghprbTargetBranch}}" ]; then
                 git rebase --preserve-merges origin/${{ghprbTargetBranch}}
@@ -1897,7 +1909,7 @@
             done
             echo 'Using Host' $CICO_hostname
 
-            env > jenkins-env
+            {dump_env}
             set -e
 
             # Run E2E tests
@@ -1967,7 +1979,7 @@
             # testing out the cico client
             set +e
             set +x
-            env > jenkins-env
+            {dump_env}
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
             n=1
