@@ -2015,6 +2015,82 @@
             fi
             exit $rtn_code
 
+- job:
+    name: 'devtools-openshiftio-cico-jobs-build-master'
+    defaults: global
+    node: devtools
+    properties:
+        - github:
+            url: https://github.com/openshiftio/openshiftio-cico-jobs
+    scm:
+        - git:
+            url: https://github.com/openshiftio/openshiftio-cico-jobs.git
+            shallow_clone: true
+            branches:
+                - master
+    triggers:
+        - github
+    builders:
+        - shell: |
+            set -x
+
+            cmp scripts/env-toolkit ~/cico-tools/env-toolkit
+            [ $? -eq 0 ] && exit 0
+
+            set -e
+
+            set +x
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            # get node
+            n=1
+            while true
+            do
+                cico_output=$(cico node get -f value -c ip_address -c comment)
+                if [ $? -eq 0 ]; then
+                    read CICO_hostname CICO_ssid <<< $cico_output
+                    if  [ ! -z "$CICO_hostname" ]; then
+                        # we got hostname from cico
+                        break
+                    fi
+                    echo "'cico node get' succeed, but can't get hostname from output"
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
+            echo 'Using Host' $CICO_hostname
+
+            set -x
+
+            # copy payload
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd yum -y install rsync
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+
+            # run test
+            $ssh_cmd -t "cd payload && /bin/bash cico_test.sh"
+
+            rtn_code=$?
+
+            if [ $rtn_code -eq 0 ]; then
+                cico node done $CICO_ssid
+                mkdir -p ~/cico-tools
+                cp scripts/env-toolkit ~/cico-tools/env-toolkit
+                chmod +x ~/cico-tools/env-toolkit
+            else
+                # fail mode gives us 12 hrs to debug the machine
+                set +x
+                curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
+            fi
+
+            exit $rtn_code
+
 - job-template:
     name: '{ci_project}-{git_repo}-copr-mercator-build-master'
     wrappers:
