@@ -1506,7 +1506,7 @@
         - githubprb:
             github_hooks: '{github_hooks}'
             status-context: 'ci.centos.org PR check on {git_repo} {test_url}'
-            success-comment: "$ghprbPullAuthorLoginMention The che server [build $ghprbPullId] has been successfully deployed: https://rhche-che6-automated.dev.rdu2c.fabric8.io/"
+            success-comment: "$ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] has been successfully deployed: https://rhche-che6-automated.dev.rdu2c.fabric8.io/ artifacts: https://artifacts.ci.centos.org/devtools/che-functional-tests/{ci_project}-{git_repo}-rh-che-prcheck-{test_url}/$BUILD_NUMBER/"
     <<: *rh-che-automation-template
 
 
