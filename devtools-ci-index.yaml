@@ -2033,7 +2033,9 @@
     builders:
         - shell: |
             set -x
+            set +e
 
+            # quit if env-toolkit does not change
             cmp scripts/env-toolkit ~/cico-tools/env-toolkit
             [ $? -eq 0 ] && exit 0
 
