@@ -1,0 +1,129 @@
+#!/usr/bin/env python2
+
+import json
+import os
+import argparse
+import sys
+import re
+import pipes
+
+EPILOG = """
+examples:
+
+    # dump the environment to STDOUT
+    {exe} dump
+
+    # dump the environment to a file
+    {exe} dump -f FILE
+
+    # generate the snippet, matchin keys starting with SSH_
+    {exe} load -f FILE --regex ^SSH_
+
+    # load into the current shell (regex). Don't forget the double quotes
+    eval "$({exe} load -f FILE --regex ^SSH_)"
+
+    # load into the current shell. Don't forget the double quotes
+    eval "$({exe} load -f FILE SSH_ASKPASS SSH_AGENT_PID)"
+""".format(exe=sys.argv[0])
+
+
+def parse_args():
+    # Arg parser
+    formatter = argparse.RawDescriptionHelpFormatter
+    parser = argparse.ArgumentParser(description='env-toolkit',
+                                     epilog=EPILOG,
+                                     formatter_class=formatter)
+    subparsers = parser.add_subparsers(title='subcommands', dest='command')
+
+    sp_dump = subparsers.add_parser('dump',
+                                    help='dumps the environment in json '
+                                         'format to file or STDOUT')
+    sp_dump.add_argument('-f', '--file',
+                         default='-',
+                         help="dump to the selected file",
+                         required=False)
+    sp_dump.add_argument('--force',
+                         default=False,
+                         action='store_true',
+                         help="forces overwriting of the target file")
+
+    sp_load = subparsers.add_parser('load',
+                                    help='generates snippet that can be '
+                                         'sourced by bash to load the selected '
+                                         'env variables')
+    sp_load.add_argument('-f', '--file',
+                         help="load from file. Use - for STDIN.",
+                         required=True)
+    sp_load.add_argument('-r', '--regex',
+                         dest='regex', action='store_true',
+                         help="interprets all patterns as regexps")
+    sp_load.add_argument('--export',
+                         dest='export', action='store_true',
+                         help="adds 'export' to the snippet (default)")
+    sp_load.add_argument('--no-export',
+                         dest='export', action='store_false',
+                         help="does not add 'export' to the snippet")
+    sp_load.set_defaults(export=True)
+    sp_load.add_argument('envpatterns',
+                         nargs='+',
+                         help="list of keys to select, it can be a regexp")
+
+    return parser.parse_args()
+
+
+def dump(args):
+    env = {}
+
+    for k, v in os.environ.items():
+        env[k] = v
+
+    if args.file == '-':
+        print json.dumps(env)
+    else:
+        if not args.force and os.path.exists(args.file):
+            print >>sys.stderr, "Will not overwrite target file: " \
+                                "'%s'. Use --force." % (args.file)
+            sys.exit(1)
+        else:
+            with open(args.file, 'w') as f:
+                f.write(json.dumps(env))
+
+
+def load(args):
+    if args.file == '-':
+        source_env = json.loads(sys.stdin.read())
+    else:
+        with open(args.file, 'r') as f:
+            source_env = json.loads(f.read())
+
+    target_env = {}
+
+    for pattern in args.envpatterns:
+        if args.regex:
+            for k, v in source_env.items():
+                if re.search(pattern, k):
+                    target_env[k] = v
+        else:
+            if pattern in source_env:
+                target_env[pattern] = source_env[pattern]
+
+    if args.export:
+        export_cmd = "export "
+    else:
+        export_cmd = ""
+
+    for k, v in target_env.items():
+        print "{}{}={}".format(export_cmd, k, pipes.quote(v))
+
+
+def main():
+    args = parse_args()
+
+    if args.command == 'dump':
+        dump(args)
+    elif args.command == 'load':
+        load(args)
+
+
+if __name__ == '__main__':
+    main()
