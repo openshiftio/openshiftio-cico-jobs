@@ -17,10 +17,13 @@ examples:
     {exe} dump -f FILE
 
     # generate the snippet, matchin keys starting with SSH_
-    {exe} load -f FILE ^SSH_
+    {exe} load -f FILE --regex ^SSH_
+
+    # load into the current shell (regex). Don't forget the double quotes
+    eval "$({exe} load -f FILE --regex ^SSH_)"
 
     # load into the current shell. Don't forget the double quotes
-    eval "$({exe} load -f FILE ^SSH_)"
+    eval "$({exe} load -f FILE SSH_ASKPASS SSH_AGENT_PID)"
 """.format(exe=sys.argv[0])
 
 
@@ -51,6 +54,9 @@ def parse_args():
     sp_load.add_argument('-f', '--file',
                          help="load from file. Use - for STDIN.",
                          required=True)
+    sp_load.add_argument('-r', '--regex',
+                         dest='regex', action='store_true',
+                         help="interprets all patterns as regexps")
     sp_load.add_argument('--export',
                          dest='export', action='store_true',
                          help="adds 'export' to the snippet (default)")
@@ -58,7 +64,7 @@ def parse_args():
                          dest='export', action='store_false',
                          help="does not add 'export' to the snippet")
     sp_load.set_defaults(export=True)
-    sp_load.add_argument('envkeys',
+    sp_load.add_argument('envpatterns',
                          nargs='+',
                          help="list of keys to select, it can be a regexp")
 
@@ -91,10 +97,15 @@ def load(args):
             source_env = json.loads(f.read())
 
     target_env = {}
-    for pattern in args.envkeys:
-        for k, v in source_env.items():
-            if re.search(pattern, k):
-                target_env[k] = v
+
+    for pattern in args.envpatterns:
+        if args.regex:
+            for k, v in source_env.items():
+                if re.search(pattern, k):
+                    target_env[k] = v
+        else:
+            if pattern in source_env:
+                target_env[pattern] = source_env[pattern]
 
     if args.export:
         export_cmd = "export "
