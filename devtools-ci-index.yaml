@@ -2819,7 +2819,7 @@
             cluster: pr-us-east-2a
             feature_level: released
             osio_creds: 0f17e05a-a57b-4997-a935-98a1f44b333c
-            ee_test_start_time: '5 * * * *'
+            ee_test_start_time: '10 * * * *'
             zabbix_enabled: false
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: prod-preview.openshift.io
@@ -2827,7 +2827,7 @@
             cluster: pr-us-east-2a
             feature_level: beta
             osio_creds: 38d2ebca-2c23-4054-9a4e-e1bc05183fd8
-            ee_test_start_time: '35 * * * *'
+            ee_test_start_time: '40 * * * *'
             zabbix_enabled: false
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
