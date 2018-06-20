@@ -90,7 +90,6 @@
         - tradej
         - tsmaeder
         - vikram-raj
-        - vpavlin
         - xcoulon
 
 - github_pull_request_defaults: &github_pull_request_defaults
