@@ -2730,7 +2730,7 @@
             ci_project: 'devtools'
             ci_cmd: 'cd scripts && /bin/bash build_guides.sh'
             timeout: '20m'
-            artifacts: './scripts/html/*'
+            artifacts: './html'
             allow_empty: true
             fingerprint: true
         - '{ci_project}-{git_repo}-build-master':
