@@ -341,6 +341,15 @@
     <<: *job_template_defaults
 
 - job-template:
+    name: '{ci_project}-{git_repo}-prcheck-publish-artifacts'
+    publishers:
+      - archive:
+           artifacts: '{artifacts}'
+           allow-empty: '{allow_empty}'
+           fingerprint: '{fingerprint}'
+    <<: *job_template_defaults
+
+- job-template:
     name: '{ci_project}-{git_repo}-jjb-test'
     builders:
     - shell: |
@@ -2715,6 +2724,15 @@
             saas_git: saas-openshiftio
             timeout: '20m'
             extra_target: rhel
+        - '{ci_project}-{git_repo}-prcheck-publish-artifacts':
+            git_repo: fabric8-online-docs
+            git_organization: fabric8io
+            ci_project: 'devtools'
+            ci_cmd: 'cd scripts && /bin/bash build_guides.sh'
+            timeout: '20m'
+            artifacts: './scripts/html/*'
+            allow_empty: true
+            fingerprint: true
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8io
             git_repo: fabric8-test
