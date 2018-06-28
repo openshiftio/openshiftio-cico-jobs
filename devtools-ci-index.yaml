@@ -1790,6 +1790,7 @@
     triggers:
         - timed: '{ee_test_start_time}'
     wrappers:
+        - ansicolor
         - credentials-binding:
             - username-password-separated:
                 credential-id: "{osio_creds}"
