@@ -3489,7 +3489,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-analytics
-            deployment_units: 'f8a-hpf-insights'
-            deployment_configs: 'f8a-hpf-insights'
+            deployment_units: 'f8a-hpf-insights-maven'
+            deployment_configs: 'f8a-hpf-insights-maven'
             timeout: '20m'
             extra_target: rhel
