@@ -2968,8 +2968,8 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-analytics
-            deployment_units: 'kronos-pypi kronos-maven'
-            deployment_configs: 'bayesian-kronos-pypi bayesian-kronos-maven'
+            deployment_units: 'kronos-maven'
+            deployment_configs: 'bayesian-kronos-maven'
             timeout: '20m'
             extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
