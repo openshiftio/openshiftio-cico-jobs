@@ -337,6 +337,7 @@
     name: '{ci_project}-{git_repo}-prcheck'
     wrappers:
         - registry_devshift_credentials
+        - quay_credentials
         - che_functional_tests_credentials_wrapper-periodical-prod-preview.openshift.io-free-stg
     <<: *job_template_defaults
 
@@ -368,6 +369,7 @@
     image_name: 'MISSING_IMAGE_NAME'
     wrappers:
         - registry_devshift_credentials
+        - quay_credentials
         - ansicolor
     triggers:
       - github-pull-request:
@@ -391,6 +393,7 @@
             username: USERNAME
             password: PASSWORD
       - registry_devshift_credentials
+      - quay_credentials
       - ansicolor
     triggers:
       - github-pull-request:
@@ -419,6 +422,7 @@
     image_name: 'MISSING_IMAGE_NAME'
     wrappers:
         - registry_devshift_credentials
+        - quay_credentials
         - ansicolor
     triggers:
       - github-pull-request:
@@ -792,6 +796,7 @@
     name: '{ci_project}-{git_repo}-f8a-build-master'
     wrappers:
         - registry_devshift_credentials
+        - quay_credentials
         - ansicolor
         - recommender_api_token_prod
     scm:
@@ -1150,6 +1155,7 @@
     wrappers:
         - che_credentials_wrapper
         - registry_devshift_credentials
+        - quay_credentials
         - che_functional_tests_credentials_wrapper-periodical-prod-preview.openshift.io-free-stg
     scm:
         - git:
@@ -1385,6 +1391,7 @@
     wrappers:
         - che_credentials_wrapper
         - registry_devshift_credentials
+        - quay_credentials
     defaults: global
     node: devtools
     properties:
@@ -1489,6 +1496,7 @@
     concurrent: false
     wrappers:
         - registry_devshift_credentials
+        - quay_credentials
         - rh_che_automation_credentials_wrapper_dev.rdu2c.fabric8.io
         - rh_che_automation_credentials_wrapper_prod-preview.openshift.io
         - rh_che_automation_credentials_wrapper_dockerhub
@@ -1879,12 +1887,14 @@
     wrappers:
         - fabric8_launcher_credentials_wrapper
         - registry_devshift_credentials
+        - quay_credentials
     <<: *job_template_build_defaults
 
 - job-template:
     name: 'devtools-launcher-backend'
     wrappers:
         - registry_devshift_credentials
+        - quay_credentials
         - fabric8_launcher_credentials_wrapper
     builders:
         - shell: |
