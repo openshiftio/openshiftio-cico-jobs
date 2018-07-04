@@ -3533,3 +3533,10 @@
             deployment_configs: 'f8a-hpf-insights-maven'
             timeout: '20m'
             extra_target: rhel
+        - '{ci_project}-{git_repo}-npm-publish-build-master':
+            git_organization: fabric8-ui
+            git_repo: fabric8-recommender
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '20m'
+
