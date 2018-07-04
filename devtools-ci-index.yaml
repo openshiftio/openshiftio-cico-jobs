@@ -337,7 +337,17 @@
     name: '{ci_project}-{git_repo}-prcheck'
     wrappers:
         - registry_devshift_credentials
+        - quay_credentials
         - che_functional_tests_credentials_wrapper-periodical-prod-preview.openshift.io-free-stg
+    <<: *job_template_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-prcheck-publish-artifacts'
+    publishers:
+      - archive:
+           artifacts: '{artifacts}'
+           allow-empty: '{allow_empty}'
+           fingerprint: '{fingerprint}'
     <<: *job_template_defaults
 
 - job-template:
@@ -368,6 +378,7 @@
     image_name: 'MISSING_IMAGE_NAME'
     wrappers:
         - registry_devshift_credentials
+        - quay_credentials
         - ansicolor
     triggers:
       - github-pull-request:
@@ -391,6 +402,7 @@
             username: USERNAME
             password: PASSWORD
       - registry_devshift_credentials
+      - quay_credentials
       - ansicolor
     triggers:
       - github-pull-request:
@@ -419,6 +431,7 @@
     image_name: 'MISSING_IMAGE_NAME'
     wrappers:
         - registry_devshift_credentials
+        - quay_credentials
         - ansicolor
     triggers:
       - github-pull-request:
@@ -792,6 +805,7 @@
     name: '{ci_project}-{git_repo}-f8a-build-master'
     wrappers:
         - registry_devshift_credentials
+        - quay_credentials
         - ansicolor
         - recommender_api_token_prod
     scm:
@@ -1150,6 +1164,7 @@
     wrappers:
         - che_credentials_wrapper
         - registry_devshift_credentials
+        - quay_credentials
         - che_functional_tests_credentials_wrapper-periodical-prod-preview.openshift.io-free-stg
     scm:
         - git:
@@ -1385,6 +1400,7 @@
     wrappers:
         - che_credentials_wrapper
         - registry_devshift_credentials
+        - quay_credentials
     defaults: global
     node: devtools
     properties:
@@ -1489,6 +1505,7 @@
     concurrent: false
     wrappers:
         - registry_devshift_credentials
+        - quay_credentials
         - rh_che_automation_credentials_wrapper_dev.rdu2c.fabric8.io
         - rh_che_automation_credentials_wrapper_prod-preview.openshift.io
         - rh_che_automation_credentials_wrapper_dockerhub
@@ -1879,12 +1896,14 @@
     wrappers:
         - fabric8_launcher_credentials_wrapper
         - registry_devshift_credentials
+        - quay_credentials
     <<: *job_template_build_defaults
 
 - job-template:
     name: 'devtools-launcher-backend'
     wrappers:
         - registry_devshift_credentials
+        - quay_credentials
         - fabric8_launcher_credentials_wrapper
     builders:
         - shell: |
@@ -2715,6 +2734,15 @@
             saas_git: saas-openshiftio
             timeout: '20m'
             extra_target: rhel
+        - '{ci_project}-{git_repo}-prcheck-publish-artifacts':
+            git_repo: fabric8-online-docs
+            git_organization: fabric8io
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash scripts/build_guides.sh'
+            timeout: '20m'
+            artifacts: './html'
+            allow_empty: true
+            fingerprint: true
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8io
             git_repo: fabric8-test
