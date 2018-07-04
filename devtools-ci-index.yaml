@@ -376,6 +376,7 @@
 - job-template:
     name: '{ci_project}-{git_repo}-fabric8-analytics'
     image_name: 'MISSING_IMAGE_NAME'
+    registry: 'MISSING_REGISTRY_NAME'
     wrappers:
         - registry_devshift_credentials
         - quay_credentials
@@ -385,7 +386,7 @@
           status-context: "ci.centos.org PR build (fabric8-analytics)"
           org-list:
             - fabric8-analytics
-          success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry: `docker pull registry.devshift.net/{image_name}:SNAPSHOT-PR-$ghprbPullId`"
+          success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry: `docker pull {registry}/{image_name}:SNAPSHOT-PR-$ghprbPullId`"
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
 
@@ -2863,6 +2864,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '10m'
+            registry: 'registry.devshift.net'
             image_name: 'bayesian/coreapi-pgbouncer'
         - '{ci_project}-f8a-master-deploy-e2e-test':
             git_organization: fabric8-analytics
@@ -2892,6 +2894,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'registry.devshift.net'
             image_name: 'bayesian/coreapi-jobs'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -2923,6 +2926,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '1h'
+            registry: 'registry.devshift.net'
             image_name: 'bayesian/gremlin'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -2940,6 +2944,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'registry.devshift.net'
             image_name: 'bayesian/kronos'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -2961,6 +2966,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'registry.devshift.net'
             image_name: 'fabric8-analytics/license-analysis'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -2982,6 +2988,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'registry.devshift.net'
             image_name: 'fabric8-analytics/f8a-server-backbone'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -3003,6 +3010,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'registry.devshift.net'
             image_name: 'fabric8-analytics/f8a-npm-insights'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -3024,6 +3032,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '30m'
+            registry: 'registry.devshift.net'
             image_name: 'bayesian/cucos-worker'
             discarder_days: 30
         - '{ci_project}-{git_repo}-f8a-build-master':
@@ -3047,6 +3056,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '30m'
+            registry: 'registry.devshift.net'
             image_name: 'bayesian/bayesian-api'
             discarder_days: 30
         - '{ci_project}-{git_repo}-f8a-build-master':
@@ -3088,6 +3098,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '30m'
+            registry: 'registry.devshift.net'
             image_name: 'fabric8-analytics/f8a-worker-base'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -3104,6 +3115,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '30m'
+            registry: 'registry.devshift.net'
             image_name: 'fabric8-analytics/f8a-kronos-base'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -3119,6 +3131,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'registry.devshift.net'
             image_name: 'bayesian/cvedb-s3-dump'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -3134,6 +3147,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'registry.devshift.net'
             image_name: 'bayesian/data-model-importer'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -3155,6 +3169,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'registry.devshift.net'
             image_name: 'fabric8-analytics/f8a-firehose-fetcher'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -3172,6 +3187,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'registry.devshift.net'
             image_name: 'fabric8-analytics-stack-report-ui'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -3189,6 +3205,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'registry.devshift.net'
             image_name: 'fabric8-analytics/worker-scaler'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -3206,6 +3223,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'registry.devshift.net'
             image_name: 'fabric8-analytics/f8a-gemini-server'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -3245,6 +3263,8 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'registry.devshift.net'
+            image_name: 'fabric8-analytics/f8a-analytics-ingestion'
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-ingestion
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
@@ -3347,6 +3367,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'registry.devshift.net'
             image_name: 'fabric8-analytics/f8a-3scale-connect-api'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -3364,6 +3385,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'registry.devshift.net'
             image_name: 'fabric8-analytics/api-machine-stacks'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -3431,6 +3453,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'registry.devshift.net'
             image_name: 'fabric8-analytics/f8a-api-gateway'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
@@ -3518,7 +3541,8 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
-            image_name: 'fabric8-analytics/f8a-hpf-insights'
+            registry: 'quay.io'
+            image_name: 'openshiftio/fabric8-analytics-f8a-hpf-insights'
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: f8a-hpf-insights
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
@@ -3539,4 +3563,3 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
-
