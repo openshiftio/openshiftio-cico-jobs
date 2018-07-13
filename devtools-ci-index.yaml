@@ -848,6 +848,8 @@
             done
             echo 'Using Host' $CICO_hostname
 
+            export DEVSHIFT_TAG_LEN=7
+
             (
                 # run in subshell not to affect current environment
                 set +x
