@@ -1791,8 +1791,8 @@
            allow-empty: true
            fingerprint: true
 
-- job-template:
-    name: 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}'
+- e2e_tests_template: &e2e_tests_template
+    name: 'e2e_tests_template'
     defaults: global
     node: devtools
     timeout: 60m
@@ -1806,8 +1806,6 @@
             shallow_clone: true
             branches:
                 - master
-    triggers:
-        - timed: '{ee_test_start_time}'
     wrappers:
         - ansicolor
         - credentials-binding:
@@ -1876,6 +1874,12 @@
             fi
             cico node done $CICO_ssid
             exit $rtn_code
+
+- job-template:
+    name: 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}'
+    triggers:
+        - timed: '{ee_test_start_time}'
+    <<: *e2e_tests_template
 
 - wrapper:
     name: fabric8_launcher_credentials_wrapper
