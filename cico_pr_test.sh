@@ -11,7 +11,7 @@ delete_tmp() {
     rm -rf $NEW_JOBS $MASTER_JOBS
 }
 
-jenkins-jobs test $JJB_INDEX -o $NEW_JOBS
+~/venv/env/bin/jenkins-jobs test $JJB_INDEX -o $NEW_JOBS
 ret=$?
 
 if [ "$ret" != "0" ]; then
@@ -19,7 +19,7 @@ if [ "$ret" != "0" ]; then
     exit $ret
 fi
 
-git show origin/master:$JJB_INDEX | jenkins-jobs test -o $MASTER_JOBS
+git show origin/master:$JJB_INDEX | ~/venv/env/bin/jenkins-jobs test -o $MASTER_JOBS
 
 set +x
 

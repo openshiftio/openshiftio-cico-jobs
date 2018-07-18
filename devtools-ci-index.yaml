@@ -2227,6 +2227,23 @@
                 - master
     <<: *job_template_build_defaults
 
+- job-template:
+    name: 'devtools-test-e2e-{test_url}-{test_suite}'
+    triggers:
+      - timed: '{ee_test_start_time}'
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: "{osio_token}"
+                variable: REFRESH_TOKEN
+    scm:
+        - git:
+            url: https://github.com/{git_organization}/{git_repo}.git
+            shallow_clone: true
+            branches:
+                - '{branch}'
+    <<: *job_template_build_defaults
+
 - project:
     name: devtools
     disabled: false
@@ -3579,3 +3596,25 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
+        - 'devtools-test-e2e-{test_url}-{test_suite}':
+            git_organization: fabric8-ui
+            git_repo: fabric8-planner
+            test_url: prod-preview.openshift.io
+            test_suite: planner-functional-tests
+            osio_token: be32035b-cdd2-441b-ab27-93d023feeb1d
+            ci_project: 'devtools'
+            branch: 'UI-tests'
+            ee_test_start_time: '0 * * * *'
+            ci_cmd: '/bin/bash cico_test_prod.sh --prod-preview'
+            timeout: '40m'
+        - 'devtools-test-e2e-{test_url}-{test_suite}':
+            git_organization: fabric8-ui
+            git_repo: fabric8-planner
+            test_suite: planner-functional-tests
+            osio_token: 37851cbe-37eb-4c2b-944f-0a875d510795
+            ci_project: 'devtools'
+            test_url: 'openshift.io'
+            branch: 'UI-tests'
+            ee_test_start_time: '0 */4 * * *'
+            ci_cmd: '/bin/bash cico_test_prod.sh'
+            timeout: '40m'
