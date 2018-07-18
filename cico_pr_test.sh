@@ -6,7 +6,7 @@ NEW_JOBS=$(mktemp -d)
 MASTER_JOBS=$(mktemp -d)
 
 JJB_INDEX="devtools-ci-index.yaml"
-JENKINS_JOBS="~/venv/env/bin/jenkins-jobs"
+JENKINS_JOBS=~/venv/env/bin/jenkins-jobs
 
 delete_tmp() {
     rm -rf $NEW_JOBS $MASTER_JOBS
