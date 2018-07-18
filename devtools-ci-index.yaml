@@ -1399,7 +1399,7 @@
 
 
 - job:
-    name: 'devtools-eclipse-che-build-dockerfiles-new'
+    name: 'devtools-eclipse-che-build-dockerfiles'
     wrappers:
         - che_credentials_wrapper
         - registry_devshift_credentials
