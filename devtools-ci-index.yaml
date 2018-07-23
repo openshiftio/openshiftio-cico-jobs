@@ -3619,3 +3619,15 @@
             ee_test_start_time: '0 */4 * * *'
             ci_cmd: '/bin/bash cico_test_prod.sh'
             timeout: '40m'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-analytics
+            git_repo: cvedb
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .qa/cico_run_tests.sh'
+            timeout: '5m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-analytics
+            git_repo: cvedb
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .qa/cico_run_tests.sh'
+            timeout: '5m'
