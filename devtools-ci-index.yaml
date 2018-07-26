@@ -1976,11 +1976,11 @@
 - job-template:
     name: 'devtools-test-end-to-end-{test_url}-planner-api-test'
     triggers:
-      - timed: '0 */4 * * *'
+      - timed: '{ee_test_start_time}'
     wrappers:
       - credentials-binding:
         - text:
-            credential-id: 1b1d24cc-7bf5-46dc-a112-657de8f1388c
+            credential-id: "{creds_id}"
             variable: EE_TEST_OSIO_TOKEN
     scm:
       - git:
@@ -2028,7 +2028,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload-tests
-            $ssh_cmd -t "cd payload-tests/EE_API_automation && /bin/bash cico_run_EE_tests.sh"
+            $ssh_cmd -t "cd payload-tests && {ci_cmd}"
             rtn_code=$?
             cico node done $CICO_ssid
             exit $rtn_code
@@ -3481,6 +3481,9 @@
             git_organization: fabric8io
             git_repo: fabric8-test
             ci_project: 'devtools'
+            creds_id: 1b1d24cc-7bf5-46dc-a112-657de8f1388c
+            ee_test_start_time: '0 */4 * * *'
+            ci_cmd: 'cd EE_API_automation && /bin/bash cico_run_EE_tests.sh'
             timeout: '30m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
@@ -3632,3 +3635,12 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .qa/cico_run_tests.sh'
             timeout: '5m'
+        - 'devtools-test-end-to-end-{test_url}-planner-api-test':
+            test_url: prod-preview.openshift.io
+            git_organization: fabric8io
+            git_repo: fabric8-test
+            ee_test_start_time: '0 */2 * * *'
+            ci_project: 'devtools'
+            creds_id: be32035b-cdd2-441b-ab27-93d023feeb1d
+            ci_cmd: 'cd EE_API_automation && /bin/bash cico_run_EE_tests.sh --prod-preview'
+            timeout: '30m'
