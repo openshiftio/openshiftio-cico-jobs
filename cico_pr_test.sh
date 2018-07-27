@@ -6,12 +6,13 @@ NEW_JOBS=$(mktemp -d)
 MASTER_JOBS=$(mktemp -d)
 
 JJB_INDEX="devtools-ci-index.yaml"
+JENKINS_JOBS=~/venv/env/bin/jenkins-jobs
 
 delete_tmp() {
     rm -rf $NEW_JOBS $MASTER_JOBS
 }
 
-~/venv/env/bin/jenkins-jobs test $JJB_INDEX -o $NEW_JOBS
+$JENKINS_JOBS test --config-xml $JJB_INDEX -o $NEW_JOBS
 ret=$?
 
 if [ "$ret" != "0" ]; then
@@ -19,7 +20,7 @@ if [ "$ret" != "0" ]; then
     exit $ret
 fi
 
-git show origin/master:$JJB_INDEX | ~/venv/env/bin/jenkins-jobs test -o $MASTER_JOBS
+git show origin/master:$JJB_INDEX | $JENKINS_JOBS test --config-xml -o $MASTER_JOBS
 
 set +x
 
