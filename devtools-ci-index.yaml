@@ -1527,6 +1527,14 @@
         - rh_che_automation_credentials_wrapper_dev.rdu2c.fabric8.io
         - rh_che_automation_credentials_wrapper_prod-preview.openshift.io
         - rh_che_automation_credentials_wrapper_dockerhub
+        - quay_credentials
+    <<: *job_template_defaults
+
+- rh-che-automation-depbuild-template: &rh-che-automation-depbuild-template
+    name: 'rh-che-automation-depbuild-template'
+    concurrent: false
+    wrappers:
+        - quay_credentials
     <<: *job_template_defaults
 
 - job-template:
@@ -1568,6 +1576,18 @@
             status-context: 'ci.centos.org PR check on {test_url}'
             <<: *github_pull_request_defaults
     <<: *che-functional-tests-template
+
+- job-template:
+    name: '{ci_project}-{git_repo}-prcheck-build-dep-{test_url}'
+    triggers:
+        - build-result:
+            cron: '* * * * *'
+            groups:
+              - jobs:
+                    - 'devtools-rh-che-build-che-credentials-master'
+                results:
+                    - success
+    <<: *rh-che-automation-depbuild-template
 
 - job-template:
     name: '{ci_project}-{git_repo}-after-rh-che-build-{test_url}'
@@ -2681,6 +2701,15 @@
             ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh ./cico/config_prod_preview'
             test_url: 'prod-preview.openshift.io'
             timeout: '20m'
+            type: 'mergeCheck'
+            cluster: '2a'
+        - '{ci_project}-{git_repo}-prcheck-build-dep-{test_url}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash ./ci/cico_build_prcheck_dep.sh'
+            test_url: 'dev.rdu2c.fabric8.io.openshift.io'
+            timeout: '30m'
             type: 'mergeCheck'
             cluster: '2a'
         - '{ci_project}-{git_repo}-periodical-{test_url}-{cluster}':
