@@ -3482,7 +3482,7 @@
             git_repo: fabric8-test
             ci_project: 'devtools'
             creds_id: 1b1d24cc-7bf5-46dc-a112-657de8f1388c
-            ee_test_start_time: '0 */4 * * *'
+            ee_test_start_time: '52 */4 * * *'
             ci_cmd: 'cd EE_API_automation && /bin/bash cico_run_EE_tests.sh'
             timeout: '30m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
@@ -3639,7 +3639,7 @@
             test_url: prod-preview.openshift.io
             git_organization: fabric8io
             git_repo: fabric8-test
-            ee_test_start_time: '0 */2 * * *'
+            ee_test_start_time: '27 */2 * * *'
             ci_project: 'devtools'
             creds_id: be32035b-cdd2-441b-ab27-93d023feeb1d
             ci_cmd: 'cd EE_API_automation && /bin/bash cico_run_EE_tests.sh --prod-preview'
