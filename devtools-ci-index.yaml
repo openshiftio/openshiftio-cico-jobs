@@ -1822,10 +1822,14 @@
                 credential-id: "{osio_creds}"
                 username: OSIO_USERNAME
                 password: OSIO_PASSWORD
+    beforeScript: ''
     builders:
         - shell: |
             set +e
             set +x
+
+            {beforeScript}
+
             export OSIO_CLUSTER="{cluster}"
             export OSIO_URL="https://{test_url}"
             export TEST_SUITE="{test_suite}"
@@ -1888,6 +1892,26 @@
     name: 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}'
     triggers:
         - timed: '{ee_test_start_time}'
+    <<: *e2e_tests_template
+
+- job-template:
+    name: 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}'
+    test_url: prod-preview.openshift.io
+    test_suite: smoketest
+    cluster: pr-us-east-2a
+    zabbix_enabled: false
+    git_organization: openshiftio
+    git_repo: saas-openshiftio
+    beforeScript: |
+        # if the PR to saas-openshiftio is done immediatelly after the commit
+        # to dependency's master, it might be still deploying to prod-preview
+        echo "Sleeping for 1 min"
+        sleep 60
+    triggers:
+        - github-pull-request:
+            github_hooks: '{github_hooks}'
+            status-context: 'ci.centos.org E2E smoke test ({feature_level})'
+            <<: *github_pull_request_defaults
     <<: *e2e_tests_template
 
 - wrapper:
@@ -2903,6 +2927,12 @@
             osio_creds: 38d2ebca-2c23-4054-9a4e-e1bc05183fd8
             ee_test_start_time: '40 * * * *'
             zabbix_enabled: false
+        - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
+            feature_level: released
+            osio_creds: 5eb1d9c4-df37-4c89-855d-3fb06e57411c
+        - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
+            feature_level: beta
+            osio_creds: cc4645dc-3f32-4187-aacc-f2bbcd5fc182
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
