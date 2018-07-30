@@ -2062,6 +2062,7 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-promote-to-prod-test'
+    image_pattern: ''
     builders:
         - shell: |
             set -ex
@@ -2070,7 +2071,7 @@
             for c in `echo $CONTEXTS`; do
                 DIR=$(readlink -f $c-20* | tail -1)
                 for f in `ls $DIR`; do
-                    python ~/saasherder/check_image.py $DIR/$f
+                    python ~/saasherder/check_image.py $DIR/$f '{image_pattern}'
                 done
             done
     <<: *job_template_defaults
@@ -2719,10 +2720,12 @@
             git_repo: saas-openshiftio
             git_organization: openshiftio
             ci_project: 'devtools'
+            image_pattern: '^quay\.io/openshiftio/rhel-'
         - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-analytics
             git_organization: openshiftio
             ci_project: 'devtools'
+            image_pattern: '^quay\.io/openshiftio/rhel-'
         - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-launchpad
             git_organization: openshiftio
