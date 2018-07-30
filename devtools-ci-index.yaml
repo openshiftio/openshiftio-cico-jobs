@@ -39,6 +39,7 @@
         - garagatyi
         - gastaldi
         - hferentschik
+        - hemanik
         - ia3andy
         - ibuziuk
         - inoxx03
@@ -72,6 +73,7 @@
         - riuvshin
         - rkratky
         - rohitkrai03
+        - rupalibehera
         - sahil143
         - sanbornsen
         - sbose78
@@ -1520,7 +1522,7 @@
         - github-pull-request:
             github_hooks: '{github_hooks}'
             status-context: 'ci.centos.org PR check on {test_url}'
-            success-comment: "$ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] has been successfully deployed: https://rhche-che6-automated.dev.rdu2c.fabric8.io/"
+            success-comment: "$ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] has been successfully deployed: http://rhche-che6-automated.dev.rdu2c.fabric8.io/"
             failure-comment: "$ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] failed. artifacts: http://artifacts.ci.centos.org/devtools/che-functional-tests/{ci_project}-{git_repo}-rh-che-prcheck-{test_url}/$BUILD_NUMBER/"
             error-comment: "$ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] failed. artifacts: http://artifacts.ci.centos.org/devtools/che-functional-tests/{ci_project}-{git_repo}-rh-che-prcheck-{test_url}/$BUILD_NUMBER/"
             <<: *github_pull_request_defaults
@@ -1564,6 +1566,11 @@
                 results:
                     - success
                     - failure
+    scm:
+        - git:
+            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            branches:
+                - origin/master
     beforeGetNode: |
         #Wait for correct rh-che version to be deployed & running on prod-preview
         isPodRunning () (
@@ -1998,11 +2005,11 @@
 - job-template:
     name: 'devtools-test-end-to-end-{test_url}-planner-api-test'
     triggers:
-      - timed: '0 */4 * * *'
+      - timed: '{ee_test_start_time}'
     wrappers:
       - credentials-binding:
         - text:
-            credential-id: 1b1d24cc-7bf5-46dc-a112-657de8f1388c
+            credential-id: "{creds_id}"
             variable: EE_TEST_OSIO_TOKEN
     scm:
       - git:
@@ -2050,7 +2057,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload-tests
-            $ssh_cmd -t "cd payload-tests/EE_API_automation && /bin/bash cico_run_EE_tests.sh"
+            $ssh_cmd -t "cd payload-tests && {ci_cmd}"
             rtn_code=$?
             cico node done $CICO_ssid
             exit $rtn_code
@@ -2079,6 +2086,7 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-promote-to-prod-test'
+    image_pattern: ''
     builders:
         - shell: |
             set -ex
@@ -2087,7 +2095,7 @@
             for c in `echo $CONTEXTS`; do
                 DIR=$(readlink -f $c-20* | tail -1)
                 for f in `ls $DIR`; do
-                    python ~/saasherder/check_image.py $DIR/$f
+                    python ~/saasherder/check_image.py $DIR/$f '{image_pattern}'
                 done
             done
     <<: *job_template_defaults
@@ -2736,10 +2744,12 @@
             git_repo: saas-openshiftio
             git_organization: openshiftio
             ci_project: 'devtools'
+            image_pattern: '^quay\.io/openshiftio/rhel-'
         - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-analytics
             git_organization: openshiftio
             ci_project: 'devtools'
+            image_pattern: '^quay\.io/openshiftio/rhel-'
         - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-launchpad
             git_organization: openshiftio
@@ -3509,6 +3519,9 @@
             git_organization: fabric8io
             git_repo: fabric8-test
             ci_project: 'devtools'
+            creds_id: 1b1d24cc-7bf5-46dc-a112-657de8f1388c
+            ee_test_start_time: '52 */4 * * *'
+            ci_cmd: 'cd EE_API_automation && /bin/bash cico_run_EE_tests.sh'
             timeout: '30m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
@@ -3648,3 +3661,24 @@
             ee_test_start_time: '0 */4 * * *'
             ci_cmd: '/bin/bash cico_test_prod.sh'
             timeout: '40m'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-analytics
+            git_repo: cvedb
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .qa/cico_run_tests.sh'
+            timeout: '5m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-analytics
+            git_repo: cvedb
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .qa/cico_run_tests.sh'
+            timeout: '5m'
+        - 'devtools-test-end-to-end-{test_url}-planner-api-test':
+            test_url: prod-preview.openshift.io
+            git_organization: fabric8io
+            git_repo: fabric8-test
+            ee_test_start_time: '27 */2 * * *'
+            ci_project: 'devtools'
+            creds_id: be32035b-cdd2-441b-ab27-93d023feeb1d
+            ci_cmd: 'cd EE_API_automation && /bin/bash cico_run_EE_tests.sh --prod-preview'
+            timeout: '30m'
