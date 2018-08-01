@@ -3686,3 +3686,21 @@
             creds_id: be32035b-cdd2-441b-ab27-93d023feeb1d
             ci_cmd: 'cd EE_API_automation && /bin/bash cico_run_EE_tests.sh --prod-preview'
             timeout: '30m'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-analytics
+            git_repo: cvejob
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-analytics
+            git_repo: cvejob
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: cvejob
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: cvejob
+            discarder_days: 30
