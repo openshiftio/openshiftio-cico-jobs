@@ -1814,18 +1814,14 @@
 - e2e_tests_template: &e2e_tests_template
     name: 'e2e_tests_template'
     defaults: global
+    description: |
+      {jobdescription}
     node: devtools
     timeout: 60m
     zabbix_enabled: ''
     properties:
         - github:
             url: https://github.com/{git_organization}/{git_repo}
-    scm:
-        - git:
-            url: https://github.com/fabric8io/fabric8-test.git
-            shallow_clone: true
-            branches:
-                - master
     wrappers:
         - ansicolor
         - credentials-binding:
@@ -1856,10 +1852,10 @@
 
                 cp ~/cico-tools/env-toolkit .
                 ./env-toolkit dump -f jenkins-env.json
-                env > jenkins-env
+                env > f8tests/jenkins-env
             )
 
-            cp ~/artifacts.key .
+            cp ~/artifacts.key f8tests
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
             n=1
@@ -1889,7 +1885,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_e2e_tests.sh"
+            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh"
             rtn_code=$?
             if [[ $rtn_code -eq 124 ]]; then
                echo "BUILD TIMEOUT";
@@ -1903,6 +1899,13 @@
     name: 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}'
     git_organization: fabric8io
     git_repo: fabric8-test
+    scm:
+        - git:
+            url: https://github.com/{git_organization}/{git_repo}.git
+            shallow_clone: true
+            branches:
+                - master
+            basedir: f8tests
     triggers:
         - timed: '{ee_test_start_time}'
     <<: *e2e_tests_template
@@ -1915,6 +1918,15 @@
     zabbix_enabled: false
     git_organization: openshiftio
     git_repo: saas-openshiftio
+    scm:
+        - git-scm:
+            git_url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+        - git:
+            url: https://github.com/fabric8io/fabric8-test.git
+            shallow_clone: true
+            branches:
+                - master
+            basedir: f8tests
     beforeScript: |
         # if the PR to saas-openshiftio is done immediatelly after the commit
         # to dependency's master, it might be still deploying to prod-preview
