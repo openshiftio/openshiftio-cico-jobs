@@ -84,6 +84,7 @@
         - stooke
         - surajssd
         - tinakurian
+        - tisnik
         - tradej
         - tsmaeder
         - vikram-raj
@@ -739,6 +740,14 @@
                 variable: RECOMMENDER_API_TOKEN
 
 - wrapper:
+    name: recommender_refresh_token
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: 2065692a-5ee1-4dbf-90a5-4cdded1d1c62
+                variable: RECOMMENDER_REFRESH_TOKEN
+
+- wrapper:
     name: recommender_api_token_prod
     wrappers:
         - credentials-binding:
@@ -920,6 +929,7 @@
           <<: *github_pull_request_defaults
     wrappers:
         - recommender_api_token
+        - recommender_refresh_token
         - ansicolor
     concurrent: false
     builders:
@@ -1046,6 +1056,7 @@
             send-to-individuals: true
     wrappers:
         - recommender_api_token
+        - recommender_refresh_token
         - ansicolor
     concurrent: false
     parameters:
@@ -1808,7 +1819,7 @@
     zabbix_enabled: ''
     properties:
         - github:
-            url: https://github.com/fabric8io/fabric8-test
+            url: https://github.com/{git_organization}/{git_repo}
     scm:
         - git:
             url: https://github.com/fabric8io/fabric8-test.git
@@ -1890,6 +1901,8 @@
 
 - job-template:
     name: 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}'
+    git_organization: fabric8io
+    git_repo: fabric8-test
     triggers:
         - timed: '{ee_test_start_time}'
     <<: *e2e_tests_template
