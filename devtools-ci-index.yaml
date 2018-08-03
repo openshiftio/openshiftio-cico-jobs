@@ -84,6 +84,7 @@
         - stooke
         - surajssd
         - tinakurian
+        - tisnik
         - tradej
         - tsmaeder
         - vikram-raj
@@ -739,6 +740,14 @@
                 variable: RECOMMENDER_API_TOKEN
 
 - wrapper:
+    name: recommender_refresh_token
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: 2065692a-5ee1-4dbf-90a5-4cdded1d1c62
+                variable: RECOMMENDER_REFRESH_TOKEN
+
+- wrapper:
     name: recommender_api_token_prod
     wrappers:
         - credentials-binding:
@@ -920,6 +929,7 @@
           <<: *github_pull_request_defaults
     wrappers:
         - recommender_api_token
+        - recommender_refresh_token
         - ansicolor
     concurrent: false
     builders:
@@ -1046,6 +1056,7 @@
             send-to-individuals: true
     wrappers:
         - recommender_api_token
+        - recommender_refresh_token
         - ansicolor
     concurrent: false
     parameters:
@@ -1803,18 +1814,14 @@
 - e2e_tests_template: &e2e_tests_template
     name: 'e2e_tests_template'
     defaults: global
+    description: |
+      {jobdescription}
     node: devtools
     timeout: 60m
     zabbix_enabled: ''
     properties:
         - github:
-            url: https://github.com/fabric8io/fabric8-test
-    scm:
-        - git:
-            url: https://github.com/fabric8io/fabric8-test.git
-            shallow_clone: true
-            branches:
-                - master
+            url: https://github.com/{git_organization}/{git_repo}
     wrappers:
         - ansicolor
         - credentials-binding:
@@ -1845,10 +1852,10 @@
 
                 cp ~/cico-tools/env-toolkit .
                 ./env-toolkit dump -f jenkins-env.json
-                env > jenkins-env
+                env > f8tests/jenkins-env
             )
 
-            cp ~/artifacts.key .
+            cp ~/artifacts.key f8tests
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
             n=1
@@ -1878,7 +1885,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_e2e_tests.sh"
+            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh"
             rtn_code=$?
             if [[ $rtn_code -eq 124 ]]; then
                echo "BUILD TIMEOUT";
@@ -1890,6 +1897,15 @@
 
 - job-template:
     name: 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}'
+    git_organization: fabric8io
+    git_repo: fabric8-test
+    scm:
+        - git:
+            url: https://github.com/{git_organization}/{git_repo}.git
+            shallow_clone: true
+            branches:
+                - master
+            basedir: f8tests
     triggers:
         - timed: '{ee_test_start_time}'
     <<: *e2e_tests_template
@@ -1902,6 +1918,15 @@
     zabbix_enabled: false
     git_organization: openshiftio
     git_repo: saas-openshiftio
+    scm:
+        - git-scm:
+            git_url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+        - git:
+            url: https://github.com/fabric8io/fabric8-test.git
+            shallow_clone: true
+            branches:
+                - master
+            basedir: f8tests
     beforeScript: |
         # if the PR to saas-openshiftio is done immediatelly after the commit
         # to dependency's master, it might be still deploying to prod-preview
@@ -2277,6 +2302,101 @@
             branches:
                 - '{branch}'
     <<: *job_template_build_defaults
+
+- booster_bdd_tests_template: &booster_bdd_tests_template
+    name: 'booster_bdd_tests_template'
+    defaults: global
+    node: devtools
+    timeout: 60m
+    zabbix_enabled: ''
+    properties:
+        - github:
+            url: https://github.com/fabric8io/fabric8-test
+    scm:
+        - git:
+            url: https://github.com/fabric8io/fabric8-test.git
+            shallow_clone: true
+            branches:
+                - master
+    wrappers:
+        - ansicolor
+        - credentials-binding:
+            - username-password-separated:
+                credential-id: "{osio_creds}"
+                username: OSIO_USERNAME
+                password: OSIO_PASSWORD
+    builders:
+        - shell: |
+            set +e
+            set +x
+            export OSIO_CLUSTER_ADDRESS="{cluster}"
+            export ZABBIX_ENABLED="{zabbix_enabled}"
+            export SCENARIO="{scenario}"
+            export SERVER_ADDRESS="{server_address}"
+            export FORGE_API="{forge_api}"
+            export WIT_API="{wit_api}"
+            export AUTH_API="{auth_api}"
+            export OSIO_DANGER_ZONE="{danger_zone}"
+            export PIPELINE="{pipeline}"
+            export BOOSTER_MISSION="{booster_mission}"
+            export BOOSTER_RUNTIME="{booster_runtime}"
+            export BLANK_BOOSTER="{blank_booster}"
+            export GIT_REPO="{git_repo}"
+            export PROJECT_NAME="{project_name}"
+            export AUTH_CLIENT_ID="{auth_client_id}"
+            export REPORT_DIR="{report_dir}"
+            export UI_HEADLESS="{ui_headless}"
+            export OSO_CLUSTER_ADDRESS="{oso_cluster_address}"
+
+            cp ~/cico-tools/env-toolkit .
+            ./env-toolkit dump -f jenkins-env.json
+            env > jenkins-env
+
+            cp ~/artifacts.key .
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            # get node
+            n=1
+            while true
+            do
+                cico_output=$(cico node get -f value -c ip_address -c comment)
+                if [ $? -eq 0 ]; then
+                    read CICO_hostname CICO_ssid <<< $cico_output
+                    if  [ ! -z "$CICO_hostname" ]; then
+                        # we got hostname from cico
+                        break
+                    fi
+                    echo "'cico node get' succeed, but can't get hostname from output"
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
+            echo 'Using Host' $CICO_hostname
+            set -x
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd yum -y install rsync
+            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/booster_bdd && /bin/bash cico_run_booster_tests.sh"
+            rtn_code=$?
+            if [[ $rtn_code -eq 124 ]]; then
+               echo "BUILD TIMEOUT";
+            else
+               rsync -delete -PHva -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
+            fi
+            cico node done $CICO_ssid
+            exit $rtn_code
+
+- job-template:
+    name: 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime}'
+    triggers:
+        - timed: '{ee_test_start_time}'
+    <<: *booster_bdd_tests_template
 
 - project:
     name: devtools
@@ -2927,6 +3047,29 @@
             osio_creds: 38d2ebca-2c23-4054-9a4e-e1bc05183fd8
             ee_test_start_time: '40 * * * *'
             zabbix_enabled: false
+        - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime}':
+            test_url: openshift.io
+            test_suite: logintest
+            cluster: us-east-2
+            osio_creds: ac385fcd-749c-4ca9-85db-20d7cd23740c
+            ee_test_start_time: '5 0-23/4 * * *'
+            timeout: 6m
+            scenario: import-repo
+            server_address: https://openshift.io
+            oso_cluster_address: https://api.starter-us-east-2.openshift.com:443
+            forge_api: https://forge.api.openshift.io
+            wit_api: https://api.openshift.io
+            auth_api: https://auth.openshift.io
+            danger_zone: '@osio.danger-zone'
+            pipeline: maven-releasestageapproveandpromote
+            booster_mission: rest-http
+            booster_runtime: vert.x
+            blank_booster: false
+            git_repo: test123
+            project_name: test123
+            auth_client_id: 740650a2-9c44-4db5-b067-a3d1b2cd2d01
+            report_dir: target
+            ui_headless: true
         - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
             feature_level: released
             osio_creds: 5eb1d9c4-df37-4c89-855d-3fb06e57411c
