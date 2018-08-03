@@ -1808,7 +1808,7 @@
     zabbix_enabled: ''
     properties:
         - github:
-            url: https://github.com/fabric8io/fabric8-test
+            url: https://github.com/{git_organization}/{git_repo}
     scm:
         - git:
             url: https://github.com/fabric8io/fabric8-test.git
@@ -1890,6 +1890,8 @@
 
 - job-template:
     name: 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}'
+    git_organization: fabric8io
+    git_repo: fabric8-test
     triggers:
         - timed: '{ee_test_start_time}'
     <<: *e2e_tests_template
