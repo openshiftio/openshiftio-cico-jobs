@@ -2308,6 +2308,7 @@
     defaults: global
     node: devtools
     timeout: 60m
+    gh_username: osiotestmachine
     zabbix_enabled: ''
     properties:
         - github:
@@ -2331,6 +2332,7 @@
             set +x
             export OSIO_CLUSTER_ADDRESS="{cluster}"
             export ZABBIX_ENABLED="{zabbix_enabled}"
+            export GITHUB_USERNAME="{gh_username}"
             export SCENARIO="{scenario}"
             export SERVER_ADDRESS="{server_address}"
             export FORGE_API="{forge_api}"
@@ -2347,6 +2349,7 @@
             export REPORT_DIR="{report_dir}"
             export UI_HEADLESS="{ui_headless}"
             export OSO_CLUSTER_ADDRESS="{oso_cluster_address}"
+            export SCENARIO="{scenario}"
 
             cp ~/cico-tools/env-toolkit .
             ./env-toolkit dump -f jenkins-env.json
@@ -3054,7 +3057,7 @@
             osio_creds: ac385fcd-749c-4ca9-85db-20d7cd23740c
             ee_test_start_time: '5 0-23/4 * * *'
             timeout: 6m
-            scenario: import-repo
+            scenario: launch-repo
             server_address: https://openshift.io
             oso_cluster_address: https://api.starter-us-east-2.openshift.com:443
             forge_api: https://forge.api.openshift.io
