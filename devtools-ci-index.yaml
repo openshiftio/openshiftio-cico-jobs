@@ -3058,7 +3058,7 @@
             osio_creds: ac385fcd-749c-4ca9-85db-20d7cd23740c
             ee_test_start_time: '5 0-23/4 * * *'
             timeout: 60m
-            scenario: launch-repo
+            scenario: launch-booster
             server_address: https://openshift.io
             oso_cluster_address: https://api.starter-us-east-2.openshift.com:443
             forge_api: https://forge.api.openshift.io
