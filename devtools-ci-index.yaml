@@ -89,6 +89,7 @@
         - tsmaeder
         - vikram-raj
         - xcoulon
+        - davidfestal
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
@@ -3857,3 +3858,11 @@
             ci_cmd: '/bin/bash cico_build_test.sh'
             timeout: '20m'
             discarder_days: 30
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: eclipse
+            git_repo: che-plugin-registry
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            saas_git: saas-openshiftio
+            timeout: '10m'
+            extra_target: rhel
