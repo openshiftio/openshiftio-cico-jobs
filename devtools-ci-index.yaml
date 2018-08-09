@@ -89,6 +89,7 @@
         - tsmaeder
         - vikram-raj
         - xcoulon
+        - dfestal
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
