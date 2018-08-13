@@ -1617,7 +1617,7 @@
         #Wait for correct rh-che version to be deployed & running on prod-preview
         isPodRunning () (
             echo "Getting status of pod with image tag $IMAGE_TAG"
-            STATUS=`oc get pod -l app=rhche -o json -n dsaas-preview | jq -r ".items[] | select (.spec.containers[0].image | contains(\"IMAGE_TAG\")).status.phase"`
+            STATUS=`oc get pod -l app=rhche -o json -n dsaas-preview | jq -r ".items[] | select (.spec.containers[0].image | contains(\"$IMAGE_TAG\")).status.phase"`
             echo "Status is $STATUS"
             if [ $STATUS = "Running" ]; then
                 return 0
