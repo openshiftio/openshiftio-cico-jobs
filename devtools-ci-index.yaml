@@ -371,6 +371,14 @@
     <<: *job_template_defaults
 
 - job-template:
+    name: '{ci_project}-{git_repo}-e2e'
+    triggers:
+      - github-pull-request:
+          status-context: "ci.centos.org PR build (e2e)"
+          <<: *github_pull_request_defaults
+    <<: *job_template_defaults
+
+- job-template:
     name: '{ci_project}-{git_repo}-wit-go-benchmarks'
     triggers:
       - timed: '59 23 * * 6'
@@ -2441,6 +2449,12 @@
             git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
+            timeout: '3h'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-e2e':
+            git_repo: fabric8-wit
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_e2e_tests.sh'
             timeout: '3h'
             discarder_days: 30
         - '{ci_project}-{git_repo}':
