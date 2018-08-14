@@ -1568,6 +1568,7 @@
     name: 'che-functional-tests-template'
     wrappers:
         - che_functional_tests_credentials_wrapper-{type}-{test_url}-{cluster}
+        - quay_credentials
     concurrent: false
     <<: *job_template_defaults
 
@@ -1592,7 +1593,7 @@
     <<: *che-functional-tests-template
 
 - job-template:
-    name: '{ci_project}-{git_repo}-prcheck-build-dep-{test_url}'
+    name: '{ci_project}-{git_repo}-prcheck-build-dep'
     triggers:
         - build-result:
             cron: '* * * * *'
@@ -2723,15 +2724,12 @@
             timeout: '20m'
             type: 'mergeCheck'
             cluster: '2a'
-        - '{ci_project}-{git_repo}-prcheck-build-dep-{test_url}':
+        - '{ci_project}-{git_repo}-prcheck-build-dep':
             git_organization: redhat-developer
             git_repo: rh-che
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash ./ci/cico_build_prcheck_dep.sh'
-            test_url: 'dev.rdu2c.fabric8.io.openshift.io'
+            ci_cmd: '/bin/bash ./.ci/cico_build_prcheck_dep.sh'
             timeout: '30m'
-            type: 'mergeCheck'
-            cluster: '2a'
         - '{ci_project}-{git_repo}-periodical-{test_url}-{cluster}':
             git_organization: redhat-developer
             git_repo: che-functional-tests
