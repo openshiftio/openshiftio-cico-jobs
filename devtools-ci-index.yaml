@@ -3111,7 +3111,7 @@
             forge_api: https://forge.api.openshift.io
             wit_api: https://api.openshift.io
             auth_api: https://auth.openshift.io
-            danger_zone: '@osio.danger-zone'
+            danger_zone: true
             pipeline: maven-releasestageapproveandpromote
             booster_mission: rest-http
             booster_runtime: vert.x
