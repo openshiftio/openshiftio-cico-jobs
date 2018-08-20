@@ -4074,6 +4074,13 @@
             timeout: '20m'
             discarder_days: 30
         - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8io
+            git_repo: kubernetes-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_test.sh'
+            timeout: '20m'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-build-master':
             git_organization: eclipse
             git_repo: che-plugin-registry
             ci_project: 'devtools'
