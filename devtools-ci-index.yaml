@@ -3754,7 +3754,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             registry: 'quay.io'
-            image_name: 'openshiftio/rhel-fabric8-ui-fabric8-planner'
+            image_name: 'openshiftio/fabric8-ui-fabric8-planner'
             timeout: '1h'
             discarder_days: 30
         - 'devtools-test-end-to-end-{test_url}-planner-api-test':
