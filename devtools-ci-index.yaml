@@ -2345,7 +2345,6 @@
     defaults: global
     node: devtools
     timeout: 60m
-    gh_username: osiotestmachine
     zabbix_enabled: ''
     properties:
         - github:
@@ -2367,9 +2366,6 @@
         - shell: |
             set +e
             set +x
-            export OSIO_CLUSTER_ADDRESS="{cluster}"
-            export ZABBIX_ENABLED="{zabbix_enabled}"
-            export GITHUB_USERNAME="{gh_username}"
             export SCENARIO="{scenario}"
             export SERVER_ADDRESS="{server_address}"
             export FORGE_API="{forge_api}"
@@ -2385,8 +2381,6 @@
             export AUTH_CLIENT_ID="{auth_client_id}"
             export REPORT_DIR="{report_dir}"
             export UI_HEADLESS="{ui_headless}"
-            export OSO_CLUSTER_ADDRESS="{oso_cluster_address}"
-            export SCENARIO="{scenario}"
 
             cp ~/cico-tools/env-toolkit .
             ./env-toolkit dump -f jenkins-env.json
@@ -3125,14 +3119,12 @@
             zabbix_enabled: false
         - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime}':
             test_url: openshift.io
-            test_suite: logintest
-            cluster: us-east-2
+            cluster: us-east-2a
             osio_creds: ac385fcd-749c-4ca9-85db-20d7cd23740c
             ee_test_start_time: '5 0-23/4 * * *'
             timeout: 60m
             scenario: launch-booster
             server_address: https://openshift.io
-            oso_cluster_address: https://api.starter-us-east-2.openshift.com:443
             forge_api: https://forge.api.openshift.io
             wit_api: https://api.openshift.io
             auth_api: https://auth.openshift.io
