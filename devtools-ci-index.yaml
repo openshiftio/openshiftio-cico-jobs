@@ -2415,13 +2415,13 @@
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
-            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            rsync --delete -e "ssh $sshopts" -Ha $(pwd)/booster_bdd/ $CICO_hostname:payload/booster_bdd/
             /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/booster_bdd && /bin/bash cico_run_booster_tests.sh"
             rtn_code=$?
             if [[ $rtn_code -eq 124 ]]; then
                echo "BUILD TIMEOUT";
             else
-               rsync -delete -PHva -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
+               rsync --delete -PHva -e "ssh $sshopts" $CICO_hostname:payload/booster_bdd/ $(pwd)/booster_bdd/ || rtn_code=$?
             fi
             cico node done $CICO_ssid
             exit $rtn_code
