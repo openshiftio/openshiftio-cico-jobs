@@ -2416,13 +2416,13 @@
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
-            rsync --delete -e "ssh $sshopts" -Ha $(pwd)/booster_bdd/ $CICO_hostname:payload/booster_bdd/
+            rsync --delete -e "ssh $sshopts" -Ha $(pwd)/booster_bdd/ $CICO_hostname:payload
             /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/booster_bdd && /bin/bash cico_run_booster_tests.sh"
             rtn_code=$?
             if [[ $rtn_code -eq 124 ]]; then
                echo "BUILD TIMEOUT";
             else
-               rsync --delete -PHva -e "ssh $sshopts" $CICO_hostname:payload/booster_bdd/ $(pwd)/booster_bdd/ || rtn_code=$?
+               rsync --delete -PHva -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd)/booster_bdd || rtn_code=$?
             fi
             cico node done $CICO_ssid
             exit $rtn_code
@@ -2430,7 +2430,7 @@
 - job-template:
     name: 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime}'
     triggers:
-        - timed: '{ee_test_start_time}'
+        - timed: '{bdd_test_start_time}'
     <<: *booster_bdd_tests_template
 
 - project:
@@ -3122,7 +3122,7 @@
             test_url: openshift.io
             cluster: us-east-2a
             osio_creds: ac385fcd-749c-4ca9-85db-20d7cd23740c
-            ee_test_start_time: '5 0-23/4 * * *'
+            bdd_test_start_time: '5 0-23/4 * * *'
             timeout: 60m
             scenario: launch-booster
             server_address: https://openshift.io
