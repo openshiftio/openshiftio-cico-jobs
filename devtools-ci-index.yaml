@@ -2515,6 +2515,12 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '10m'
+        - '{ci_project}-{git_repo}-coverage':
+            git_repo: fabric8-oso-proxy
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            timeout: '15m'
+            discarder_days: 30
         - '{ci_project}-{git_repo}':
             git_organization: openshiftio
             git_repo: tenant-log-indirector
