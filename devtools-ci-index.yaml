@@ -547,7 +547,7 @@
         fi
     saasherder_deploy: |
         if [ "$SVC_NAME" != "none" ]; then
-            oc deploy $SVC_NAME --latest -n $PRJ_NAME
+            oc rollout latest $SVC_NAME -n $PRJ_NAME
             rtn_code=$?
         fi
         if [ "$SAAS_GIT" != "none" ]; then
@@ -717,7 +717,7 @@
             if [ $rtn_code -eq 0 ]; then
               cico node done $CICO_ssid
               if [ "{svc_name}" != "none" ]; then
-                oc deploy {svc_name} --latest
+                oc rollout latest {svc_name}
               fi
             else
               # fail mode gives us 12 hrs to debug the machine
