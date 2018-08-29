@@ -167,6 +167,13 @@
       - env-var: 'QUAY_PASSWORD'
         vault-key: 'quay_password'
 
+- osiotestmachine-clean-up-gh-token: &osiotestmachine-clean-up-gh-token
+    name: "osiotestmachine-clean-up-gh-token"
+    secret-path: 'devtools-osio-ci/osiotestmachine-clean-up-gh-token'
+    secret-values:
+      - env-var: 'GITHUB_TOKEN'
+        vault-key: 'token'
+
 - wrapper:
     name: che_credentials_wrapper
     wrappers:
@@ -2021,6 +2028,22 @@
             status-context: 'ci.centos.org E2E smoke test ({feature_level})'
             <<: *github_pull_request_defaults
     <<: *e2e_tests_template
+
+- job:
+    name: 'devtools-test-e2e-cleanup'
+    git_organization: fabric8io
+    git_repo: fabric8-test
+    wrappers:
+        - vault-secrets:
+            <<: *vault_defaults
+          secrets:
+            - *osiotestmachine-clean-up-gh-token
+        - ansicolor
+    triggers:
+      - timed: '5 */2 * * *'
+    ci_project: 'devtools'
+    ci_cmd: '/bin/bash ee_tests/clean_test_repos.sh'
+    <<: *job_template_build_defaults
 
 - wrapper:
     name: fabric8_launcher_credentials_wrapper
