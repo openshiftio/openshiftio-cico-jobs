@@ -2029,7 +2029,7 @@
             <<: *github_pull_request_defaults
     <<: *e2e_tests_template
 
-- job:
+- job-template:
     name: 'devtools-test-e2e-cleanup'
     git_organization: fabric8io
     git_repo: fabric8-test
@@ -3084,6 +3084,7 @@
             ci_project: 'devtools'
             ci_cmd: 'cd ee_tests/ && /bin/bash cico_build_deploy.sh'
             timeout: '30m'
+        - 'devtools-test-e2e-cleanup'
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: openshift.io
             test_suite: logintest
