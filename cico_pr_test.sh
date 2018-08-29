@@ -54,7 +54,7 @@ diff -U0 $MASTER_JOBS/old_creds.txt $NEW_JOBS/new_creds.txt
 echo "-------------------------------------------------------------------------"
 echo "JOB_DIFF:"
 echo
-JOB_DIFF=$(find $NEW_JOBS -type d -printf '%P\n' | scripts/jenkins-jobs-diff.py 2>/dev/null)
+JOB_DIFF=$(find "$NEW_JOBS" -type d -printf '%P\n' | scripts/jenkins-jobs-diff.py 2>/dev/null)
 echo "$JOB_DIFF"
 
 if echo "$JOB_DIFF" | grep -q 'removed_jobs'; then
