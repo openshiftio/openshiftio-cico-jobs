@@ -30,7 +30,6 @@
         - chrislessard
         - christianvogt
         - corinnekrych
-        - davidfestal
         - dgutride
         - DhritiShikhar
         - dipak-pawar
@@ -41,8 +40,8 @@
         - fche
         - garagatyi
         - gastaldi
-        - hemanik
         - hferentschik
+        - hemanik
         - ia3andy
         - ibuziuk
         - inoxx03
@@ -76,8 +75,8 @@
         - rhopp
         - riuvshin
         - rkratky
-        - rohanKanojia
         - rohitkrai03
+        - rohanKanojia
         - rupalibehera
         - sahil143
         - sanbornsen
@@ -94,6 +93,7 @@
         - tsmaeder
         - vikram-raj
         - xcoulon
+        - davidfestal
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
