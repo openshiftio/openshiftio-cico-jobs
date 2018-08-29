@@ -2042,7 +2042,7 @@
     triggers:
       - timed: '5 */2 * * *'
     ci_project: 'devtools'
-    ci_cmd: 'yum -y install jq && yes | /bin/bash ee_tests/clean_test_repos.sh'
+    ci_cmd: '/bin/bash ee_tests/cico_clean_test_repos.sh'
     <<: *job_template_build_defaults
 
 - wrapper:
@@ -2453,7 +2453,7 @@
             export OSIO_DANGER_ZONE="{danger_zone}"
             export PIPELINE="{pipeline}"
             export BOOSTER_MISSION="{booster_mission}"
-            export BOOSTER_RUNTIME="{booster_runtime}"
+            export BOOSTER_RUNTIME="{booster_runtime_id}:{booster_runtime_version}"
             export BLANK_BOOSTER="{blank_booster}"
             export GIT_REPO="{git_repo}"
             export PROJECT_NAME="{project_name}"
@@ -2506,7 +2506,7 @@
             exit $rtn_code
 
 - job-template:
-    name: 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime}'
+    name: 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}'
     triggers:
         - timed: '{bdd_test_start_time}'
     <<: *booster_bdd_tests_template
@@ -3197,7 +3197,7 @@
             osio_creds: 38d2ebca-2c23-4054-9a4e-e1bc05183fd8
             ee_test_start_time: '40 * * * *'
             zabbix_enabled: false
-        - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime}':
+        - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}':
             test_url: openshift.io
             cluster: us-east-2a
             osio_creds_username: 'username_1'
@@ -3212,7 +3212,8 @@
             danger_zone: true
             pipeline: maven-releasestageapproveandpromote
             booster_mission: rest-http
-            booster_runtime: vert.x
+            booster_runtime_id: vert.x
+            booster_runtime_version: redhat
             blank_booster: false
             git_repo: test123
             project_name: test123
