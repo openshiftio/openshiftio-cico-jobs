@@ -17,7 +17,7 @@ else
 fi
 
 JJB_INDEX="devtools-ci-index.yaml"
-JENKINS_JOBS="${JENKINS_JOBS-~/venv/env/bin/jenkins-jobs}"
+JENKINS_JOBS=${JENKINS_JOBS-~/venv/env/bin/jenkins-jobs}
 
 delete_tmp() {
     if [ -z "$USE_LOCAL" ]; then
