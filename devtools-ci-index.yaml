@@ -2036,13 +2036,13 @@
     wrappers:
         - vault-secrets:
             <<: *vault_defaults
-          secrets:
-            - *osiotestmachine-clean-up-gh-token
+            secrets:
+              - *osiotestmachine-clean-up-gh-token
         - ansicolor
     triggers:
       - timed: '5 */2 * * *'
     ci_project: 'devtools'
-    ci_cmd: '/bin/bash ee_tests/clean_test_repos.sh'
+    ci_cmd: 'yum -y install jq && yes | /bin/bash ee_tests/clean_test_repos.sh'
     <<: *job_template_build_defaults
 
 - wrapper:
