@@ -35,10 +35,6 @@ set +x
 
 echo
 echo "-------------------------------------------------------------------------"
-echo "Check admin list in alphabetical order:"
-scripts/check-admin-list-aphabetical.py $JJB_INDEX
-echo OK
-echo "-------------------------------------------------------------------------"
 echo diff -uNr '$MASTER_JOBS' '$NEW_JOBS'
 echo diff -uNr $MASTER_JOBS $NEW_JOBS
 echo
