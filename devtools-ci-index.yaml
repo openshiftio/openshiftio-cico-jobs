@@ -124,24 +124,49 @@
             branches:
                 - '${{ghprbActualCommit}}'
 
-- wrapper:
-    name: npm-build-deliver-creds
-    wrappers:
-        - credentials-binding:
-            - text:
-                credential-id: ca93a149-7f35-4be4-b1bf-c6cb2ed83c34
-                variable: GH_TOKEN
-            - text:
-                credential-id: dea94aec-467e-4363-9578-3a3a2d0009e6
-                variable: NPM_TOKEN
+- vault_defaults: &vault_defaults
+    name: 'vault_defaults'
+    vault-url: 'https://vault.devshift.net'
+    credentials-id: '52ce5cda-e8f3-47a7-917b-8771518b4729'
 
-- wrapper:
-    name: fabric8-planner-test-token
-    wrappers:
-      - credentials-binding:
-        - text:
-            credential-id: 270c316a-5343-4b61-9d1f-e506038c08cd
-            variable: REFRESH_TOKEN
+- fabric8-planner-test-token: &fabric8-planner-test-token
+    name: "fabric8-planner-test-token"
+    secret-path: 'devtools-osio-ci/fabric8-planner-test-token-refresh-token'
+    secret-values:
+      - env-var: 'REFRESH_TOKEN'
+        vault-key: 'token'
+
+- npm-build-deliver-creds-gh-token: &npm-build-deliver-creds-gh-token
+    name: "npm-build-deliver-creds-gh-token"
+    secret-path: 'devtools-osio-ci/npm-build-deliver-creds-gh-token'
+    secret-values:
+      - env-var: 'GH_TOKEN'
+        vault-key: 'token'
+
+- npm-build-deliver-creds-npm-token: &npm-build-deliver-creds-npm-token
+    name: "npm-build-deliver-creds-npm-token"
+    secret-path: 'devtools-osio-ci/npm-build-deliver-creds-npm-token'
+    secret-values:
+      - env-var: 'NPM_TOKEN'
+        vault-key: 'token'
+
+- registry-devshift-credentials: &registry-devshift-credentials
+    name: "registry-devshift-credentials"
+    secret-path: 'devtools-osio-ci/hsd/registry-devshift-credentials'
+    secret-values:
+      - env-var: 'DEVSHIFT_USERNAME'
+        vault-key: 'devshift_username'
+      - env-var: 'DEVSHIFT_PASSWORD'
+        vault-key: 'devshift_password'
+
+- quay-credentials: &quay-credentials
+    name: "quay-credentials"
+    secret-path: 'devtools-osio-ci/hsd/quay-credentials'
+    secret-values:
+      - env-var: 'QUAY_USERNAME'
+        vault-key: 'quay_username'
+      - env-var: 'QUAY_PASSWORD'
+        vault-key: 'quay_password'
 
 - wrapper:
     name: che_credentials_wrapper
@@ -337,16 +362,22 @@
 - job-template:
     name: '{ci_project}-{git_repo}'
     wrappers:
-        - registry_devshift_credentials
-        - quay_credentials
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *quay-credentials
+            - *registry-devshift-credentials
     <<: *job_template_defaults
 
 - job-template:
     name: '{ci_project}-{git_repo}-prcheck'
     wrappers:
-        - registry_devshift_credentials
-        - quay_credentials
-        - che_functional_tests_credentials_wrapper-periodical-prod-preview.openshift.io-free-stg
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *quay-credentials
+            - *registry-devshift-credentials
+      - che_functional_tests_credentials_wrapper-periodical-prod-preview.openshift.io-free-stg
     <<: *job_template_defaults
 
 - job-template:
@@ -394,9 +425,12 @@
     registry: 'MISSING_REGISTRY_NAME'
     image_name: 'MISSING_IMAGE_NAME'
     wrappers:
-        - registry_devshift_credentials
-        - quay_credentials
-        - ansicolor
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *quay-credentials
+            - *registry-devshift-credentials
+      - ansicolor
     triggers:
       - github-pull-request:
           status-context: "ci.centos.org PR build (fabric8-analytics)"
@@ -411,16 +445,17 @@
     registry: 'MISSING_REGISTRY_NAME'
     image_name: 'MISSING_IMAGE_NAME'
     wrappers:
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *fabric8-planner-test-token
+            - *quay-credentials
+            - *registry-devshift-credentials
       - credentials-binding:
-        - text:
-            credential-id: 270c316a-5343-4b61-9d1f-e506038c08cd
-            variable: REFRESH_TOKEN
         - username-password-separated:
             credential-id: 17c4ae0f-80d2-4cce-be76-8fd67c83d97f
             username: USERNAME
             password: PASSWORD
-      - registry_devshift_credentials
-      - quay_credentials
       - ansicolor
     triggers:
       - github-pull-request:
@@ -449,9 +484,12 @@
     image_name: 'MISSING_IMAGE_NAME'
     registry: 'MISSING_REGISTRY_NAME'
     wrappers:
-        - registry_devshift_credentials
-        - quay_credentials
-        - ansicolor
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *quay-credentials
+            - *registry-devshift-credentials
+      - ansicolor
     triggers:
       - github-pull-request:
           status-context: "ci.centos.org PR build (fabric8-hdd)"
@@ -728,24 +766,6 @@
             exit $rtn_code
 
 - wrapper:
-    name: registry_devshift_credentials
-    wrappers:
-        - credentials-binding:
-            - username-password-separated:
-                credential-id: 1e87842e-7bb7-42f3-aad0-9431acb55c01
-                username: DEVSHIFT_USERNAME
-                password: DEVSHIFT_PASSWORD
-
-- wrapper:
-    name: quay_credentials
-    wrappers:
-        - credentials-binding:
-            - username-password-separated:
-                credential-id: 59d1d5c5-1367-4b3e-a5cc-26846a1ea80b
-                username: QUAY_USERNAME
-                password: QUAY_PASSWORD
-
-- wrapper:
     name: recommender_api_token
     wrappers:
         - credentials-binding:
@@ -783,8 +803,11 @@
 - job-template: &job_template_build_master
     name: '{ci_project}-{git_repo}-build-master'
     wrappers:
-        - registry_devshift_credentials
-        - quay_credentials
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *quay-credentials
+            - *registry-devshift-credentials
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
@@ -831,10 +854,13 @@
 - job-template:
     name: '{ci_project}-{git_repo}-f8a-build-master'
     wrappers:
-        - registry_devshift_credentials
-        - quay_credentials
-        - ansicolor
-        - recommender_api_token_prod
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *quay-credentials
+            - *registry-devshift-credentials
+      - ansicolor
+      - recommender_api_token_prod
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
@@ -1193,10 +1219,13 @@
 - job-template: &build_che_template
     name: '{ci_project}-{git_repo}-build-che-credentials-{branch}'
     wrappers:
-        - che_credentials_wrapper
-        - registry_devshift_credentials
-        - quay_credentials
-        - che_functional_tests_credentials_wrapper-periodical-prod-preview.openshift.io-free-stg
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *quay-credentials
+            - *registry-devshift-credentials
+      - che_credentials_wrapper
+      - che_functional_tests_credentials_wrapper-periodical-prod-preview.openshift.io-free-stg
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
@@ -1325,10 +1354,14 @@
       If all goes well, npm is published
     node: "{ci_project}"
     wrappers:
-            - npm-build-deliver-creds
-            - fabric8-planner-test-token
-            - registry_devshift_credentials
-            - quay_credentials
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+              - *npm-build-deliver-creds-gh-token
+              - *npm-build-deliver-creds-npm-token
+              - *fabric8-planner-test-token
+              - *quay-credentials
+              - *registry-devshift-credentials
     properties:
         - github:
             url: https://github.com/{git_organization}/{git_repo}/
@@ -1429,9 +1462,12 @@
 - job:
     name: 'devtools-eclipse-che-build-dockerfiles'
     wrappers:
-        - che_credentials_wrapper
-        - registry_devshift_credentials
-        - quay_credentials
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *quay-credentials
+            - *registry-devshift-credentials
+      - che_credentials_wrapper
     defaults: global
     node: devtools
     properties:
@@ -1535,19 +1571,24 @@
     name: 'rh-che-automation-template'
     concurrent: false
     wrappers:
-        - registry_devshift_credentials
-        - quay_credentials
-        - rh_che_automation_credentials_wrapper_dev.rdu2c.fabric8.io
-        - rh_che_automation_credentials_wrapper_prod-preview.openshift.io
-        - rh_che_automation_credentials_wrapper_dockerhub
-        - quay_credentials
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *quay-credentials
+            - *registry-devshift-credentials
+      - rh_che_automation_credentials_wrapper_dev.rdu2c.fabric8.io
+      - rh_che_automation_credentials_wrapper_prod-preview.openshift.io
+      - rh_che_automation_credentials_wrapper_dockerhub
     <<: *job_template_defaults
 
 - rh-che-automation-depbuild-template: &rh-che-automation-depbuild-template
     name: 'rh-che-automation-depbuild-template'
     concurrent: false
     wrappers:
-        - quay_credentials
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *quay-credentials
     scm:
         - git:
             url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
@@ -1571,8 +1612,11 @@
 - che-functional-tests-template: &che-functional-tests-template
     name: 'che-functional-tests-template'
     wrappers:
-        - che_functional_tests_credentials_wrapper-{type}-{test_url}-{cluster}
-        - quay_credentials
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *quay-credentials
+      - che_functional_tests_credentials_wrapper-{type}-{test_url}-{cluster}
     concurrent: false
     <<: *job_template_defaults
 
@@ -1999,17 +2043,23 @@
             branches:
                 - master
     wrappers:
-        - fabric8_launcher_credentials_wrapper
-        - registry_devshift_credentials
-        - quay_credentials
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *quay-credentials
+            - *registry-devshift-credentials
+      - fabric8_launcher_credentials_wrapper
     <<: *job_template_build_defaults
 
 - job-template:
     name: 'devtools-launcher-backend'
     wrappers:
-        - registry_devshift_credentials
-        - quay_credentials
-        - fabric8_launcher_credentials_wrapper
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *quay-credentials
+            - *registry-devshift-credentials
+      - fabric8_launcher_credentials_wrapper
     builders:
         - shell: |
             # testing out the cico client
