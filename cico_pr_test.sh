@@ -50,7 +50,7 @@ echo
 SED_EXPR='s/^.*>\(.*\)<.*$/\1/'
 grep -rh credentialsId $MASTER_JOBS|sed "$SED_EXPR"|sort -u > $MASTER_JOBS/old_creds.txt
 grep -rh credentialsId $NEW_JOBS|sed "$SED_EXPR"|sort -u > $NEW_JOBS/new_creds.txt
-diff -U0 $MASTER_JOBS/old_creds.txt $NEW_JOBS/new_creds.txt
+diff -U0 $MASTER_JOBS/old_creds.txt $NEW_JOBS/new_creds.txt || :
 echo "-------------------------------------------------------------------------"
 echo "JOB_DIFF:"
 echo
