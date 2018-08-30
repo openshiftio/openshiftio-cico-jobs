@@ -82,6 +82,13 @@
       - env-var: 'QUAY_PASSWORD'
         vault-key: 'quay_password'
 
+- osiotestmachine-clean-up-gh-token: &osiotestmachine-clean-up-gh-token
+    name: "osiotestmachine-clean-up-gh-token"
+    secret-path: 'devtools-osio-ci/osiotestmachine-clean-up-gh-token'
+    secret-values:
+      - env-var: 'GITHUB_TOKEN'
+        vault-key: 'token'
+
 - wrapper:
     name: che_credentials_wrapper
     wrappers:
@@ -1525,9 +1532,20 @@
         - github-pull-request:
             github_hooks: '{github_hooks}'
             status-context: 'ci.centos.org PR check on {test_url}'
-            success-comment: "$ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] has been successfully deployed: http://rhche-che6-automated.dev.rdu2c.fabric8.io/"
-            failure-comment: "$ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] failed. artifacts: http://artifacts.ci.centos.org/devtools/che-functional-tests/{ci_project}-{git_repo}-rh-che-prcheck-{test_url}/$BUILD_NUMBER/"
-            error-comment: "$ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] failed. artifacts: http://artifacts.ci.centos.org/devtools/che-functional-tests/{ci_project}-{git_repo}-rh-che-prcheck-{test_url}/$BUILD_NUMBER/"
+            success-comment: "### $ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] has been successfully deployed.\n
+            http://rhche-che6-automated.dev.rdu2c.fabric8.io/"
+            failure-comment: "### $ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] failed.\n
+            | Link | URL |\n
+            | ---- | :-: |\n
+            | console | https://ci.centos.org/view/Devtools/job/devtools-rh-che-rh-che-prcheck-dev.rdu2c.fabric8.io/$BUILD_NUMBER/console |\n
+            | artifacts | http://artifacts.ci.centos.org/devtools/che-functional-tests/{ci_project}-{git_repo}-rh-che-prcheck-{test_url}/$BUILD_NUMBER/ |\n
+            ### *If the build or deployment fails, the artifacts will not be present. Don't panic, just grab a towel.*"
+            error-comment: "### $ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] failed.\n
+            | Link | URL |\n
+            | ---- | :-: |\n
+            | console | https://ci.centos.org/view/Devtools/job/devtools-rh-che-rh-che-prcheck-dev.rdu2c.fabric8.io/$BUILD_NUMBER/console |\n
+            | artifacts | http://artifacts.ci.centos.org/devtools/che-functional-tests/{ci_project}-{git_repo}-rh-che-prcheck-{test_url}/$BUILD_NUMBER/ |\n
+            ### *If the build or deployment fails, the artifacts will not be present. Don't panic, just grab a towel.*"
             <<: *github_pull_request_defaults
     <<: *rh-che-automation-template
 
@@ -1945,6 +1963,22 @@
             <<: *github_pull_request_defaults
     <<: *e2e_tests_template
 
+- job-template:
+    name: 'devtools-test-e2e-cleanup'
+    git_organization: fabric8io
+    git_repo: fabric8-test
+    wrappers:
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+              - *osiotestmachine-clean-up-gh-token
+        - ansicolor
+    triggers:
+      - timed: '5 */2 * * *'
+    ci_project: 'devtools'
+    ci_cmd: '/bin/bash ee_tests/cico_clean_test_repos.sh'
+    <<: *job_template_build_defaults
+
 - wrapper:
     name: fabric8_launcher_credentials_wrapper
     wrappers:
@@ -2349,7 +2383,7 @@
             export OSIO_DANGER_ZONE="{danger_zone}"
             export PIPELINE="{pipeline}"
             export BOOSTER_MISSION="{booster_mission}"
-            export BOOSTER_RUNTIME="{booster_runtime}"
+            export BOOSTER_RUNTIME="{booster_runtime_id}:{booster_runtime_version}"
             export BLANK_BOOSTER="{blank_booster}"
             export GIT_REPO="{git_repo}"
             export PROJECT_NAME="{project_name}"
@@ -2402,7 +2436,7 @@
             exit $rtn_code
 
 - job-template:
-    name: 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime}'
+    name: 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}'
     triggers:
         - timed: '{bdd_test_start_time}'
     <<: *booster_bdd_tests_template
@@ -2984,6 +3018,7 @@
             ci_project: 'devtools'
             ci_cmd: 'cd ee_tests/ && /bin/bash cico_build_deploy.sh'
             timeout: '30m'
+        - 'devtools-test-e2e-cleanup'
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: openshift.io
             test_suite: logintest
@@ -3092,7 +3127,7 @@
             osio_creds: 38d2ebca-2c23-4054-9a4e-e1bc05183fd8
             ee_test_start_time: '40 * * * *'
             zabbix_enabled: false
-        - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime}':
+        - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}':
             test_url: openshift.io
             cluster: us-east-2a
             osio_creds: ac385fcd-749c-4ca9-85db-20d7cd23740c
@@ -3106,7 +3141,8 @@
             danger_zone: true
             pipeline: maven-releasestageapproveandpromote
             booster_mission: rest-http
-            booster_runtime: vert.x
+            booster_runtime_id: vert.x
+            booster_runtime_version: redhat
             blank_booster: false
             git_repo: test123
             project_name: test123
