@@ -222,6 +222,20 @@
       - env-var: 'PASSWORD'
         vault-key: 'password'
 
+- recommender-api-token: &recommender-api-token
+    name: "recommender-api-token"
+    secret-path: 'devtools-osio-ci/recommender-api-token'
+    secret-values:
+      - env-var: 'RECOMMENDER_API_TOKEN'
+        vault-key: 'token'
+
+- recommender-refresh-token: &recommender-refresh-token
+    name: "recommender-refresh-token"
+    secret-path: 'devtools-osio-ci/recommender-refresh-token'
+    secret-values:
+      - env-var: 'RECOMMENDER_REFRESH_TOKEN'
+        vault-key: 'token'
+
 - wrapper:
     name: che_credentials_wrapper
     wrappers:
@@ -789,22 +803,6 @@
             exit $rtn_code
 
 - wrapper:
-    name: recommender_api_token
-    wrappers:
-        - credentials-binding:
-            - text:
-                credential-id: 2fc94f6b-dfef-49a4-a217-fe47aaeea056
-                variable: RECOMMENDER_API_TOKEN
-
-- wrapper:
-    name: recommender_refresh_token
-    wrappers:
-        - credentials-binding:
-            - text:
-                credential-id: 2065692a-5ee1-4dbf-90a5-4cdded1d1c62
-                variable: RECOMMENDER_REFRESH_TOKEN
-
-- wrapper:
     name: recommender_api_token_prod
     wrappers:
         - credentials-binding:
@@ -980,8 +978,11 @@
             - fabric8-analytics
           <<: *github_pull_request_defaults
     wrappers:
-        - recommender_api_token
-        - recommender_refresh_token
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+              - *recommender-api-token
+              - *recommender-refresh-token
         - ansicolor
     concurrent: false
     builders:
@@ -1107,8 +1108,11 @@
             notify-every-unstable-build: true
             send-to-individuals: true
     wrappers:
-        - recommender_api_token
-        - recommender_refresh_token
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+              - *recommender-api-token
+              - *recommender-refresh-token
         - ansicolor
     concurrent: false
     parameters:
