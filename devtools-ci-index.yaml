@@ -236,6 +236,13 @@
       - env-var: 'RECOMMENDER_REFRESH_TOKEN'
         vault-key: 'token'
 
+- recommender-api-token-prod: &recommender-api-token-prod
+    name: "recommender-api-token-prod"
+    secret-path: 'devtools-osio-ci/recommender-api-token-prod'
+    secret-values:
+      - env-var: 'RECOMMENDER_API_TOKEN'
+        vault-key: 'token'
+
 - wrapper:
     name: che_credentials_wrapper
     wrappers:
@@ -802,14 +809,6 @@
             fi
             exit $rtn_code
 
-- wrapper:
-    name: recommender_api_token_prod
-    wrappers:
-        - credentials-binding:
-            - text:
-                credential-id: a08f984d-b9f9-4ba8-afa1-4aff10b6da6d
-                variable: RECOMMENDER_API_TOKEN
-
 - job-template: &job_template_build_master
     name: '{ci_project}-{git_repo}-build-master'
     wrappers:
@@ -869,8 +868,8 @@
           secrets:
             - *quay-credentials
             - *registry-devshift-credentials
+            - *recommender-api-token-prod
       - ansicolor
-      - recommender_api_token_prod
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
@@ -1039,7 +1038,10 @@
     triggers:
       - timed: '@hourly'
     wrappers:
-        - recommender_api_token_prod
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+              - *recommender-api-token-prod
         - ansicolor
     scm:
         - git:
