@@ -213,6 +213,15 @@
       - env-var: 'RH_CHE_AUTOMATION_DOCKERHUB_PASSWORD'
         vault-key: 'password'
 
+- fabric8-planner-test-preview-creds: &fabric8-planner-test-preview-creds
+    name: "fabric8-planner-test-preview-creds"
+    secret-path: 'devtools-osio-ci/fabric8-planner-test-preview-creds'
+    secret-values:
+      - env-var: 'USERNAME'
+        vault-key: 'username'
+      - env-var: 'PASSWORD'
+        vault-key: 'password'
+
 - wrapper:
     name: che_credentials_wrapper
     wrappers:
@@ -466,11 +475,7 @@
             - *fabric8-planner-test-token
             - *quay-credentials
             - *registry-devshift-credentials
-      - credentials-binding:
-        - username-password-separated:
-            credential-id: 17c4ae0f-80d2-4cce-be76-8fd67c83d97f
-            username: USERNAME
-            password: PASSWORD
+            - *fabric8-planner-test-preview-creds
       - ansicolor
     triggers:
       - github-pull-request:
