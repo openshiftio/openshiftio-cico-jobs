@@ -9,95 +9,10 @@
     discarder_days: -1
     discarder_num: -1
 
-- admin_list_defaults: &admin_list_defaults
-    name: 'admin_list_defaults'
-    admin-list:
-        - aditya-konarde
-        - akurinnoy
-        - alexeykazakov
-        - amisevsk
-        - andrewazores
-        - animuk
-        - anmolbabu
-        - aptmac
-        - ashumilova
-        - aslakknutsen
-        - baijum
-        - bartoszmajsak
-        - c-koehler
-        - cescoffier
-        - chmouel
-        - chrislessard
-        - christianvogt
-        - corinnekrych
-        - dgutride
-        - DhritiShikhar
-        - dipak-pawar
-        - dlabrecq
-        - ebaron
-        - edewit
-        - fabric8cd
-        - fche
-        - garagatyi
-        - gastaldi
-        - hferentschik
-        - hemanik
-        - ia3andy
-        - ibuziuk
-        - inoxx03
-        - invincibleJai
-        - jarifibrahim
-        - jiekang
-        - jmelis
-        - joshuawilson
-        - jyasveer
-        - Katka92
-        - kbsingh
-        - kishansagathiya
-        - kwk
-        - l0rd
-        - ldimaggi
-        - ljelinkova
-        - MatousJobanek
-        - maxandersen
-        - michaelkleinhenz
-        - mindreeper2420
-        - mmclanerh
-        - msrb
-        - neugens
-        - nimishamukherjee
-        - nurali-techie
-        - pbergene
-        - ppitonak
-        - Preeticp
-        - quintesse
-        - rhoads-zach
-        - rhopp
-        - riuvshin
-        - rkratky
-        - rohitkrai03
-        - rohanKanojia
-        - rupalibehera
-        - sahil143
-        - sanbornsen
-        - sbose78
-        - sbryzak
-        - ScrewTSW
-        - SMahil
-        - sthaha
-        - stooke
-        - surajssd
-        - tinakurian
-        - tisnik
-        - tradej
-        - tsmaeder
-        - vikram-raj
-        - xcoulon
-        - davidfestal
-
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
-    <<: *admin_list_defaults
+    org-list:
+        - rhdt-dev
     cron: '* * * * *'
     github-hooks: '{github_hooks}'
     permit-all: false
@@ -480,6 +395,7 @@
       - github-pull-request:
           status-context: "ci.centos.org PR build (fabric8-analytics)"
           org-list:
+            - rhdt-dev
             - fabric8-analytics
           success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry: `docker pull {registry}/{image_name}:SNAPSHOT-PR-$ghprbPullId`"
           <<: *github_pull_request_defaults
@@ -502,6 +418,7 @@
       - github-pull-request:
           status-context: "ci.centos.org PR build (fabric8-planner)"
           org-list:
+            - rhdt-dev
             - fabric8-ui
           success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry. Run `docker pull {registry}/{image_name}:SNAPSHOT-PR-$ghprbPullId && docker run -it -p 5000:8080 {registry}/{image_name}:SNAPSHOT-PR-$ghprbPullId` and visit `http://localhost:5000` to access it."
           <<: *github_pull_request_defaults
@@ -519,6 +436,7 @@
       - github-pull-request:
           status-context: "ci.centos.org PR (copr) build (fabric8-analytics)"
           org-list:
+            - rhdt-dev
             - fabric8-analytics
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
@@ -538,6 +456,7 @@
       - github-pull-request:
           status-context: "ci.centos.org PR build (fabric8-hdd)"
           org-list:
+            - rhdt-dev
             - fabric8-hdd
           success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry: `docker pull {registry}/{image_name}:SNAPSHOT-PR-$ghprbPullId`"
           <<: *github_pull_request_defaults
@@ -555,6 +474,7 @@
       - github-pull-request:
           status-context: "ci.centos.org eslint run (fabric8-hdd)"
           org-list:
+            - rhdt-dev
             - fabric8-hdd
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
@@ -571,6 +491,7 @@
       - github-pull-request:
           status-context: "ci.centos.org pylint run (fabric8-analytics)"
           org-list:
+            - rhdt-dev
             - fabric8-analytics
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
@@ -586,6 +507,7 @@
       - github-pull-request:
           status-context: "ci.centos.org check-style run (fabric8-analytics)"
           org-list:
+            - rhdt-dev
             - fabric8-analytics
           <<: *github_pull_request_defaults
     <<: *job_template_defaults
@@ -974,6 +896,7 @@
       - github-pull-request:
           status-context: "ci.centos.org PR build (fabric8-analytics)"
           org-list:
+            - rhdt-dev
             - fabric8-analytics
           <<: *github_pull_request_defaults
     wrappers:
