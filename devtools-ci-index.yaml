@@ -2054,6 +2054,7 @@
       - timed: '5 */2 * * *'
     ci_project: 'devtools'
     ci_cmd: '/bin/bash ee_tests/cico_clean_test_repos.sh'
+    timeout: 15m
     <<: *job_template_build_defaults
 
 - wrapper:
