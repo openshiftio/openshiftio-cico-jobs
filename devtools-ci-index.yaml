@@ -174,6 +174,75 @@
       - env-var: 'GITHUB_TOKEN'
         vault-key: 'token'
 
+- copr-mercator-api-token: &copr-mercator-api-token
+    name: "copr-mercator-api-token"
+    secret-path: 'devtools-osio-ci/copr-mercator-api-token'
+    secret-values:
+      - env-var: 'COPR_LOGIN_MERCATOR'
+        vault-key: 'login'
+      - env-var: 'COPR_TOKEN_MERCATOR'
+        vault-key: 'token'
+
+- rh-che-automation-credentials-devrdu2c-fabric8-io: &rh-che-automation-credentials-devrdu2c-fabric8-io
+    name: "rh-che-automation-credentials-devrdu2c-fabric8-io"
+    secret-path: 'devtools-osio-ci/rh-che-automation-credentials-devrdu2c-fabric8-io'
+    secret-values:
+      - env-var: 'RH_CHE_AUTOMATION_RDU2C_USERNAME'
+        vault-key: 'username'
+      - env-var: 'RH_CHE_AUTOMATION_RDU2C_PASSWORD'
+        vault-key: 'password'
+
+- rh-che-automation-credentials-prod-preview-openshift-io: &rh-che-automation-credentials-prod-preview-openshift-io
+    name: "rh-che-automation-credentials-prod-preview-openshift-io"
+    secret-path: 'devtools-osio-ci/rh-che-automation-credentials-prod-preview-openshift-io'
+    secret-values:
+      - env-var: 'KEYCLOAK_TOKEN'
+        vault-key: 'keycloak_token'
+      - env-var: 'RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME'
+        vault-key: 'che_preview_username'
+      - env-var: 'RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD'
+        vault-key: 'che_preview_password'
+
+
+- rh-che-automation-credentials-dockerhub: &rh-che-automation-credentials-dockerhub
+    name: "rh-che-automation-credentials-dockerhub"
+    secret-path: 'devtools-osio-ci/rh-che-automation-credentials-dockerhub'
+    secret-values:
+      - env-var: 'RH_CHE_AUTOMATION_DOCKERHUB_USERNAME'
+        vault-key: 'username'
+      - env-var: 'RH_CHE_AUTOMATION_DOCKERHUB_PASSWORD'
+        vault-key: 'password'
+
+- fabric8-planner-test-preview-creds: &fabric8-planner-test-preview-creds
+    name: "fabric8-planner-test-preview-creds"
+    secret-path: 'devtools-osio-ci/fabric8-planner-test-preview-creds'
+    secret-values:
+      - env-var: 'USERNAME'
+        vault-key: 'username'
+      - env-var: 'PASSWORD'
+        vault-key: 'password'
+
+- recommender-api-token: &recommender-api-token
+    name: "recommender-api-token"
+    secret-path: 'devtools-osio-ci/recommender-api-token'
+    secret-values:
+      - env-var: 'RECOMMENDER_API_TOKEN'
+        vault-key: 'token'
+
+- recommender-refresh-token: &recommender-refresh-token
+    name: "recommender-refresh-token"
+    secret-path: 'devtools-osio-ci/recommender-refresh-token'
+    secret-values:
+      - env-var: 'RECOMMENDER_REFRESH_TOKEN'
+        vault-key: 'token'
+
+- recommender-api-token-prod: &recommender-api-token-prod
+    name: "recommender-api-token-prod"
+    secret-path: 'devtools-osio-ci/recommender-api-token-prod'
+    secret-values:
+      - env-var: 'RECOMMENDER_API_TOKEN'
+        vault-key: 'token'
+
 - wrapper:
     name: che_credentials_wrapper
     wrappers:
@@ -257,36 +326,6 @@
                 credential-id: f9b7e98d-2ba0-40c3-8454-2475a064e216
                 username: OSIO_USERNAME
                 password: OSIO_PASSWORD
-
-- wrapper:
-    name: rh_che_automation_credentials_wrapper_dev.rdu2c.fabric8.io
-    wrappers:
-        - credentials-binding:
-            - username-password-separated:
-                credential-id: 2aef0e89-40a6-4dd6-8104-fd1f81656e5d
-                username: RH_CHE_AUTOMATION_RDU2C_USERNAME
-                password: RH_CHE_AUTOMATION_RDU2C_PASSWORD
-
-- wrapper:
-    name: rh_che_automation_credentials_wrapper_prod-preview.openshift.io
-    wrappers:
-        - credentials-binding:
-            - text:
-                credential-id: d8e23ea1-7f30-40c4-816f-50fc91ebfa6f
-                variable: KEYCLOAK_TOKEN
-            - username-password-separated:
-                credential-id: 79f2b240-e87e-4216-ba88-6b3431bceb2f
-                username: RH_CHE_AUTOMATION_CHE_PREVIEW_USERNAME
-                password: RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD
-
-- wrapper:
-    name: rh_che_automation_credentials_wrapper_dockerhub
-    wrappers:
-        - credentials-binding:
-            - username-password-separated:
-                credential-id: 458034f1-cdda-4066-bca9-d06c3dee3282
-                username: RH_CHE_AUTOMATION_DOCKERHUB_USERNAME
-                password: RH_CHE_AUTOMATION_DOCKERHUB_PASSWORD
 
 - job_template_defaults: &job_template_defaults
     name: 'job_template_defaults'
@@ -457,11 +496,7 @@
             - *fabric8-planner-test-token
             - *quay-credentials
             - *registry-devshift-credentials
-      - credentials-binding:
-        - username-password-separated:
-            credential-id: 17c4ae0f-80d2-4cce-be76-8fd67c83d97f
-            username: USERNAME
-            password: PASSWORD
+            - *fabric8-planner-test-preview-creds
       - ansicolor
     triggers:
       - github-pull-request:
@@ -475,7 +510,10 @@
 - job-template:
     name: '{ci_project}-{git_repo}-fabric8-analytics-copr-mercator'
     wrappers:
-        - copr_mercator_api_token
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+              - *copr-mercator-api-token
         - ansicolor
     triggers:
       - github-pull-request:
@@ -771,41 +809,6 @@
             fi
             exit $rtn_code
 
-- wrapper:
-    name: recommender_api_token
-    wrappers:
-        - credentials-binding:
-            - text:
-                credential-id: 2fc94f6b-dfef-49a4-a217-fe47aaeea056
-                variable: RECOMMENDER_API_TOKEN
-
-- wrapper:
-    name: recommender_refresh_token
-    wrappers:
-        - credentials-binding:
-            - text:
-                credential-id: 2065692a-5ee1-4dbf-90a5-4cdded1d1c62
-                variable: RECOMMENDER_REFRESH_TOKEN
-
-- wrapper:
-    name: recommender_api_token_prod
-    wrappers:
-        - credentials-binding:
-            - text:
-                credential-id: a08f984d-b9f9-4ba8-afa1-4aff10b6da6d
-                variable: RECOMMENDER_API_TOKEN
-
-- wrapper:
-    name: copr_mercator_api_token
-    wrappers:
-        - credentials-binding:
-            - text:
-                credential-id: 9553a3e6-a315-4d6a-9a58-559271b7e39c
-                variable: COPR_LOGIN_MERCATOR
-            - text:
-                credential-id: fecaa647-2720-47f8-99d2-722cb1bce850
-                variable: COPR_TOKEN_MERCATOR
-
 - job-template: &job_template_build_master
     name: '{ci_project}-{git_repo}-build-master'
     wrappers:
@@ -865,8 +868,8 @@
           secrets:
             - *quay-credentials
             - *registry-devshift-credentials
+            - *recommender-api-token-prod
       - ansicolor
-      - recommender_api_token_prod
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
@@ -974,8 +977,11 @@
             - fabric8-analytics
           <<: *github_pull_request_defaults
     wrappers:
-        - recommender_api_token
-        - recommender_refresh_token
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+              - *recommender-api-token
+              - *recommender-refresh-token
         - ansicolor
     concurrent: false
     builders:
@@ -1032,7 +1038,10 @@
     triggers:
       - timed: '@hourly'
     wrappers:
-        - recommender_api_token_prod
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+              - *recommender-api-token-prod
         - ansicolor
     scm:
         - git:
@@ -1101,8 +1110,11 @@
             notify-every-unstable-build: true
             send-to-individuals: true
     wrappers:
-        - recommender_api_token
-        - recommender_refresh_token
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+              - *recommender-api-token
+              - *recommender-refresh-token
         - ansicolor
     concurrent: false
     parameters:
@@ -1582,9 +1594,9 @@
           secrets:
             - *quay-credentials
             - *registry-devshift-credentials
-      - rh_che_automation_credentials_wrapper_dev.rdu2c.fabric8.io
-      - rh_che_automation_credentials_wrapper_prod-preview.openshift.io
-      - rh_che_automation_credentials_wrapper_dockerhub
+            - *rh-che-automation-credentials-devrdu2c-fabric8-io
+            - *rh-che-automation-credentials-prod-preview-openshift-io
+            - *rh-che-automation-credentials-dockerhub
     <<: *job_template_defaults
 
 - rh-che-automation-depbuild-template: &rh-che-automation-depbuild-template
@@ -2400,7 +2412,10 @@
 - job-template:
     name: '{ci_project}-{git_repo}-copr-mercator-build-master'
     wrappers:
-        - copr_mercator_api_token
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+              - *copr-mercator-api-token
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
