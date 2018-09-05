@@ -151,6 +151,13 @@
       - env-var: 'NPM_TOKEN'
         vault-key: 'token'
 
+- fabric8-build-dockerio-dockercfg: &fabric8-build-dockerio-dockercfg
+    name: "fabric8-build-dockerio-dockercfg"
+    secret-path: 'devtools-osio-ci/fabric8-build-dockerio-dockercfg'
+    secret-values:
+      - env-var: 'FABRIC8_DOCKERIO_CFG'
+        vault-key: 'config.json'
+
 - registry-devshift-credentials: &registry-devshift-credentials
     name: "registry-devshift-credentials"
     secret-path: 'devtools-osio-ci/hsd/registry-devshift-credentials'
