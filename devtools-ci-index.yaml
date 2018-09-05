@@ -3139,7 +3139,7 @@
             cluster: us-east-1a
             feature_level: beta
             osio_creds: 9f21878c-cbde-4e5a-85a6-76ea996df4ab
-            ee_test_start_time: '35 0-23/4 * * *'
+            ee_test_start_time: '35 0-23/2 * * *'
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: openshift.io
             test_suite: logintest
@@ -3158,13 +3158,6 @@
             ee_test_start_time: '5 1-23/4 * * *'
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: openshift.io
-            test_suite: smoketest
-            cluster: us-east-1b
-            feature_level: beta
-            osio_creds: f4077726-de5d-4593-982f-3b04478347e7
-            ee_test_start_time: '35 1-23/4 * * *'
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: openshift.io
             test_suite: logintest
             cluster: us-east-2
             feature_level: released
@@ -3181,13 +3174,6 @@
             ee_test_start_time: '5 2-23/4 * * *'
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: openshift.io
-            test_suite: smoketest
-            cluster: us-east-2
-            feature_level: beta
-            osio_creds: f2109fcc-4053-44bd-bdc5-a129d5b38c27
-            ee_test_start_time: '35 2-23/4 * * *'
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: openshift.io
             test_suite: logintest
             cluster: us-east-2a
             feature_level: released
@@ -3202,13 +3188,6 @@
             feature_level: released
             osio_creds: 9cfb97b8-1569-4cd4-9497-a7ede45e7cd6
             ee_test_start_time: '5 3-23/4 * * *'
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: openshift.io
-            test_suite: smoketest
-            cluster: us-east-2a
-            feature_level: beta
-            osio_creds: f98e38e7-2c3d-49d0-8a7d-06d6e79719b7
-            ee_test_start_time: '35 3-23/4 * * *'
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: prod-preview.openshift.io
             test_suite: smoketest
