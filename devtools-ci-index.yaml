@@ -151,6 +151,13 @@
       - env-var: 'NPM_TOKEN'
         vault-key: 'token'
 
+- fabric8-build-dockerio-dockercfg: &fabric8-build-dockerio-dockercfg
+    name: "fabric8-build-dockerio-dockercfg"
+    secret-path: 'devtools-osio-ci/fabric8-build-dockerio-dockercfg'
+    secret-values:
+      - env-var: 'FABRIC8_DOCKERIO_CFG'
+        vault-key: 'config.json'
+
 - registry-devshift-credentials: &registry-devshift-credentials
     name: "registry-devshift-credentials"
     secret-path: 'devtools-osio-ci/hsd/registry-devshift-credentials'
@@ -4119,4 +4126,16 @@
             git_repo: fabric8-analytics-lsp-server
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-jenkins
+            git_repo: jenkins-openshift-base
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_deploy.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-jenkins
+            git_repo: jenkins-openshift-base
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
             timeout: '20m'
