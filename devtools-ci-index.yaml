@@ -4127,9 +4127,15 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-jenkins
+            git_repo: jenkins-openshift-base
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_deploy.sh'
+            timeout: '20m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-jenkins
             git_repo: jenkins-openshift-base
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            ci_cmd: '/bin/bash cico_build.sh'
             timeout: '20m'
