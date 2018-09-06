@@ -1485,6 +1485,38 @@
                 remote: origin
                 name: "gh-pages"
 
+- job-template:
+    name: '{ci_project}-{git_repo}-fabric8-push-build-master'
+    description: |
+      {jobdescription}
+      If all goes well, fabric8 images are pushed
+    node: "{ci_project}"
+    wrappers:
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+              - *fabric8-build-dockerio-dockercfg
+              - *quay-credentials
+              - *registry-devshift-credentials
+    properties:
+        - github:
+            url: https://github.com/{git_organization}/{git_repo}/
+        - inject:
+            properties-content: |
+               JENKINS_URL=https://ci.centos.org
+    scm:
+        - git:
+            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            credentials-id: "c4872223-4024-4cd4-8e09-1bbdc7d6e971"
+            git-tool: ci-git
+            shallow_clone: false
+            skip-tag: True
+            branches:
+                - master
+
+    triggers:
+        - github
+    <<: *job_template_build_defaults
 
 - job:
     name: 'devtools-eclipse-che-build-dockerfiles'
@@ -4127,7 +4159,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-fabric8-push-build-master':
             git_organization: fabric8-jenkins
             git_repo: jenkins-openshift-base
             ci_project: 'devtools'
