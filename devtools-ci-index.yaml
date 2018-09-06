@@ -2528,7 +2528,7 @@
             set -x
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
-            $ssh_cmd yum -y install rsync
+            $ssh_cmd "yum -y -d1 --setopt tsflags='nodocs' install rsync"
             rsync --delete -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
             /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/booster_bdd && /bin/bash cico_run_booster_tests.sh"
             rtn_code=$?
