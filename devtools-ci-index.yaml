@@ -1410,82 +1410,6 @@
     <<: *job_template_build_defaults
 
 - job-template:
-    name: '{ci_project}-fabric8-devdoc-build-master'
-    description: |
-      {jobdescription}
-      If all goes well, gh-pages is pushed
-    node: "{ci_project}"
-    properties:
-        - github:
-            url: https://github.com/{git_organization}/{git_repo}/
-    scm:
-        - git:
-            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
-            credentials-id: "c4872223-4024-4cd4-8e09-1bbdc7d6e971"
-            git-tool: ci-git
-            shallow_clone: false
-            branches:
-                - master
-
-    triggers:
-        - github
-    builders:
-        - shell: |
-            # testing out the cico client
-            set +e
-            export CICO_API_KEY=$(cat ~/duffy.key )
-            # get node
-            n=1
-            while true
-            do
-                cico_output=$(cico node get -f value -c ip_address -c comment)
-                if [ $? -eq 0 ]; then
-                    read CICO_hostname CICO_ssid <<< $cico_output
-                    if  [ ! -z "$CICO_hostname" ]; then
-                        # we got hostname from cico
-                        break
-                    fi
-                    echo "'cico node get' succeed, but can't get hostname from output"
-                fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
-                    echo "giving up on 'cico node get'"
-                    exit 1
-                fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
-                n=$[$n+1]
-                sleep 60
-            done
-            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
-            ssh_cmd="ssh $sshopts $CICO_hostname"
-
-            cp ~/cico-tools/env-toolkit .
-            ./env-toolkit dump -f jenkins-env.json
-            env > jenkins-env
-
-            $ssh_cmd yum -y install rsync
-            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && {ci_cmd}"
-            rtn_code=$?
-            if [[ $rtn_code -eq 124 ]]; then
-               echo "BUILD TIMEOUT";
-            else
-               rsync --delete -PHva -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd)
-               rtn_code=$?
-            fi
-            cico node done $CICO_ssid
-            exit $rtn_code
-    publishers:
-      - git:
-          push-only-if-success: true
-          push-merge: true
-          force-push: true
-          branches:
-            - branch:
-                remote: origin
-                name: "gh-pages"
-
-- job-template:
     name: '{ci_project}-{git_repo}-fabric8-push-build-master'
     description: |
       {jobdescription}
@@ -2606,11 +2530,6 @@
             timeout: '3h'
             discarder_days: 30
         - '{ci_project}-{git_repo}':
-            git_repo: fabric8-devdoc
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
-        - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
             git_repo: fabric8-ui
             ci_project: 'devtools'
@@ -2666,11 +2585,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '10m'
-        - '{ci_project}-fabric8-devdoc-build-master':
-            git_repo: fabric8-devdoc
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            timeout: '30m'
         - '{ci_project}-{git_repo}-build-master':
             git_repo: fabric8-wit
             ci_project: 'devtools'
