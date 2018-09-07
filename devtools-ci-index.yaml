@@ -2451,6 +2451,11 @@
             export AUTH_CLIENT_ID="{auth_client_id}"
             export REPORT_DIR="{report_dir}"
             export UI_HEADLESS="{ui_headless}"
+            export ZABBIX_ENABLED="{zabbix_enabled}"
+            export ZABBIX_SERVER="{zabbix_server}"
+            export ZABBIX_PORT="{zabbix_port}"
+            export ZABBIX_HOST="{zabbix_host}"
+            export ZABBIX_METRIC_PREFIX="{zabbix_metric_prefix}"
 
             cp ~/cico-tools/env-toolkit .
             ./env-toolkit dump -f jenkins-env.json
@@ -3180,6 +3185,11 @@
             auth_client_id: 740650a2-9c44-4db5-b067-a3d1b2cd2d01
             report_dir: target
             ui_headless: true
+            zabbix_enabled: true
+            zabbix_server: zabbix.devshift.net
+            zabbix_port: 9443
+            zabbix_host: qa_openshift.io
+            zabbix_metric_prefix: "booster-bdd.{booster_runtime_id}.{scenario}"
         - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}':
             test_url: openshift.io
             cluster: us-east-2a
@@ -3203,6 +3213,11 @@
             auth_client_id: 740650a2-9c44-4db5-b067-a3d1b2cd2d01
             report_dir: target
             ui_headless: true
+            zabbix_enabled: true
+            zabbix_server: zabbix.devshift.net
+            zabbix_port: 9443
+            zabbix_host: qa_openshift.io
+            zabbix_metric_prefix: "booster-bdd.{booster_runtime_id}.{scenario}"
         - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}':
             test_url: openshift.io
             cluster: us-east-2a
@@ -3226,6 +3241,11 @@
             auth_client_id: 740650a2-9c44-4db5-b067-a3d1b2cd2d01
             report_dir: target
             ui_headless: true
+            zabbix_enabled: true
+            zabbix_server: zabbix.devshift.net
+            zabbix_port: 9443
+            zabbix_host: qa_openshift.io
+            zabbix_metric_prefix: "booster-bdd.{booster_runtime_id}.{scenario}"
         - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
             feature_level: released
             osio_creds: 5eb1d9c4-df37-4c89-855d-3fb06e57411c
