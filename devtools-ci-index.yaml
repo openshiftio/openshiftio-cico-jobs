@@ -4054,6 +4054,17 @@
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: cvejob
             discarder_days: 30
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8io
+            git_repo: kubernetes-model
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_release.sh'
+            timeout: '30m'
+            wrappers:
+                - vault-secrets:
+                    <<: *vault_defaults
+                    secrets:
+                      - *fabric8cd-sonatype-creds
         - '{ci_project}-{git_repo}':
             git_organization: fabric8io
             git_repo: kubernetes-model
@@ -4061,6 +4072,11 @@
             ci_cmd: '/bin/bash cico_build_test.sh'
             timeout: '20m'
             discarder_days: 30
+            wrappers:
+                - vault-secrets:
+                    <<: *vault_defaults
+                        secrets:
+                        - *fabric8cd-sonatype-creds
         - '{ci_project}-{git_repo}-build-master':
             git_organization: eclipse
             git_repo: che-plugin-registry
