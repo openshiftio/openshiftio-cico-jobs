@@ -252,6 +252,15 @@
       - env-var: 'RECOMMENDER_API_TOKEN'
         vault-key: 'token'
 
+- fabric8cd-sonatype-creds: &fabric8cd-sonatype-creds
+    name: "fabric8cd-sonatype-creds"
+    secret-path: 'devtools-osio-ci/sonatype-creds'
+    secret-values:
+      - env-var: 'SONATYPE_USERNAME'
+        vault-key: 'sonatype_username'
+      - env-var: 'SONATYPE_PASSWORD'
+        vault-key: 'sonatype_password'
+
 - wrapper:
     name: che_credentials_wrapper
     wrappers:
