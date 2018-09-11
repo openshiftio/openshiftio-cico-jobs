@@ -954,6 +954,7 @@
                 cico node done $CICO_ssid
             fi
 
+            # Dump params for deploy-e2e-test-params
             cat > deploy-e2e-test-params << EOF
             GIT_ORGANIZATION={git_organization}
             UPSTREAM_GIT_COMMIT=$GIT_COMMIT
