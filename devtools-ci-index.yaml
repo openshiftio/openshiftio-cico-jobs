@@ -1442,6 +1442,7 @@
             secrets:
               - *fabric8-github-ssh-key
               - *fabric8-build-dockerio-dockercfg
+              - *gpgkeys-for-signing-maven-artefacts
               - *quay-credentials
               - *registry-devshift-credentials
     properties:
@@ -4086,7 +4087,7 @@
             ci_cmd: '/bin/bash cico_build_test.sh'
             timeout: '20m'
             discarder_days: 30
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-fabric8-push-build-master':
             git_organization: fabric8io
             git_repo: kubernetes-client
             ci_project: 'devtools'
