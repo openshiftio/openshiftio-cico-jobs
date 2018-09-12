@@ -2432,7 +2432,7 @@
     defaults: global
     node: devtools
     timeout: 60m
-    zabbix_enabled: ''
+    zabbix_enabled: true
     properties:
         - github:
             url: https://github.com/fabric8io/fabric8-test
