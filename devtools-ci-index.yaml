@@ -266,6 +266,19 @@
       - env-var: 'RECOMMENDER_API_TOKEN'
         vault-key: 'token'
 
+- gpgkeys-for-signing-maven-artefacts: &gpgkeys-for-signing-maven-artefacts
+    name: "gpgkeys-for-signing-maven-artefacts"
+    secret-path: 'devtools-osio-ci/gpgkeys'
+    secret-values:
+      - env-var: 'PUBRING'
+        vault-key: 'pubring.gpg'
+      - env-var: 'SEC_JENKINS'
+        vault-key: 'sec-jenkins.gpg'
+      - env-var: 'SECRING'
+        vault-key: 'secring.gpg'
+      - env-var: 'TRUSTDB'
+        vault-key: 'trustdb.gpg'
+
 - wrapper:
     name: che_credentials_wrapper
     wrappers:
@@ -1437,6 +1450,7 @@
               - *fabric8-hub-token
               - *fabric8-github-ssh-key
               - *fabric8-build-dockerio-dockercfg
+              - *gpgkeys-for-signing-maven-artefacts
               - *quay-credentials
               - *registry-devshift-credentials
     properties:
@@ -4004,6 +4018,13 @@
             git_repo: kubernetes-model
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_test.sh'
+            timeout: '20m'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-fabric8-push-build-master':
+            git_organization: fabric8io
+            git_repo: kubernetes-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
             timeout: '20m'
             discarder_days: 30
         - '{ci_project}-{git_repo}-build-master':
