@@ -158,6 +158,13 @@
       - env-var: 'FABRIC8_DOCKERIO_CFG'
         vault-key: 'config.json'
 
+- fabric8-github-ssh-key: &fabric8-github-ssh-key
+    name: "fabric8-github-ssh-key"
+    secret-path: 'devtools-osio-ci/fabric8-github-ssh-key'
+    secret-values:
+      - env-var: 'FABRIC8_GITHUB_SSH_KEY'
+        vault-key: 'ssh-key'
+
 - registry-devshift-credentials: &registry-devshift-credentials
     name: "registry-devshift-credentials"
     secret-path: 'devtools-osio-ci/hsd/registry-devshift-credentials'
@@ -1420,6 +1427,7 @@
         - vault-secrets:
             <<: *vault_defaults
             secrets:
+              - *fabric8-github-ssh-key
               - *fabric8-build-dockerio-dockercfg
               - *quay-credentials
               - *registry-devshift-credentials
@@ -1449,6 +1457,7 @@
       - vault-secrets:
           <<: *vault_defaults
           secrets:
+            - *fabric8-github-ssh-key
             - *fabric8-build-dockerio-dockercfg
             - *quay-credentials
             - *registry-devshift-credentials
