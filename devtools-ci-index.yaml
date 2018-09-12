@@ -165,6 +165,13 @@
       - env-var: 'FABRIC8_GITHUB_SSH_KEY'
         vault-key: 'ssh-key'
 
+- fabric8-hub-token: &fabric8-hub-token
+    name: "fabric8-hub-token"
+    secret-path: 'devtools-osio-ci/fabric8-hub-token'
+    secret-values:
+      - env-var: 'FABRIC8_HUB_TOKEN'
+        vault-key: 'hub'
+
 - registry-devshift-credentials: &registry-devshift-credentials
     name: "registry-devshift-credentials"
     secret-path: 'devtools-osio-ci/hsd/registry-devshift-credentials'
@@ -1440,6 +1447,7 @@
         - vault-secrets:
             <<: *vault_defaults
             secrets:
+              - *fabric8-hub-token
               - *fabric8-github-ssh-key
               - *fabric8-build-dockerio-dockercfg
               - *gpgkeys-for-signing-maven-artefacts
@@ -1471,6 +1479,7 @@
       - vault-secrets:
           <<: *vault_defaults
           secrets:
+            - *fabric8-hub-token
             - *fabric8-github-ssh-key
             - *fabric8-build-dockerio-dockercfg
             - *quay-credentials
@@ -1752,76 +1761,6 @@
             oc scale --replicas=0 dc almighty-performance
             oc logs dc/almighty-performance --follow
 
-- job:
-    name: 'devtools-test-perfcake-performance-core-db'
-    disabled: true
-    defaults: global
-    node: devtools
-    properties:
-        - github:
-            url: https://github.com/ldimaggi/perfcake
-    scm:
-        - git:
-            url: https://github.com/ldimaggi/perfcake.git
-            shallow_clone: true
-            branches:
-                - master
-    triggers:
-        - timed: '1 22 * * *'
-    builders:
-        - shell: |
-            set +e
-            set +x
-
-            (
-                # run in subshell not to affect current environment
-                set +x
-
-                # load creds_config_file
-                eval "$(sed '/^\s*$/d;s/^/export /' $creds_config_file)"
-
-                cp ~/cico-tools/env-toolkit .
-                ./env-toolkit dump -f jenkins-env.json
-                env > jenkins-env
-            )
-
-            export CICO_API_KEY=$(cat ~/duffy.key )
-            # get node
-            n=1
-            while true
-            do
-                cico_output=$(cico node get -f value -c ip_address -c comment)
-                if [ $? -eq 0 ]; then
-                    read CICO_hostname CICO_ssid <<< $cico_output
-                    if  [ ! -z "$CICO_hostname" ]; then
-                        # we got hostname from cico
-                        break
-                    fi
-                    echo "'cico node get' succeed, but can't get hostname from output"
-                fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
-                    echo "giving up on 'cico node get'"
-                    exit 1
-                fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
-                n=$[$n+1]
-                sleep 60
-            done
-            echo 'Using Host' $CICO_hostname
-            set -x
-            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
-            ssh_cmd="ssh $sshopts $CICO_hostname"
-            $ssh_cmd yum -y install rsync
-            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload && /bin/bash ./POC_perf_test.sh"
-            rtn_code=$?
-            cico node done $CICO_ssid
-            exit $rtn_code
-    publishers:
-        - archive:
-            artifacts: ./devtools-performance-results
-
 - job-template: &job_template_end_to_end_tests_defaults
     name: 'devtools-test-end-to-end-{test_url}-{test_suite}'
     defaults: global
@@ -1930,7 +1869,7 @@
     description: |
       {jobdescription}
     node: devtools
-    timeout: 60m
+    timeout: 30m
     zabbix_enabled: ''
     properties:
         - github:
@@ -2446,7 +2385,7 @@
     defaults: global
     node: devtools
     timeout: 60m
-    zabbix_enabled: ''
+    zabbix_enabled: true
     properties:
         - github:
             url: https://github.com/fabric8io/fabric8-test
@@ -2531,7 +2470,7 @@
             if [[ $rtn_code -eq 124 ]]; then
                echo "BUILD TIMEOUT";
             else
-               rsync --delete -PHva -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
+               rsync --delete -Ha -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
             fi
             cico node done $CICO_ssid
             exit $rtn_code
@@ -2922,12 +2861,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_test.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}':
-            git_organization: ldimaggi
-            git_repo: perfcake
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash POC_perf_test.sh'
-            timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: redhat-developer
             git_repo: osd-monitor-poc
@@ -3284,11 +3217,11 @@
         - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
             feature_level: released
             osio_creds: 5eb1d9c4-df37-4c89-855d-3fb06e57411c
-            timeout: 40m
+            timeout: 30m
         - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
             feature_level: beta
             osio_creds: cc4645dc-3f32-4187-aacc-f2bbcd5fc182
-            timeout: 40m
+            timeout: 30m
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
