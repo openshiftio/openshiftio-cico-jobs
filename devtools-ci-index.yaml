@@ -1443,6 +1443,17 @@
         - github
     <<: *job_template_build_defaults
 
+- job-template:
+    name: '{ci_project}-{git_repo}-fabric8-push-prcheck'
+    wrappers:
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *fabric8-build-dockerio-dockercfg
+            - *quay-credentials
+            - *registry-devshift-credentials
+    <<: *job_template_defaults
+
 - job:
     name: 'devtools-eclipse-che-build-dockerfiles'
     wrappers:
@@ -4079,7 +4090,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_deploy.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}':
+        - '{ci_project}-{git_repo}-fabric8-push-prcheck':
             git_organization: fabric8-jenkins
             git_repo: jenkins-openshift-base
             ci_project: 'devtools'
