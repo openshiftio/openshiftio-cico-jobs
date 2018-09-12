@@ -2441,7 +2441,7 @@
     defaults: global
     node: devtools
     timeout: 60m
-    zabbix_enabled: ''
+    zabbix_enabled: true
     properties:
         - github:
             url: https://github.com/fabric8io/fabric8-test
@@ -2526,7 +2526,7 @@
             if [[ $rtn_code -eq 124 ]]; then
                echo "BUILD TIMEOUT";
             else
-               rsync --delete -PHva -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
+               rsync --delete -Ha -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
             fi
             cico node done $CICO_ssid
             exit $rtn_code
