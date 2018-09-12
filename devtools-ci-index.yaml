@@ -1855,7 +1855,7 @@
     description: |
       {jobdescription}
     node: devtools
-    timeout: 60m
+    timeout: 30m
     zabbix_enabled: ''
     properties:
         - github:
@@ -3203,11 +3203,11 @@
         - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
             feature_level: released
             osio_creds: 5eb1d9c4-df37-4c89-855d-3fb06e57411c
-            timeout: 40m
+            timeout: 30m
         - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
             feature_level: beta
             osio_creds: cc4645dc-3f32-4187-aacc-f2bbcd5fc182
-            timeout: 40m
+            timeout: 30m
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
