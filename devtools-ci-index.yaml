@@ -172,6 +172,13 @@
       - env-var: 'FABRIC8_HUB_TOKEN'
         vault-key: 'hub'
 
+- fabric8-maven-settingsxml: &fabric8-maven-settingsxml
+    name: "fabric8-maven-settingsxml"
+    secret-path: 'devtools-osio-ci/fabric8-maven-settingsxml'
+    secret-values:
+      - env-var: 'FABRIC8_MAVEN_SETTINGS'
+        vault-key: 'settings.xml'
+
 - registry-devshift-credentials: &registry-devshift-credentials
     name: "registry-devshift-credentials"
     secret-path: 'devtools-osio-ci/hsd/registry-devshift-credentials'
@@ -1447,6 +1454,7 @@
         - vault-secrets:
             <<: *vault_defaults
             secrets:
+              - *fabric8-maven-settingsxml
               - *fabric8-hub-token
               - *fabric8-github-ssh-key
               - *fabric8-build-dockerio-dockercfg
@@ -1479,6 +1487,7 @@
       - vault-secrets:
           <<: *vault_defaults
           secrets:
+            - *fabric8-maven-settingsxml
             - *fabric8-hub-token
             - *fabric8-github-ssh-key
             - *fabric8-build-dockerio-dockercfg
