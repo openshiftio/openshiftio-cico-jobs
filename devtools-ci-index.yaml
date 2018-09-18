@@ -1681,6 +1681,7 @@
     
 - job-template:
     name: '{ci_project}-{git_repo}-rh-che-rollout-test-{test_url}'
+    concurrent: false
     triggers:
         - timed: 'H 3 * * *'
     wrappers:
@@ -1689,7 +1690,8 @@
           secrets:
             - *rollout-test-token
             - *rollout-test-creds
-    <<: *rh-che-automation-template
+            - *rh-che-automation-credentials-devrdu2c-fabric8-io
+    <<: *job_template_defaults
 
 
 - che-functional-tests-template: &che-functional-tests-template
