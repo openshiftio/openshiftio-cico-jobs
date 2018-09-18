@@ -1957,8 +1957,6 @@
             rtn_code=$?
             if [[ $rtn_code -eq 124 ]]; then
                echo "BUILD TIMEOUT";
-            else
-               rsync --delete -qPHva -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
             fi
             cico node done $CICO_ssid
             exit $rtn_code
