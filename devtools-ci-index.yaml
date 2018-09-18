@@ -269,6 +269,15 @@
       - env-var: 'RECOMMENDER_API_TOKEN'
         vault-key: 'token'
 
+- fabric8cd-sonatype-creds: &fabric8cd-sonatype-creds
+    name: "fabric8cd-sonatype-creds"
+    secret-path: 'devtools-osio-ci/sonatype-creds'
+    secret-values:
+      - env-var: 'SONATYPE_USERNAME'
+        vault-key: 'sonatype_username'
+      - env-var: 'SONATYPE_PASSWORD'
+        vault-key: 'sonatype_password'
+
 - gpgkeys-for-signing-maven-artefacts: &gpgkeys-for-signing-maven-artefacts
     name: "gpgkeys-for-signing-maven-artefacts"
     secret-path: 'devtools-osio-ci/gpgkeys'
@@ -1451,6 +1460,8 @@
             <<: *vault_defaults
             secrets:
               - *fabric8-maven-settingsxml
+              - *fabric8cd-sonatype-creds
+              - *npm-build-deliver-creds-gh-token
               - *fabric8-hub-token
               - *fabric8-github-ssh-key
               - *fabric8-build-dockerio-dockercfg
@@ -4023,6 +4034,12 @@
             ci_cmd: '/bin/bash cico_build_test.sh'
             timeout: '20m'
             discarder_days: 30
+        - '{ci_project}-{git_repo}-fabric8-push-build-master':
+            git_organization: fabric8io
+            git_repo: kubernetes-model
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_release.sh'
+            timeout: '30m'
         - '{ci_project}-{git_repo}-fabric8-push-build-master':
             git_organization: fabric8io
             git_repo: kubernetes-client
