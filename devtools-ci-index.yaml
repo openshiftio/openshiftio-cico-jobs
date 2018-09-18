@@ -1483,6 +1483,7 @@
             skip-tag: True
             branches:
                 - master
+                - cico-test
 
     triggers:
         - github
