@@ -1663,6 +1663,37 @@
             <<: *github_pull_request_defaults
     <<: *rh-che-automation-template
 
+- rollout-test-token: &rollout-test-token
+    name: "rollout-test-token"
+    secret-path: 'devtools-osio-ci/qe-osio-token-for-rollout-test'
+    secret-values:
+      - env-var: 'CHE_TESTUSER_OFFLINE__TOKEN'
+        vault-key: 'token'    
+        
+- rollout-test-creds: &rollout-test-creds
+    name: "rollout-test-creds"
+    secret-path: 'devtools-osio-ci/qe-osio-creds-for-rollout-test'
+    secret-values:
+      - env-var: 'CHE_TESTUSER_NAME'
+        vault-key: 'username'
+      - env-var: 'CHE_TESTUSER_PASSWORD'
+        vault-key: 'password'
+    
+- job-template:
+    name: '{ci_project}-{git_repo}-rollout-test-{test_url}'
+    concurrent: false
+    triggers:
+        - timed: 'H 3 * * *'
+    wrappers:
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *rollout-test-token
+            - *rollout-test-creds
+            - *rh-che-automation-credentials-devrdu2c-fabric8-io
+    <<: *job_template_defaults
+
+
 - che-functional-tests-template: &che-functional-tests-template
     name: 'che-functional-tests-template'
     wrappers:
@@ -2744,6 +2775,13 @@
             ci_project: 'devtools'
             ci_cmd: 'TARGET="rhel" PR_CHECK_BUILD="true" /bin/bash ./.ci/cico_rhche_prcheck.sh'
             test_url: 'dev.rdu2c.fabric8.io'
+            timeout: '60m'
+        - '{ci_project}-{git_repo}-rollout-test-{test_url}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash ./.ci/cico_rollout_test.sh'
+            test_url: 'devtools-dev.ext.devshift.net'
             timeout: '60m'
         - '{ci_project}-{git_repo}-prcheck-{test_url}-{cluster}':
             git_organization: redhat-developer
