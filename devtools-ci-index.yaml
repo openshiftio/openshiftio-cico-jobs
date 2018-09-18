@@ -1460,6 +1460,8 @@
             <<: *vault_defaults
             secrets:
               - *fabric8-maven-settingsxml
+              - *fabric8cd-sonatype-creds
+              - *npm-build-deliver-creds-gh-token
               - *fabric8-hub-token
               - *fabric8-github-ssh-key
               - *fabric8-build-dockerio-dockercfg
@@ -1876,25 +1878,6 @@
            artifacts: './ee_tests/target/screenshots/*.*'
            allow-empty: true
            fingerprint: true
-
-- job-template:
-    name: '{ci_project}-{git_repo}-fabric8cd-publish'
-    description: |
-      {jobdescription}
-      If all goes well, publish artifacts to sonatype
-    node: "{ci_project}"
-    wrappers:
-        - vault-secrets:
-            <<: *vault_defaults
-            secrets:
-              - *npm-build-deliver-creds-gh-token
-              - *fabric8cd-sonatype-creds
-    properties:
-        - github:
-            url: https://github.com/{git_organization}/{git_repo}/
-        - inject:
-            properties-content: |
-               JENKINS_URL=https://ci.centos.org
 
 - e2e_tests_template: &e2e_tests_template
     name: 'e2e_tests_template'
@@ -4053,6 +4036,12 @@
             ci_cmd: '/bin/bash cico_build_test.sh'
             timeout: '20m'
             discarder_days: 30
+        - '{ci_project}-{git_repo}-fabric8-push-build-master':
+            git_organization: fabric8io
+            git_repo: kubernetes-model
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_release.sh'
+            timeout: '30m'
         - '{ci_project}-{git_repo}-fabric8-push-build-master':
             git_organization: fabric8io
             git_repo: kubernetes-client
