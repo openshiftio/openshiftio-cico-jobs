@@ -1680,7 +1680,7 @@
         vault-key: 'password'
     
 - job-template:
-    name: '{ci_project}-{git_repo}-rh-che-rollout-test-{test_url}'
+    name: '{ci_project}-{git_repo}-rollout-test-{test_url}'
     concurrent: false
     triggers:
         - timed: 'H 3 * * *'
@@ -2776,7 +2776,7 @@
             ci_cmd: 'TARGET="rhel" PR_CHECK_BUILD="true" /bin/bash ./.ci/cico_rhche_prcheck.sh'
             test_url: 'dev.rdu2c.fabric8.io'
             timeout: '60m'
-        - '{ci_project}-{git_repo}-rh-che-rollout-test-{test_url}':
+        - '{ci_project}-{git_repo}-rollout-test-{test_url}':
             git_organization: redhat-developer
             git_repo: rh-che
             ci_project: 'devtools'
