@@ -1663,15 +1663,15 @@
             <<: *github_pull_request_defaults
     <<: *rh-che-automation-template
 
-- test-for-rollout-token: &test-for-rollout-token
-    name: "test-for-rollout-token"
+- rollout-test-token: &rollout-test-token
+    name: "rollout-test-token"
     secret-path: 'devtools-osio-ci/qe-osio-token-for-rollout-test'
     secret-values:
       - env-var: 'CHE_TESTUSER_OFFLINE__TOKEN'
         vault-key: 'token'    
         
-- test-for-rollout-creds: &test-for-rollout-creds
-    name: "test-for-rollout-creds"
+- rollout-test-creds: &rollout-test-creds
+    name: "rollout-test-creds"
     secret-path: 'devtools-osio-ci/qe-osio-creds-for-rollout-test'
     secret-values:
       - env-var: 'CHE_TESTUSER_NAME'
@@ -1684,11 +1684,11 @@
     triggers:
         - timed: 'H 3 * * *'
     wrappers:
-        - vault-secrets:
+      - vault-secrets:
           <<: *vault_defaults
           secrets:
-            - *test-for-rollout-token
-            - *test-for-rollout-creds
+            - *rollout-test-token
+            - *rollout-test-creds
     <<: *rh-che-automation-template
 
 
