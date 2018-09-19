@@ -1687,6 +1687,11 @@
     concurrent: false
     triggers:
         - timed: 'H 3 * * *'
+    scm:
+        - git:
+            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            branches:
+                - origin/master
     wrappers:
       - vault-secrets:
           <<: *vault_defaults
@@ -1707,6 +1712,7 @@
       - che_functional_tests_credentials_wrapper-{type}-{test_url}-{cluster}
     concurrent: false
     <<: *job_template_defaults
+
 
 - job-template:
     name: '{ci_project}-{git_repo}-periodical-{test_url}-{cluster}'
