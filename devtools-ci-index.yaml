@@ -290,7 +290,9 @@
         vault-key: 'secring.gpg'
       - env-var: 'TRUSTDB'
         vault-key: 'trustdb.gpg'
-
+      - env-var: 'GPG_PASSPHRASE'
+        vault-key: 'GPG_PASSPHRASE'
+        
 - wrapper:
     name: che_credentials_wrapper
     wrappers:
