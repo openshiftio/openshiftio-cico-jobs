@@ -290,6 +290,8 @@
         vault-key: 'secring.gpg'
       - env-var: 'TRUSTDB'
         vault-key: 'trustdb.gpg'
+      - env-var: 'GPG_PASSPHRASE'
+        vault-key: 'gpg.passphrase'
 
 - wrapper:
     name: che_credentials_wrapper
@@ -1483,6 +1485,7 @@
             skip-tag: True
             branches:
                 - master
+                - cico-test
 
     triggers:
         - github
