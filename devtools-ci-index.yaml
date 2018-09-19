@@ -1613,6 +1613,13 @@
             docker tag ${CHE_SERVER_STAGE_DOCKER_IMAGE} ${CHE_SERVER_PROD_DOCKER_IMAGE}
             docker push ${CHE_SERVER_PROD_DOCKER_IMAGE}
 
+- rh-che-automation-quay-secret: &rh-che-automation-quay-secret
+    name: "rh-che-automation-quay-secret"
+    secret-path: "devtools-osio-ci/dev-rdu2c-quay-access-secret"
+    secret-values:
+      - env-var: 'QUAY_SECRET_JSON'
+        vault-key: 'secret'
+
 - rh-che-automation-template: &rh-che-automation-template
     name: 'rh-che-automation-template'
     concurrent: false
@@ -1625,6 +1632,7 @@
             - *rh-che-automation-credentials-devrdu2c-fabric8-io
             - *rh-che-automation-credentials-prod-preview-openshift-io
             - *rh-che-automation-credentials-dockerhub
+            - *rh-che-automation-quay-secret
     <<: *job_template_defaults
 
 - rh-che-automation-depbuild-template: &rh-che-automation-depbuild-template
