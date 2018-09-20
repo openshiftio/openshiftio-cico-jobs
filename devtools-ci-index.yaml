@@ -3118,7 +3118,7 @@
             cluster: us-east-1a
             feature_level: released
             osio_creds: 48966098-532e-42b1-ac2a-d6a3db6f06f3
-            ee_test_start_time: '0-59/15 * * * *'
+            ee_test_start_time: '2-59/20 * * * *'
             timeout: 6m
             zabbix_enabled: false
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
@@ -3141,7 +3141,7 @@
             cluster: us-east-1b
             feature_level: released
             osio_creds: 35afd1c4-b52d-4738-becc-5bb81ec750a1
-            ee_test_start_time: '4-59/15 * * * *'
+            ee_test_start_time: '4-59/20 * * * *'
             timeout: 6m
             zabbix_enabled: false
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
@@ -3157,7 +3157,7 @@
             cluster: us-east-2
             feature_level: released
             osio_creds: 452db931-6cb0-465e-addd-1620df4fe428
-            ee_test_start_time: '8-59/15 * * * *'
+            ee_test_start_time: '8-59/20 * * * *'
             timeout: 6m
             zabbix_enabled: false
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
@@ -3173,7 +3173,7 @@
             cluster: us-east-2a
             feature_level: released
             osio_creds: 9cfb97b8-1569-4cd4-9497-a7ede45e7cd6
-            ee_test_start_time: '12-59/15 * * * *'
+            ee_test_start_time: '12-59/20 * * * *'
             timeout: 6m
             zabbix_enabled: false
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
