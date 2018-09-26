@@ -4095,6 +4095,13 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_release.sh'
             timeout: '30m'
+        - '{ci_project}-{git_repo}-fabric8-push-prcheck':
+            git_organization: fabric8io
+            git_repo: kubernetes-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            timeout: '20m'
+            discarder_days: 30
         - '{ci_project}-{git_repo}-fabric8-push-build-master':
             git_organization: fabric8io
             git_repo: kubernetes-client
