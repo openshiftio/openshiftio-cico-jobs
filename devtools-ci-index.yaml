@@ -1658,7 +1658,7 @@
             github_hooks: '{github_hooks}'
             status-context: 'ci.centos.org PR check on {test_url}'
             success-comment: "### $ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] has been successfully deployed.\n
-            http://rhche-che6-automated.dev.rdu2c.fabric8.io/"
+            http://rhche-che6-automated.devtools-dev.ext.devshift.net"
             failure-comment: "### $ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] failed.\n
             | Link | URL |\n
             | ---- | :-: |\n
@@ -4098,6 +4098,13 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_release.sh'
             timeout: '30m'
+        - '{ci_project}-{git_repo}-fabric8-push-prcheck':
+            git_organization: fabric8io
+            git_repo: kubernetes-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            timeout: '20m'
+            discarder_days: 30
         - '{ci_project}-{git_repo}-fabric8-push-build-master':
             git_organization: fabric8io
             git_repo: kubernetes-client
