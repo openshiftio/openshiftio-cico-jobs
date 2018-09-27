@@ -1659,7 +1659,7 @@
             github_hooks: '{github_hooks}'
             status-context: 'ci.centos.org PR check on {test_url}'
             success-comment: "### $ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] has been successfully deployed.\n
-            http://rhche-che6-automated.devtools-dev.ext.devshift.net"
+            http://rhche-prcheck-$ghprbPullId.devtools-dev.ext.devshift.net"
             failure-comment: "### $ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] failed.\n
             | Link | URL |\n
             | ---- | :-: |\n
@@ -1674,6 +1674,17 @@
             ### *If the build or deployment fails, the artifacts will not be present. Don't panic, just grab a towel.*"
             <<: *github_pull_request_defaults
     <<: *rh-che-automation-template
+
+- job-template:
+    name: '{ci_project}-{git_repo}-prcheck-cleanup'
+    triggers:
+        - timed: 'H 3 * * *'
+    wrappers:
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *rh-che-automation-credentials-devrdu2c-fabric8-io
+    <<: *job_template_defaults
 
 - rollout-test-token: &rollout-test-token
     name: "rollout-test-token"
@@ -2797,6 +2808,12 @@
             ci_cmd: 'TARGET="rhel" PR_CHECK_BUILD="true" /bin/bash ./.ci/cico_rhche_prcheck.sh'
             test_url: 'dev.rdu2c.fabric8.io'
             timeout: '60m'
+        - '{ci_project}-{git_repo}-prcheck-cleanup':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash ./.ci/cico_cleanup_dev_cluster.sh'
+            timeout: '15m'
         - '{ci_project}-{git_repo}-rollout-test-{test_url}':
             git_organization: redhat-developer
             git_repo: rh-che
