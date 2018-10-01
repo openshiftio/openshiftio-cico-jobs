@@ -1500,10 +1500,12 @@
           secrets:
             - *fabric8-maven-settingsxml
             - *fabric8-hub-token
+            - *fabric8cd-sonatype-creds
             - *fabric8-github-ssh-key
             - *fabric8-build-dockerio-dockercfg
             - *quay-credentials
             - *registry-devshift-credentials
+            - *gpgkeys-for-signing-maven-artefacts
     <<: *job_template_defaults
 
 - job:
