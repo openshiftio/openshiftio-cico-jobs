@@ -705,8 +705,10 @@
             cd ..
         fi
     saasherder_deploy: |
+        echo "$KUBE_CONFIG" | base64 -d > kube_config
+
         if [ "$SVC_NAME" != "none" ]; then
-            oc rollout latest $SVC_NAME -n $PRJ_NAME
+            oc --config=kube_config rollout latest $SVC_NAME -n $PRJ_NAME
             rtn_code=$?
         fi
         if [ "$SAAS_GIT" != "none" ]; then
@@ -714,7 +716,7 @@
             saasherder --environment $SAAS_ENV update hash $SAAS_SERVICE_NAME $GIT_COMMIT
             saasherder --environment $SAAS_ENV pull $SAAS_SERVICE_NAME
             saasherder --environment $SAAS_ENV template --filter Route --output-dir $GIT_REPO-processed tag $SAAS_SERVICE_NAME
-            oc apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
+            oc --config=kube_config apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
             rtn_code=$?
             cd ..
         fi
@@ -863,7 +865,8 @@
             saasherder --environment $SAAS_ENV update hash $SAAS_SERVICE_NAME $GIT_COMMIT
             saasherder --environment $SAAS_ENV pull $SAAS_SERVICE_NAME
             saasherder --environment $SAAS_ENV template --filter Route --output-dir $GIT_REPO-processed tag $SAAS_SERVICE_NAME
-            oc apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
+            echo "$KUBE_CONFIG" | base64 -d > kube_config
+            oc --config=kube_config apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
         done
         rtn_code=$?
         cd ..
@@ -1173,9 +1176,11 @@
 
             export GIT_COMMIT=$UPSTREAM_GIT_COMMIT
 
+            echo "$KUBE_CONFIG" | base64 -d > kube_config
+
             # What's the current deployment revision?
             export DC_NAME=${{DEPLOYMENT_CONFIGS##* }}
-            DC_REVISION=$(oc get dc/$DC_NAME -n $PRJ_NAME |grep $DC_NAME | awk '{{ print $2 }}')
+            DC_REVISION=$(oc --config=kube_config get dc/$DC_NAME -n $PRJ_NAME |grep $DC_NAME | awk '{{ print $2 }}')
             if [ -z "$DC_REVISION" ]; then
                 # First deployment
                 DC_REVISION=0
@@ -1197,7 +1202,7 @@
                 for DEPLOYMENT_CONFIG in $DEPLOYMENT_CONFIGS; do
                     if [ $rtn_code -ne 0 ]; then
                         # Failure, rollback
-                        oc rollback dc/$DEPLOYMENT_CONFIG -n $PRJ_NAME --to-version=$DC_REVISION || :
+                        oc --config=kube_config rollback dc/$DEPLOYMENT_CONFIG -n $PRJ_NAME --to-version=$DC_REVISION || :
                     fi
                 done
                 cico node done $CICO_SSID || :
@@ -1209,7 +1214,7 @@
             # Wait for the new deployment to begin
             # First wait for OpenShift to register the new deployment
             for i in `seq 30`; do
-                NEW_DC_REVISION=$(oc get dc/$DC_NAME -n $PRJ_NAME |grep $DC_NAME | awk '{{ print $2 }}') || :
+                NEW_DC_REVISION=$(oc --config=kube_config get dc/$DC_NAME -n $PRJ_NAME |grep $DC_NAME | awk '{{ print $2 }}') || :
                 if [ ${{NEW_DC_REVISION:-0}} -gt $DC_REVISION ]; then
                     echo "The new deployment has been created."
                     break
@@ -1225,7 +1230,7 @@
             (
                 for i in `seq 30`; do
                     export DEPLOY_POD_NAME=${{DC_NAME}}-${{NEW_DC_REVISION}}-deploy
-                    DEPLOYMENT_STATE=$(oc get pod/${{DEPLOY_POD_NAME}} -n $PRJ_NAME |grep ${{DEPLOY_POD_NAME}} |awk '{{ print $3 }}') || :
+                    DEPLOYMENT_STATE=$(oc --config=kube_config get pod/${{DEPLOY_POD_NAME}} -n $PRJ_NAME |grep ${{DEPLOY_POD_NAME}} |awk '{{ print $3 }}') || :
                     if [ ${{DEPLOYMENT_STATE:-Pending}} == "Running" ]; then
                         echo "The new deployment has started."
                         exit 0
@@ -1235,7 +1240,7 @@
                 done; exit 1
             )
             # And finally wait for the new deployment to be ready
-            oc logs -f dc/$DC_NAME -n $PRJ_NAME
+            oc --config=kube_config logs -f dc/$DC_NAME -n $PRJ_NAME
 
             # Now is the time to run E2E tests
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
@@ -1754,7 +1759,8 @@
         #Wait for correct rh-che version to be deployed & running on prod-preview
         isPodRunning () (
             echo "Getting status of pod with image tag $IMAGE_TAG"
-            STATUS=`oc get pod -l app=rhche -o json -n dsaas-preview | jq -r ".items[] | select (.spec.containers[0].image | contains(\"$IMAGE_TAG\")).status.phase"`
+            echo "$KUBE_CONFIG" | base64 -d > kube_config
+            STATUS=`oc --config=kube_config get pod -l app=rhche -o json -n dsaas-preview | jq -r ".items[] | select (.spec.containers[0].image | contains(\"$IMAGE_TAG\")).status.phase"`
             echo "Status is $STATUS"
             if [ $STATUS = "Running" ]; then
                 return 0
