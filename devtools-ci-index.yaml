@@ -2213,7 +2213,7 @@
         - shell: |
             set -ex
             echo "$KUBE_CONFIG" | base64 -d > kube_config
-            ENVIRONMENT=production PATH=$PATH:~/.local/bin /bin/bash ~/saasherder/fetch_and_apply.sh
+            ENVIRONMENT=production PATH=$PATH:~/.local/bin /bin/bash ~/saasherder/fetch_and_apply.sh kube_config
 
 - job-template:
     name: '{ci_project}-{git_repo}-promote-to-prod-test'
@@ -2227,7 +2227,7 @@
         - shell: |
             set -ex
             echo "$KUBE_CONFIG" | base64 -d > kube_config
-            ENVIRONMENT=production PATH=$PATH:~/.local/bin DRY_RUN=true /bin/bash ~/saasherder/fetch_and_apply.sh
+            ENVIRONMENT=production PATH=$PATH:~/.local/bin DRY_RUN=true /bin/bash ~/saasherder/fetch_and_apply.sh kube_config
             CONTEXTS=$(PATH=$PATH:~/.local/bin saasherder config get-contexts)
             for c in `echo $CONTEXTS`; do
                 DIR=$(readlink -f $c-20* | tail -1)
