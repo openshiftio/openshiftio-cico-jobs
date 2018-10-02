@@ -2204,17 +2204,29 @@
                 - master
     triggers:
         - github
+    wrappers:
+    - vault-secrets:
+        <<: *vault_defaults
+        secrets:
+          - *kube-config-prod-preview
     builders:
         - shell: |
             set -ex
+            echo "$KUBE_CONFIG" | base64 -d > kube_config
             ENVIRONMENT=production PATH=$PATH:~/.local/bin /bin/bash ~/saasherder/fetch_and_apply.sh
 
 - job-template:
     name: '{ci_project}-{git_repo}-promote-to-prod-test'
     image_pattern: ''
+    wrappers:
+    - vault-secrets:
+        <<: *vault_defaults
+        secrets:
+          - *kube-config-prod-preview
     builders:
         - shell: |
             set -ex
+            echo "$KUBE_CONFIG" | base64 -d > kube_config
             ENVIRONMENT=production PATH=$PATH:~/.local/bin DRY_RUN=true /bin/bash ~/saasherder/fetch_and_apply.sh
             CONTEXTS=$(PATH=$PATH:~/.local/bin saasherder config get-contexts)
             for c in `echo $CONTEXTS`; do
