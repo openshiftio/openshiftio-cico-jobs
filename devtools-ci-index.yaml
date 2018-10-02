@@ -127,6 +127,13 @@
     vault-url: 'https://vault.devshift.net'
     credentials-id: '52ce5cda-e8f3-47a7-917b-8771518b4729'
 
+- kube-config-prod-preview: &kube-config-prod-preview
+    name: "kube-config-prod-preview"
+    secret-path: 'devtools-osio-ci/hsd/kube-configs/prod-preview'
+    secret-values:
+      - env-var: 'KUBE_CONFIG'
+        vault-key: 'deployment-bot'
+
 - fabric8-planner-test-token: &fabric8-planner-test-token
     name: "fabric8-planner-test-token"
     secret-path: 'devtools-osio-ci/fabric8-planner-test-token-refresh-token'
@@ -816,6 +823,7 @@
       - vault-secrets:
           <<: *vault_defaults
           secrets:
+            - *kube-config-prod-preview
             - *quay-credentials
             - *registry-devshift-credentials
     scm:
@@ -1115,6 +1123,7 @@
         - vault-secrets:
             <<: *vault_defaults
             secrets:
+              - *kube-config-prod-preview
               - *recommender-api-token
               - *recommender-refresh-token
         - ansicolor
@@ -1242,6 +1251,7 @@
       - vault-secrets:
           <<: *vault_defaults
           secrets:
+            - *kube-config-prod-preview
             - *quay-credentials
             - *registry-devshift-credentials
       - che_credentials_wrapper
@@ -1350,6 +1360,11 @@
             shallow_clone: true
             branches:
                 - master
+    wrappers:
+    - vault-secrets:
+        <<: *vault_defaults
+        secrets:
+          - *kube-config-prod-preview
     <<: *job_template_build_defaults
 
 - job-template:
@@ -1362,6 +1377,7 @@
         - vault-secrets:
             <<: *vault_defaults
             secrets:
+              - *kube-config-prod-preview
               - *npm-build-deliver-creds-gh-token
               - *npm-build-deliver-creds-npm-token
               - *fabric8-planner-test-token
@@ -1397,6 +1413,7 @@
         - vault-secrets:
             <<: *vault_defaults
             secrets:
+              - *kube-config-prod-preview
               - *fabric8-maven-settingsxml
               - *fabric8cd-sonatype-creds
               - *npm-build-deliver-creds-gh-token
@@ -1728,6 +1745,11 @@
             url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
             branches:
                 - origin/master
+    wrappers:
+    - vault-secrets:
+        <<: *vault_defaults
+        secrets:
+          - *kube-config-prod-preview
     beforeGetNode: |
         #Wait for correct rh-che version to be deployed & running on prod-preview
         isPodRunning () (
@@ -1993,6 +2015,7 @@
         - vault-secrets:
             <<: *vault_defaults
             secrets:
+              - *kube-config-prod-preview
               - *osiotestmachine-clean-up-gh-token
         - ansicolor
     triggers:
@@ -2024,6 +2047,7 @@
       - vault-secrets:
           <<: *vault_defaults
           secrets:
+            - *kube-config-prod-preview
             - *quay-credentials
             - *registry-devshift-credentials
       - fabric8_launcher_credentials_wrapper
@@ -2348,6 +2372,7 @@
         - vault-secrets:
             <<: *vault_defaults
             secrets:
+              - *kube-config-prod-preview
               - *copr-mercator-api-token
     scm:
         - git:
@@ -2366,6 +2391,10 @@
             - text:
                 credential-id: "{osio_token}"
                 variable: REFRESH_TOKEN
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+              - *kube-config-prod-preview
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
