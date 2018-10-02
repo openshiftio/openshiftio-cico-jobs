@@ -4252,6 +4252,7 @@
             git_organization: fabric8-analytics
             git_repo: graph-cve-sync
             ci_project: 'devtools'
+            skip_deploy: 1
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
             extra_target: rhel
