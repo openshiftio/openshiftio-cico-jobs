@@ -3119,6 +3119,20 @@
             saas_git: saas-openshiftio
             timeout: '20m'
             extra_target: rhel
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-services
+            git_repo: fabric8-build-service
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/deploy.sh'
+            timeout: '20m'
+            extra_target: rhel
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-services
+            git_repo: fabric8-build-service
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/test.sh'
+            timeout: '20m'
+            discarder_days: 30
         - '{ci_project}-{git_repo}-prcheck-publish-artifacts':
             git_repo: fabric8-online-docs
             git_organization: fabric8io
