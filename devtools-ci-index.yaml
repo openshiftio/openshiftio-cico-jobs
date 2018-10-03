@@ -230,7 +230,6 @@
       - env-var: 'RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD'
         vault-key: 'che_preview_password'
 
-
 - rh-che-automation-credentials-dockerhub: &rh-che-automation-credentials-dockerhub
     name: "rh-che-automation-credentials-dockerhub"
     secret-path: 'devtools-osio-ci/rh-che-automation-credentials-dockerhub'
@@ -239,6 +238,13 @@
         vault-key: 'username'
       - env-var: 'RH_CHE_AUTOMATION_DOCKERHUB_PASSWORD'
         vault-key: 'password'
+
+- qe-osio-dev-cluster-SA-token: &qe-osio-dev-cluster-SA-token
+    name: "qe-osio-dev-cluster-SA-token"
+    secret-path: "devtools-osio-ci/qe-osio-dev-cluster-SA-token"
+    secret-values:
+        - env-var: 'RH_CHE_AUTOMATION_DEV_CLUSTER_SA_TOKEN'
+          vault-key: 'sa_token'
 
 - fabric8-planner-test-preview-creds: &fabric8-planner-test-preview-creds
     name: "fabric8-planner-test-preview-creds"
@@ -1636,6 +1642,7 @@
             - *rh-che-automation-credentials-prod-preview-openshift-io
             - *rh-che-automation-credentials-dockerhub
             - *rh-che-automation-quay-secret
+            - *qe-osio-dev-cluster-SA-token
     <<: *job_template_defaults
 
 - rh-che-automation-depbuild-template: &rh-che-automation-depbuild-template
@@ -1686,6 +1693,11 @@
           <<: *vault_defaults
           secrets:
             - *rh-che-automation-credentials-devrdu2c-fabric8-io
+    scm:
+        - git:
+            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            branches:
+                - origin/master
     <<: *job_template_defaults
 
 - rollout-test-token: &rollout-test-token
@@ -4278,3 +4290,20 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .cico/build.sh'
             timeout: '20m'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-release-monitor
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            skip_deploy: 1
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-release-monitor
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-release-monitor
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: fabric8-analytics-release-monitor
