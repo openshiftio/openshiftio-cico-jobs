@@ -483,6 +483,17 @@
     <<: *job_template_defaults
 
 - job-template:
+    name: '{ci_project}-{git_repo}-fabric8-create-comment'
+    wrappers:
+    - vault-secrets:
+        <<: *vault_defaults
+        secrets:
+        - *quay-credentials
+        - *registry-devshift-credentials
+        - *fabric8-hub-token
+    <<: *job_template_defaults
+
+- job-template:
     name: '{ci_project}-{git_repo}-prcheck-publish-artifacts'
     publishers:
       - archive:
@@ -2613,7 +2624,7 @@
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '30m'
             github_hooks: true
-        - '{ci_project}-{git_repo}':
+        - '{ci_project}-{git_repo}-fabric8-create-comment':
             git_organization: fabric8-services
             git_repo: fabric8-tenant
             ci_project: 'devtools'
