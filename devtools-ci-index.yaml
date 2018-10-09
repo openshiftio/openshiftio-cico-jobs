@@ -1703,7 +1703,7 @@
       - vault-secrets:
           <<: *vault_defaults
           secrets:
-            - *rh-che-automation-credentials-devrdu2c-fabric8-io
+            - *qe-osio-dev-cluster-SA-token
     scm:
         - git:
             url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
