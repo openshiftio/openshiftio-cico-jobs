@@ -1982,6 +1982,21 @@
         - github-pull-request:
             github_hooks: '{github_hooks}'
             status-context: 'ci.centos.org E2E smoke test ({feature_level})'
+            trigger-phrase: '.*\[(test|e2e-test-{feature_level})\].*'
+            failure-comment: "### $ghprbPullAuthorLoginMention The E2E smoke test with feature level set to '{feature_level}' failed.\n
+            | Link | URL |\n
+            | ---- | :-: |\n
+            | job log | $BUILD_URL/console |\n
+            | failure message | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER/failures.txt |\n
+            | artifacts | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER |\n
+            ### Please review the job results and re-run the job by commenting [*e2e-test-{feature_level}*] if necessary. "
+            error-comment: "### $ghprbPullAuthorLoginMention The E2E smoke test with feature level set to '{feature_level}' failed.\n
+            | Link | URL |\n
+            | ---- | :-: |\n
+            | job log | $BUILD_URL/console |\n
+            | failure message | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER/failures.txt |\n
+            | artifacts | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER |\n
+            ### Please review the job results and re-run the job by commenting [*e2e-test-{feature_level}*] if necessary. "
             <<: *github_pull_request_defaults
     <<: *e2e_tests_template
 
