@@ -3595,24 +3595,6 @@
             git_repo: fabric8-analytics-data-model
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
-            git_repo: fabric8-analytics-firehose-fetcher
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
-            registry: 'quay.io'
-            image_name: 'openshiftio/rhel-fabric8-analytics-f8a-firehose-fetcher'
-        - '{ci_project}-{git_repo}-f8a-build-master':
-            git_organization: fabric8-analytics
-            git_repo: fabric8-analytics-firehose-fetcher
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-analytics
-            deployment_units: 'f8a-firehose-fetcher'
-            deployment_configs: 'f8a-firehose-fetcher'
-            timeout: '20m'
-            extra_target: rhel
-        - '{ci_project}-{git_repo}-fabric8-analytics':
-            git_organization: fabric8-analytics
             git_repo: fabric8-analytics-stack-report-ui
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
