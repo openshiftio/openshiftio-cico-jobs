@@ -810,73 +810,6 @@
 
             exit $rtn_code
 
-- job-template: &job_template_publish_branch_defaults
-    name: 'job_template_publish_branch_defaults'
-    description: |
-      {jobdescription}
-    node: "{ci_project}"
-    properties:
-        - github:
-            url: https://github.com/{git_organization}/{git_repo}/
-    scm:
-        - git:
-            url: https://github.com/{git_organization}/{git_repo}.git
-            shallow_clone: true
-            branches:
-                - '{branch}'
-    triggers:
-        - githubprb:
-            github_hooks: '{github_hooks}'
-    svc_name: none
-    builders:
-        - shell: |
-            # testing out the cico client
-            set +e
-            export CICO_API_KEY=$(cat ~/duffy.key )
-            # get node
-            n=1
-            while true
-            do
-                cico_output=$(cico node get -f value -c ip_address -c comment)
-                if [ $? -eq 0 ]; then
-                    read CICO_hostname CICO_ssid <<< $cico_output
-                    if  [ ! -z "$CICO_hostname" ]; then
-                        # we got hostname from cico
-                        break
-                    fi
-                    echo "'cico node get' succeed, but can't get hostname from output"
-                fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
-                    echo "giving up on 'cico node get'"
-                    exit 1
-                fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
-                n=$[$n+1]
-                sleep 60
-            done
-            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
-            ssh_cmd="ssh $sshopts $CICO_hostname"
-
-            cp ~/cico-tools/env-toolkit .
-            ./env-toolkit dump -f jenkins-env.json
-            env > jenkins-env
-
-            $ssh_cmd yum -y install rsync
-            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            $ssh_cmd -t "cd payload && {ci_cmd}"
-            rtn_code=$?
-            if [ $rtn_code -eq 0 ]; then
-              cico node done $CICO_ssid
-              if [ "{svc_name}" != "none" ]; then
-                oc rollout latest {svc_name}
-              fi
-            else
-              # fail mode gives us 12 hrs to debug the machine
-              curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
-            fi
-            exit $rtn_code
-
 - job-template: &job_template_build_master
     name: '{ci_project}-{git_repo}-build-master'
     wrappers:
@@ -1410,21 +1343,6 @@
     <<: *job_template_build_defaults
 
 - job-template:
-    name: '{ci_project}-{git_repo}-publish-branch'
-    scm:
-        - git:
-            url: https://github.com/{git_organization}/{git_repo}.git
-            shallow_clone: true
-            branches:
-                - '{branch}'
-    triggers:
-      - github-pull-request:
-          white-list-target-branches:
-             - '{branch}'
-          <<: *github_pull_request_defaults
-    <<: *job_template_publish_branch_defaults
-
-- job-template:
     name: '{ci_project}-{git_repo}-build-master-coverage'
     scm:
         - git:
@@ -1703,7 +1621,7 @@
       - vault-secrets:
           <<: *vault_defaults
           secrets:
-            - *rh-che-automation-credentials-devrdu2c-fabric8-io
+            - *qe-osio-dev-cluster-SA-token
     scm:
         - git:
             url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
@@ -1838,32 +1756,6 @@
             CURRENT_TIME=$((CURRENT_TIME+5))
         done
     <<: *che-functional-tests-template
-
-- job:
-    name: 'devtools-test-performance-core-db'
-    defaults: global
-    node: devtools
-    properties:
-        - github:
-            url: https://github.com/aslakknutsen/almighty-performance
-    scm:
-        - git:
-            url: https://github.com/aslakknutsen/almighty-performance.git
-            shallow_clone: true
-            branches:
-                - master
-    triggers:
-        - timed: '15 00 * * *'
-    builders:
-        - shell: |
-            set +e
-            set +x
-            oc set env dc almighty-performance RATE=120 DURATION=30s
-            sleep 10
-            oc scale --replicas=1 dc almighty-performance
-            sleep 10
-            oc scale --replicas=0 dc almighty-performance
-            oc logs dc/almighty-performance --follow
 
 - job-template: &job_template_end_to_end_tests_defaults
     name: 'devtools-test-end-to-end-{test_url}-{test_suite}'
