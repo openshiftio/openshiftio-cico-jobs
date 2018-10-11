@@ -4203,7 +4203,7 @@
             git_repo: fabric8-analytics-release-monitor
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            skip_deploy: 1
+            skip_deploy: 0
             timeout: '10m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
