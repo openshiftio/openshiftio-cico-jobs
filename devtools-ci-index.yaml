@@ -2770,7 +2770,7 @@
             git_repo: rh-che
             ci_project: 'devtools'
             ci_cmd: '/bin/bash ./.ci/cico_build_prcheck_dep.sh'
-            timeout: '30m'
+            timeout: '60m'
         - '{ci_project}-{git_repo}-periodical-{test_url}-{cluster}':
             git_organization: redhat-developer
             git_repo: che-functional-tests
