@@ -2785,7 +2785,7 @@
             git_repo: rh-che
             ci_project: 'devtools'
             ci_cmd: '/bin/bash ./.ci/cico_build_prcheck_dep.sh'
-            timeout: '30m'
+            timeout: '60m'
         - '{ci_project}-{git_repo}-periodical-{test_url}-{cluster}':
             git_organization: redhat-developer
             git_repo: che-functional-tests
@@ -4218,8 +4218,12 @@
             git_repo: fabric8-analytics-release-monitor
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'fabric8-analytics-release-monitor'
+            deployment_configs: 'f8a-release-monitor'
+            extra_target: rhel
             skip_deploy: 0
-            timeout: '10m'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-release-monitor
