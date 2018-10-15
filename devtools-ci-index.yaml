@@ -31,6 +31,7 @@
         - dgutride
         - DhritiShikhar
         - dipak-pawar
+        - divyanshiGupta
         - dlabrecq
         - ebaron
         - edewit
@@ -1640,7 +1641,7 @@
       - vault-secrets:
           <<: *vault_defaults
           secrets:
-            - *rh-che-automation-credentials-devrdu2c-fabric8-io
+            - *qe-osio-dev-cluster-SA-token
     scm:
         - git:
             url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
@@ -2006,6 +2007,21 @@
         - github-pull-request:
             github_hooks: '{github_hooks}'
             status-context: 'ci.centos.org E2E smoke test ({feature_level})'
+            trigger-phrase: '.*\[(test|e2e-test-{feature_level})\].*'
+            failure-comment: "### $ghprbPullAuthorLoginMention The E2E smoke test with feature level set to '{feature_level}' failed.\n
+            | Link | URL |\n
+            | ---- | :-: |\n
+            | job log | $BUILD_URL/console |\n
+            | failure message | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER/failures.txt |\n
+            | artifacts | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER |\n
+            ### Please review the job results and re-run the job by commenting [*e2e-test-{feature_level}*] if necessary. "
+            error-comment: "### $ghprbPullAuthorLoginMention The E2E smoke test with feature level set to '{feature_level}' failed.\n
+            | Link | URL |\n
+            | ---- | :-: |\n
+            | job log | $BUILD_URL/console |\n
+            | failure message | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER/failures.txt |\n
+            | artifacts | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER |\n
+            ### Please review the job results and re-run the job by commenting [*e2e-test-{feature_level}*] if necessary. "
             <<: *github_pull_request_defaults
     <<: *e2e_tests_template
 
@@ -2811,7 +2827,7 @@
             git_repo: rh-che
             ci_project: 'devtools'
             ci_cmd: '/bin/bash ./.ci/cico_build_prcheck_dep.sh'
-            timeout: '30m'
+            timeout: '60m'
         - '{ci_project}-{git_repo}-periodical-{test_url}-{cluster}':
             git_organization: redhat-developer
             git_repo: che-functional-tests
@@ -3636,24 +3652,6 @@
             git_repo: fabric8-analytics-data-model
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
-            git_repo: fabric8-analytics-firehose-fetcher
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
-            registry: 'quay.io'
-            image_name: 'openshiftio/rhel-fabric8-analytics-f8a-firehose-fetcher'
-        - '{ci_project}-{git_repo}-f8a-build-master':
-            git_organization: fabric8-analytics
-            git_repo: fabric8-analytics-firehose-fetcher
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-analytics
-            deployment_units: 'f8a-firehose-fetcher'
-            deployment_configs: 'f8a-firehose-fetcher'
-            timeout: '20m'
-            extra_target: rhel
-        - '{ci_project}-{git_repo}-fabric8-analytics':
-            git_organization: fabric8-analytics
             git_repo: fabric8-analytics-stack-report-ui
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
@@ -4262,8 +4260,12 @@
             git_repo: fabric8-analytics-release-monitor
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            skip_deploy: 1
-            timeout: '10m'
+            saas_git: saas-analytics
+            deployment_units: 'fabric8-analytics-release-monitor'
+            deployment_configs: 'f8a-release-monitor'
+            extra_target: rhel
+            skip_deploy: 0
+            timeout: '20m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-release-monitor
