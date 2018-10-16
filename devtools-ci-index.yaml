@@ -3115,14 +3115,14 @@
             saas_git: saas-openshiftio
             timeout: '20m'
             extra_target: rhel
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-fabric8-push-build-master':
             git_organization: fabric8-services
             git_repo: fabric8-build-service
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .cico/deploy.sh'
             timeout: '20m'
             extra_target: rhel
-        - '{ci_project}-{git_repo}':
+        - '{ci_project}-{git_repo}-fabric8-push-prcheck':
             git_organization: fabric8-services
             git_repo: fabric8-build-service
             ci_project: 'devtools'
