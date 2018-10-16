@@ -138,6 +138,15 @@
       - env-var: 'KUBE_TOKEN'
         vault-key: 'token'
 
+- kube-config-dsaas: &kube-config-dsaas
+    name: "kube-config-dsaas-stg"
+    secret-path: 'devtools-osio-ci/hsd/kube-configs/dsaas'
+    secret-values:
+      - env-var: 'KUBE_SERVER'
+        vault-key: 'server'
+      - env-var: 'KUBE_TOKEN'
+        vault-key: 'token'
+
 - fabric8-planner-test-token: &fabric8-planner-test-token
     name: "fabric8-planner-test-token"
     secret-path: 'devtools-osio-ci/fabric8-planner-test-token-refresh-token'
@@ -2221,7 +2230,7 @@
     - vault-secrets:
         <<: *vault_defaults
         secrets:
-          - *kube-config-dsaas-stg
+          - *kube-config-dsaas
     builders:
         - shell: |
             set -ex
