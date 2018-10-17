@@ -2017,7 +2017,8 @@
         - github-pull-request:
             github_hooks: '{github_hooks}'
             status-context: 'ci.centos.org E2E smoke test ({feature_level})'
-            trigger-phrase: '.*\[(test|e2e-test-{feature_level})\].*'
+            trigger-phrase: '.*\[e2e-test-{feature_level}\].*'
+            cancel-builds-on-update: true
             failure-comment: "### $ghprbPullAuthorLoginMention The E2E smoke test with feature level set to '{feature_level}' failed.\n
             | Link | URL |\n
             | ---- | :-: |\n
