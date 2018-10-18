@@ -4271,18 +4271,6 @@
             git_repo: fabric8-analytics-github-refresh-cronjob
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-github-refresh-cronjob
-        - '{ci_project}-{git_repo}-fabric8-push-build-master':
-            git_organization: fabric8-services
-            git_repo: fabric8-tenant-jenkins
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/deploy.sh'
-            timeout: '20m'
-        - '{ci_project}-{git_repo}-fabric8-push-prcheck':
-            git_organization: fabric8-services
-            git_repo: fabric8-tenant-jenkins
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/build.sh'
-            timeout: '20m'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-release-monitor
