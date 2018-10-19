@@ -1905,13 +1905,6 @@
     properties:
         - github:
             url: https://github.com/{git_organization}/{git_repo}
-    wrappers:
-        - ansicolor
-        - credentials-binding:
-            - username-password-separated:
-                credential-id: "{osio_creds}"
-                username: OSIO_USERNAME
-                password: OSIO_PASSWORD
     beforeScript: ''
     builders:
         - shell: |
@@ -1987,6 +1980,13 @@
             branches:
                 - master
             basedir: f8tests
+    wrappers:
+        - ansicolor
+        - credentials-binding:
+            - username-password-separated:
+                credential-id: "{osio_creds}"
+                username: OSIO_USERNAME
+                password: OSIO_PASSWORD
     triggers:
         - timed: '{ee_test_start_time}'
     <<: *e2e_tests_template
@@ -2008,6 +2008,17 @@
             branches:
                 - master
             basedir: f8tests
+    wrappers:
+        - ansicolor
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+                - secret-path: 'devtools-osio-ci/e2e-tests-creds'
+                  secret-values:
+                    - env-var: 'OSIO_USERNAME'
+                      vault-key: '{osio_creds}_username'
+                    - env-var: 'OSIO_PASSWORD'
+                      vault-key: '{osio_creds}_password'
     beforeScript: |
         # if the PR to saas-openshiftio is done immediatelly after the commit
         # to dependency's master, it might be still deploying to prod-preview
@@ -2018,20 +2029,20 @@
             github_hooks: '{github_hooks}'
             status-context: 'ci.centos.org E2E smoke test ({feature_level})'
             trigger-phrase: '.*\[e2e-test-{feature_level}\].*'
-            failure-comment: "### $ghprbPullAuthorLoginMention The E2E smoke test with feature level set to '{feature_level}' failed.\n
+            failure-comment: "**The E2E smoke test with feature level set to '{feature_level}' failed.**\n
             | Link | URL |\n
             | ---- | :-: |\n
-            | job log | $BUILD_URL/console |\n
+            | job log | $BUILD_URLconsole |\n
             | failure message | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER/failures.txt |\n
             | artifacts | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER |\n
-            ### Please review the job results and re-run the job by commenting [*e2e-test-{feature_level}*] if necessary. "
-            error-comment: "### $ghprbPullAuthorLoginMention The E2E smoke test with feature level set to '{feature_level}' failed.\n
+            **Please review the job results and re-run the job by commenting [*e2e-test-{feature_level}*] if necessary.**"
+            error-comment: "**The E2E smoke test with feature level set to '{feature_level}' failed.**\n
             | Link | URL |\n
             | ---- | :-: |\n
-            | job log | $BUILD_URL/console |\n
+            | job log | $BUILD_URLconsole |\n
             | failure message | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER/failures.txt |\n
             | artifacts | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER |\n
-            ### Please review the job results and re-run the job by commenting [*e2e-test-{feature_level}*] if necessary. "
+            **Please review the job results and re-run the job by commenting [*e2e-test-{feature_level}*] if necessary.**"
             <<: *github_pull_request_defaults
     <<: *e2e_tests_template
 
@@ -3323,11 +3334,11 @@
             zabbix_metric_prefix: "booster-bdd.{booster_runtime_id}.{scenario}"
         - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
             feature_level: released
-            osio_creds: 5eb1d9c4-df37-4c89-855d-3fb06e57411c
+            osio_creds: osio-ci-e2e-003-preview
             timeout: 30m
         - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
             feature_level: beta
-            osio_creds: cc4645dc-3f32-4187-aacc-f2bbcd5fc182
+            osio_creds: osio-ci-e2e-004-preview
             timeout: 30m
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
