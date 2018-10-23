@@ -1905,6 +1905,15 @@
     properties:
         - github:
             url: https://github.com/{git_organization}/{git_repo}
+    wrappers:
+        - ansicolor
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+                - secret-path: 'devtools-osio-ci/e2e/{osio_creds}'
+                  secret-values:
+                    - env-var: 'OSIO_PASSWORD'
+                      vault-key: 'password'
     beforeScript: ''
     builders:
         - shell: |
@@ -1913,6 +1922,7 @@
 
             {beforeScript}
 
+            export OSIO_USERNAME="{osio_creds}"
             export OSIO_CLUSTER="{cluster}"
             export OSIO_URL="https://{test_url}"
             export TEST_SUITE="{test_suite}"
@@ -1980,13 +1990,6 @@
             branches:
                 - master
             basedir: f8tests
-    wrappers:
-        - ansicolor
-        - credentials-binding:
-            - username-password-separated:
-                credential-id: "{osio_creds}"
-                username: OSIO_USERNAME
-                password: OSIO_PASSWORD
     triggers:
         - timed: '{ee_test_start_time}'
     <<: *e2e_tests_template
@@ -2008,17 +2011,6 @@
             branches:
                 - master
             basedir: f8tests
-    wrappers:
-        - ansicolor
-        - vault-secrets:
-            <<: *vault_defaults
-            secrets:
-                - secret-path: 'devtools-osio-ci/e2e-tests-creds'
-                  secret-values:
-                    - env-var: 'OSIO_USERNAME'
-                      vault-key: '{osio_creds}_username'
-                    - env-var: 'OSIO_PASSWORD'
-                      vault-key: '{osio_creds}_password'
     beforeScript: |
         # if the PR to saas-openshiftio is done immediatelly after the commit
         # to dependency's master, it might be still deploying to prod-preview
@@ -2029,19 +2021,19 @@
             github_hooks: '{github_hooks}'
             status-context: 'ci.centos.org E2E smoke test ({feature_level})'
             trigger-phrase: '.*\[e2e-test-{feature_level}\].*'
-            failure-comment: "**The E2E smoke test with feature level set to '{feature_level}' failed.**\n
+            failure-comment: "**The E2E smoke test with feature level set to '{feature_level}' failed.**\n\n
             | Link | URL |\n
             | ---- | :-: |\n
-            | job log | $BUILD_URLconsole |\n
+            | job log | https://ci.centos.org/job/$JOB_NAME/$BUILD_NUMBER/console |\n
             | failure message | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER/failures.txt |\n
-            | artifacts | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER |\n
+            | artifacts | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER |\n\n
             **Please review the job results and re-run the job by commenting [*e2e-test-{feature_level}*] if necessary.**"
-            error-comment: "**The E2E smoke test with feature level set to '{feature_level}' failed.**\n
+            error-comment: "**The E2E smoke test with feature level set to '{feature_level}' failed.**\n\n
             | Link | URL |\n
             | ---- | :-: |\n
-            | job log | $BUILD_URLconsole |\n
+            | job log | https://ci.centos.org/job/$JOB_NAME/$BUILD_NUMBER/console |\n
             | failure message | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER/failures.txt |\n
-            | artifacts | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER |\n
+            | artifacts | http://artifacts.ci.centos.org/devtools/e2e/$JOB_NAME/$BUILD_NUMBER |\n\n
             **Please review the job results and re-run the job by commenting [*e2e-test-{feature_level}*] if necessary.**"
             <<: *github_pull_request_defaults
     <<: *e2e_tests_template
@@ -3179,7 +3171,7 @@
             test_suite: logintest
             cluster: us-east-1a
             feature_level: released
-            osio_creds: 48966098-532e-42b1-ac2a-d6a3db6f06f3
+            osio_creds: osio-ci-e2e-001
             ee_test_start_time: '2-59/20 * * * *'
             timeout: 6m
             zabbix_enabled: false
@@ -3188,21 +3180,21 @@
             test_suite: smoketest
             cluster: us-east-1a
             feature_level: released
-            osio_creds: 48966098-532e-42b1-ac2a-d6a3db6f06f3
+            osio_creds: osio-ci-e2e-001
             ee_test_start_time: '5 0-23/4 * * *'
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: openshift.io
             test_suite: smoketest
             cluster: us-east-1a
             feature_level: beta
-            osio_creds: 9f21878c-cbde-4e5a-85a6-76ea996df4ab
+            osio_creds: osio-ci-e2e-002
             ee_test_start_time: '35 0-23/2 * * *'
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: openshift.io
             test_suite: logintest
             cluster: us-east-1b
             feature_level: released
-            osio_creds: 35afd1c4-b52d-4738-becc-5bb81ec750a1
+            osio_creds: osio-ci-e2e-003
             ee_test_start_time: '4-59/20 * * * *'
             timeout: 6m
             zabbix_enabled: false
@@ -3211,14 +3203,14 @@
             test_suite: smoketest
             cluster: us-east-1b
             feature_level: released
-            osio_creds: 35afd1c4-b52d-4738-becc-5bb81ec750a1
+            osio_creds: osio-ci-e2e-003
             ee_test_start_time: '5 1-23/4 * * *'
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: openshift.io
             test_suite: logintest
             cluster: us-east-2
             feature_level: released
-            osio_creds: 452db931-6cb0-465e-addd-1620df4fe428
+            osio_creds: osio-ci-e2e-005
             ee_test_start_time: '8-59/20 * * * *'
             timeout: 6m
             zabbix_enabled: false
@@ -3227,14 +3219,14 @@
             test_suite: smoketest
             cluster: us-east-2
             feature_level: released
-            osio_creds: 452db931-6cb0-465e-addd-1620df4fe428
+            osio_creds: osio-ci-e2e-005
             ee_test_start_time: '5 2-23/4 * * *'
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: openshift.io
             test_suite: logintest
             cluster: us-east-2a
             feature_level: released
-            osio_creds: 9cfb97b8-1569-4cd4-9497-a7ede45e7cd6
+            osio_creds: osio-ci-e2e-007
             ee_test_start_time: '12-59/20 * * * *'
             timeout: 6m
             zabbix_enabled: false
@@ -3243,14 +3235,14 @@
             test_suite: smoketest
             cluster: us-east-2a
             feature_level: released
-            osio_creds: 9cfb97b8-1569-4cd4-9497-a7ede45e7cd6
+            osio_creds: osio-ci-e2e-007
             ee_test_start_time: '5 3-23/4 * * *'
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: prod-preview.openshift.io
             test_suite: smoketest
             cluster: pr-us-east-2a
             feature_level: released
-            osio_creds: 0f17e05a-a57b-4997-a935-98a1f44b333c
+            osio_creds: osio-ci-e2e-001-preview
             ee_test_start_time: '10 * * * *'
             zabbix_enabled: false
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
@@ -3258,7 +3250,7 @@
             test_suite: smoketest
             cluster: pr-us-east-2a
             feature_level: beta
-            osio_creds: 38d2ebca-2c23-4054-9a4e-e1bc05183fd8
+            osio_creds: osio-ci-e2e-002-preview
             ee_test_start_time: '40 * * * *'
             zabbix_enabled: false
         - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}':
