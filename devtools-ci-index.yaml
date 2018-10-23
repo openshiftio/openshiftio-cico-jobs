@@ -283,6 +283,13 @@
       - env-var: 'RECOMMENDER_API_TOKEN'
         vault-key: 'token'
 
+- 3scale-user-key: &3scale-user-key
+    name: "3scale-user-key"
+    secret-path: 'devtools-osio-ci/3scale-user-key'
+    secret-values:
+      - env-var: 'THREE_SCALE_PREVIEW_USER_KEY'
+        vault-key: 'user_key'
+
 - recommender-refresh-token: &recommender-refresh-token
     name: "recommender-refresh-token"
     secret-path: 'devtools-osio-ci/recommender-refresh-token'
