@@ -1012,6 +1012,7 @@
             <<: *vault_defaults
             secrets:
               - *recommender-api-token
+              - *3scale-user-key
               - *recommender-refresh-token
         - ansicolor
     concurrent: false
@@ -1146,6 +1147,7 @@
             secrets:
               - *kube-config-dsaas-stg
               - *recommender-api-token
+              - *3scale-user-key
               - *recommender-refresh-token
         - ansicolor
     concurrent: false
