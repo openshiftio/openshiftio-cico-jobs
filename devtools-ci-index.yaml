@@ -3180,7 +3180,7 @@
             git_repo: fabric8-online-docs
             git_organization: fabric8io
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash scripts/build_guides.sh'
+            ci_cmd: '/bin/bash cico_pr_build.sh'
             timeout: '20m'
             artifacts: './html'
             allow_empty: true
