@@ -69,7 +69,7 @@
         - nimishamukherjee
         - nurali-techie
         - pbergene
-        - piyush1594
+        - piyush-garg
         - ppitonak
         - Preeticp
         - quintesse
@@ -1012,6 +1012,7 @@
             <<: *vault_defaults
             secrets:
               - *recommender-api-token
+              - *3scale-user-key
               - *recommender-refresh-token
         - ansicolor
     concurrent: false
@@ -1146,6 +1147,7 @@
             secrets:
               - *kube-config-dsaas-stg
               - *recommender-api-token
+              - *3scale-user-key
               - *recommender-refresh-token
         - ansicolor
     concurrent: false
@@ -1479,6 +1481,17 @@
             - *quay-credentials
             - *registry-devshift-credentials
             - *gpgkeys-for-signing-maven-artefacts
+    <<: *job_template_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-fabric8-docs-prcheck'
+    wrappers:
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *fabric8-hub-token
+            - *quay-credentials
+            - *registry-devshift-credentials
     <<: *job_template_defaults
 
 - job-template:
@@ -3177,27 +3190,24 @@
             extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-push-build-master':
             git_organization: fabric8-services
-            git_repo: fabric8-build-service
+            git_repo: fabric8-build
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .cico/deploy.sh'
             timeout: '20m'
             extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-push-prcheck':
             git_organization: fabric8-services
-            git_repo: fabric8-build-service
+            git_repo: fabric8-build
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .cico/test.sh'
             timeout: '20m'
             discarder_days: 30
-        - '{ci_project}-{git_repo}-prcheck-publish-artifacts':
+        - '{ci_project}-{git_repo}-fabric8-docs-prcheck':
             git_repo: fabric8-online-docs
             git_organization: fabric8io
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash scripts/build_guides.sh'
+            ci_cmd: '/bin/bash cico_pr_build.sh'
             timeout: '20m'
-            artifacts: './html'
-            allow_empty: true
-            fingerprint: true
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8io
             git_repo: fabric8-test
