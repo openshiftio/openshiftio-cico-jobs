@@ -1484,6 +1484,17 @@
     <<: *job_template_defaults
 
 - job-template:
+    name: '{ci_project}-{git_repo}-fabric8-docs-prcheck'
+    wrappers:
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *fabric8-hub-token
+            - *quay-credentials
+            - *registry-devshift-credentials
+    <<: *job_template_defaults
+
+- job-template:
     name: '{ci_project}-{git_repo}-build-master-push-client'
     wrappers:
       - vault-secrets:
@@ -3178,7 +3189,7 @@
             ci_cmd: '/bin/bash .cico/test.sh'
             timeout: '20m'
             discarder_days: 30
-        - '{ci_project}-{git_repo}':
+        - '{ci_project}-{git_repo}-fabric8-docs-prcheck':
             git_repo: fabric8-online-docs
             git_organization: fabric8io
             ci_project: 'devtools'
