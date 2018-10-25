@@ -3166,14 +3166,14 @@
             extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-push-build-master':
             git_organization: fabric8-services
-            git_repo: fabric8-build-service
+            git_repo: fabric8-build
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .cico/deploy.sh'
             timeout: '20m'
             extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-push-prcheck':
             git_organization: fabric8-services
-            git_repo: fabric8-build-service
+            git_repo: fabric8-build
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .cico/test.sh'
             timeout: '20m'
