@@ -3159,6 +3159,12 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             timeout: '25m'
+        - '{ci_project}-{git_repo}':
+            git_repo: fabric8-cluster-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            timeout: '20m'
+            discarder_days: 30
         - '{ci_project}-{git_repo}-build-master':
             git_repo: fabric8-env
             ci_project: 'devtools'
