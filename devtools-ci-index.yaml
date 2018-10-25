@@ -3178,15 +3178,12 @@
             ci_cmd: '/bin/bash .cico/test.sh'
             timeout: '20m'
             discarder_days: 30
-        - '{ci_project}-{git_repo}-prcheck-publish-artifacts':
+        - '{ci_project}-{git_repo}':
             git_repo: fabric8-online-docs
             git_organization: fabric8io
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_pr_build.sh'
             timeout: '20m'
-            artifacts: './html'
-            allow_empty: true
-            fingerprint: true
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8io
             git_repo: fabric8-test
