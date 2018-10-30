@@ -3132,6 +3132,17 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             timeout: '25m'
+        - '{ci_project}-{git_repo}':
+            git_repo: fabric8-auth-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            timeout: '20m'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-build-master-update-downstream':
+            git_repo: fabric8-auth-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_repo: admin-console
             ci_project: 'devtools'
