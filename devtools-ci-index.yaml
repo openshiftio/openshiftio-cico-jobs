@@ -3108,7 +3108,7 @@
             git_repo: saas-hdd
             git_organization: openshiftio
             ci_project: 'devtools'
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-build-master-push-client':
             git_repo: fabric8-auth
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
