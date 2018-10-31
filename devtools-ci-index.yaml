@@ -2493,6 +2493,10 @@
             - text:
                 credential-id: "{osio_token}"
                 variable: REFRESH_TOKEN
+            - username-password-separated:
+                credential-id: "{osio_creds}"
+                username: OSIO_USERNAME
+                password: OSIO_PASSWORD
         - vault-secrets:
             <<: *vault_defaults
             secrets:
@@ -4155,6 +4159,7 @@
             test_url: prod-preview.openshift.io
             test_suite: planner-functional-tests
             osio_token: be32035b-cdd2-441b-ab27-93d023feeb1d
+            osio_creds: b310559d-91c5-469c-bb35-fc9b8333e619
             ci_project: 'devtools'
             branch: 'UI-tests'
             ee_test_start_time: '0 * * * *'
@@ -4165,6 +4170,7 @@
             git_repo: fabric8-planner
             test_suite: planner-functional-tests
             osio_token: 37851cbe-37eb-4c2b-944f-0a875d510795
+            osio_creds: e53d9045-2500-498a-936f-3ecf323af800
             ci_project: 'devtools'
             test_url: 'openshift.io'
             branch: 'UI-tests'
@@ -4400,3 +4406,27 @@
             git_repo: fabric8-analytics-release-monitor
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-release-monitor
+        - 'devtools-test-e2e-{test_url}-{test_suite}':
+            git_organization: fabric8-test
+            git_repo: fabric8io
+            test_url: prod-preview.openshift.io
+            test_suite: planner
+            osio_token: be32035b-cdd2-441b-ab27-93d023feeb1d
+            osio_creds: b310559d-91c5-469c-bb35-fc9b8333e619
+            ci_project: 'devtools'
+            branch: 'master'
+            ee_test_start_time: '35 */2 * * *'
+            ci_cmd: '/bin/bash cd ee_tests && cico_run_EE_tests.sh'
+            timeout: '40m'
+        - 'devtools-test-e2e-{test_url}-{test_suite}':
+            git_organization: fabric8-test
+            git_repo: fabric8io
+            test_url: openshift.io
+            test_suite: planner
+            osio_creds: e53d9045-2500-498a-936f-3ecf323af800
+            osio_token: 37851cbe-37eb-4c2b-944f-0a875d510795
+            ci_project: 'devtools'
+            branch: 'master'
+            ee_test_start_time: '40 */4 * * *'
+            ci_cmd: '/bin/bash cd ee_tests && cico_run_EE_tests.sh'
+            timeout: '40m'
