@@ -4395,8 +4395,8 @@
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-release-monitor
         - 'devtools-test-e2e-{test_url}-{test_suite}':
-            git_organization: fabric8-test
-            git_repo: fabric8io
+            git_organization: fabric8io
+            git_repo: fabric8-test
             test_url: prod-preview.openshift.io
             test_suite: planner
             osio_token: be32035b-cdd2-441b-ab27-93d023feeb1d
@@ -4407,8 +4407,8 @@
             ci_cmd: '/bin/bash cd ee_tests && cico_run_EE_tests.sh'
             timeout: '40m'
         - 'devtools-test-e2e-{test_url}-{test_suite}':
-            git_organization: fabric8-test
-            git_repo: fabric8io
+            git_organization: fabric8io
+            git_repo: fabric8-test
             test_url: openshift.io
             test_suite: planner
             osio_creds: e53d9045-2500-498a-936f-3ecf323af800
