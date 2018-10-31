@@ -42,6 +42,7 @@
         - gastaldi
         - hferentschik
         - hemanik
+        - hrishin
         - ia3andy
         - ibuziuk
         - inoxx03
@@ -1697,7 +1698,7 @@
             ### *If the build or deployment fails, the artifacts will not be present. Don't panic, just grab a towel.*"
             <<: *github_pull_request_defaults
     <<: *rh-che-automation-template
-    
+
 - job-template:
     name: '{ci_project}-{git_repo}-rh-che-compatibility-test-{test_url}'
     triggers:
