@@ -1495,6 +1495,22 @@
     <<: *job_template_defaults
 
 - job-template:
+    name: '{ci_project}-{git_repo}-build-master-update-downstream'
+    wrappers:
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *kube-config-dsaas-stg
+            - *fabric8-hub-token
+    scm:
+        - git:
+            url: https://github.com/{git_organization}/{git_repo}.git
+            shallow_clone: true
+            branches:
+                - master
+    <<: *job_template_build_defaults
+
+- job-template:
     name: '{ci_project}-{git_repo}-build-master-push-client'
     wrappers:
       - vault-secrets:
@@ -3096,7 +3112,7 @@
             git_repo: saas-hdd
             git_organization: openshiftio
             ci_project: 'devtools'
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-build-master-push-client':
             git_repo: fabric8-auth
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
@@ -3120,6 +3136,17 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             timeout: '25m'
+        - '{ci_project}-{git_repo}':
+            git_repo: fabric8-auth-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            timeout: '20m'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-build-master-update-downstream':
+            git_repo: fabric8-auth-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_repo: admin-console
             ci_project: 'devtools'
@@ -3174,6 +3201,11 @@
             ci_cmd: '/bin/bash cico_build.sh'
             timeout: '20m'
             discarder_days: 30
+        - '{ci_project}-{git_repo}-build-master-update-downstream':
+            git_repo: fabric8-cluster-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_repo: fabric8-env
             ci_project: 'devtools'
