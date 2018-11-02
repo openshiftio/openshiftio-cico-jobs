@@ -1770,6 +1770,7 @@
           <<: *vault_defaults
           secrets:
             - *quay-credentials
+            - *kube-config-dsaas-stg
       - che_functional_tests_credentials_wrapper-{type}-{test_url}-{cluster}
     concurrent: false
     <<: *job_template_defaults
@@ -1826,11 +1827,6 @@
             url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
             branches:
                 - origin/master
-    wrappers:
-    - vault-secrets:
-        <<: *vault_defaults
-        secrets:
-          - *kube-config-dsaas-stg
     beforeGetNode: |
         #Wait for correct rh-che version to be deployed & running on prod-preview
         isPodRunning () (
