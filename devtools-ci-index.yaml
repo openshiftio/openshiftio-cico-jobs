@@ -3240,6 +3240,7 @@
             ci_cmd: '/bin/bash .cico/deploy.sh'
             timeout: '20m'
             extra_target: rhel
+            saas_git: saas-openshiftio
         - '{ci_project}-{git_repo}-fabric8-push-prcheck':
             git_organization: fabric8-services
             git_repo: fabric8-build
