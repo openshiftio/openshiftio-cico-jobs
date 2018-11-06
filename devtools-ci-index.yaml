@@ -1804,13 +1804,25 @@
 - rhche-functional-tests-template: &rhche-functional-tests-template
     name: 'rhche-functional-tests-template'
     wrappers:
-      - vault-secrets:
-          <<: *vault_defaults
-          secrets:
-            - *rhche-periodic-{cluster}-creds
+      - rhche_credentials_wrapper-{cluster}
     concurrent: false
     <<: *job_template_defaults
+    
+- wrapper:
+    name: 'rhche_credentials_wrapper-2'
+    wrappers:
+       - vault-secrets:
+           <<: *vault_defaults
+           secrets:
+             - *rhche-periodic-2-creds
 
+- wrapper:
+    name: 'rhche_credentials_wrapper-2a'
+    wrappers:
+       - vault-secrets:
+           <<: *vault_defaults
+           secrets:
+             - *rhche-periodic-2a-creds
 
 - job-template:
     name: '{ci_project}-{git_repo}-periodical-{test_url}-{cluster}'
