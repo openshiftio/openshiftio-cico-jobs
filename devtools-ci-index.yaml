@@ -3008,8 +3008,7 @@
             git_organization: redhat-developer
             git_repo: rh-che
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash ./functionalTests/devscripts/run_tests.sh -u $USERNAME -p $PASSWORD -o $OFFLINE_TOKEN -r {test_url} -m $EMAIL'
-            test_url: 'che.prod-preview.openshift.io'
+            ci_cmd: '/bin/bash HOST_URL="che.prod-preview.openshift.io" ./functionalTests/devscripts/prepare_env.sh && /bin/bash ./functionalTests/devscripts/run_tests.sh'
             env: 'prod-preview'
             timeout: '20m'
             cluster: '2a'
@@ -3017,8 +3016,7 @@
             git_organization: redhat-developer
             git_repo: rh-che
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash ./functionalTests/devscripts/run_tests.sh -u $USERNAME -p $PASSWORD -o $OFFLINE_TOKEN -r {test_url} -m $EMAIL'
-            test_url: 'che.openshift.io'
+            ci_cmd: '/bin/bash HOST_URL="che.openshift.io" ./functionalTests/devscripts/prepare_env.sh && /bin/bash ./functionalTests/devscripts/run_tests.sh'
             env: 'prod'
             timeout: '20m'
             cluster: '2'
