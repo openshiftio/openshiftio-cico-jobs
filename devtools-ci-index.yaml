@@ -126,6 +126,7 @@
             refspec: '+refs/pull/*:refs/remotes/origin/pr/*'
             branches:
                 - '${{ghprbActualCommit}}'
+            basedir: '{git_basedir}'
 
 - vault_defaults: &vault_defaults
     name: 'vault_defaults'
@@ -430,6 +431,7 @@
     scm:
         - git-scm:
             git_url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            git_basedir: ''
     triggers:
         - githubprb:
             github_hooks: '{github_hooks}'
@@ -2068,6 +2070,7 @@
     scm:
         - git-scm:
             git_url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            git_basedir: '{git_repo}'
         - git:
             url: https://github.com/fabric8io/fabric8-test.git
             shallow_clone: true
