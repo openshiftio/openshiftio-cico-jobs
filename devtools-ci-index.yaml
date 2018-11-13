@@ -4455,7 +4455,7 @@
             ci_project: 'devtools'
             branch: 'master'
             ee_test_start_time: '35 */2 * * *'
-            ci_cmd: '/bin/bash cd ee_tests && cico_run_EE_tests.sh'
+            ci_cmd: 'cd ee_tests && /bin/bash cico_run_e2e_tests.sh'
             timeout: '40m'
         - 'devtools-test-e2e-{test_url}-{test_suite}':
             git_organization: fabric8io
@@ -4467,5 +4467,5 @@
             ci_project: 'devtools'
             branch: 'master'
             ee_test_start_time: '40 */4 * * *'
-            ci_cmd: '/bin/bash cd ee_tests && cico_run_EE_tests.sh'
+            ci_cmd: 'cd ee_tests && /bin/bash cico_run_e2e_tests.sh'
             timeout: '40m'
