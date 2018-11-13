@@ -1744,6 +1744,8 @@
         vault-key: 'username'
       - env-var: 'CHE_TESTUSER_PASSWORD'
         vault-key: 'password'
+      - env-var: 'CHE_TESTUSER_EMAIL'
+        vault-key: 'email'
 
 - job-template:
     name: '{ci_project}-{git_repo}-rollout-test-{test_url}'
@@ -1761,7 +1763,7 @@
           secrets:
             - *rollout-test-token
             - *rollout-test-creds
-            - *rh-che-automation-credentials-devrdu2c-fabric8-io
+            - *qe-osio-dev-cluster-SA-token
     <<: *job_template_defaults
 
 
