@@ -3030,7 +3030,6 @@
             git_repo: ngx-base
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: fabric8-ui-ngx-base
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-launcher
             git_repo: launcher-booster-catalog
