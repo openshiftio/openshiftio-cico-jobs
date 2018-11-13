@@ -4396,7 +4396,7 @@
             extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
-            git_repo: fabric8-analytics-stack-analysis
+            git_repo: f8a-golang-insights
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
