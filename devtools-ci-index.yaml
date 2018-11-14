@@ -126,6 +126,7 @@
             refspec: '+refs/pull/*:refs/remotes/origin/pr/*'
             branches:
                 - '${{ghprbActualCommit}}'
+            basedir: '{git_basedir}'
 
 - vault_defaults: &vault_defaults
     name: 'vault_defaults'
@@ -456,6 +457,7 @@
     scm:
         - git-scm:
             git_url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            git_basedir: ''
     triggers:
         - githubprb:
             github_hooks: '{github_hooks}'
@@ -1768,6 +1770,8 @@
         vault-key: 'username'
       - env-var: 'CHE_TESTUSER_PASSWORD'
         vault-key: 'password'
+      - env-var: 'CHE_TESTUSER_EMAIL'
+        vault-key: 'email'
 
 - job-template:
     name: '{ci_project}-{git_repo}-rollout-test-{test_url}'
@@ -1785,7 +1789,7 @@
           secrets:
             - *rollout-test-token
             - *rollout-test-creds
-            - *rh-che-automation-credentials-devrdu2c-fabric8-io
+            - *qe-osio-dev-cluster-SA-token
     <<: *job_template_defaults
 
 
@@ -2032,6 +2036,7 @@
     node: devtools
     timeout: 30m
     zabbix_enabled: ''
+    ci_cmd: 'cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh'
     properties:
         - github:
             url: https://github.com/{git_organization}/{git_repo}
@@ -2054,7 +2059,7 @@
 
             export OSIO_USERNAME="{osio_creds}"
             export OSIO_CLUSTER="{cluster}"
-            export OSIO_URL="https://{test_url}"
+            export OSIO_URL="http://{test_url}"
             export TEST_SUITE="{test_suite}"
             export FEATURE_LEVEL="{feature_level}"
             export ZABBIX_ENABLED="{zabbix_enabled}"
@@ -2101,7 +2106,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh"
+            /usr/bin/timeout {timeout} $ssh_cmd -t "{ci_cmd}"
             rtn_code=$?
             if [[ $rtn_code -eq 124 ]]; then
                echo "BUILD TIMEOUT";
@@ -2130,11 +2135,10 @@
     test_suite: smoketest
     cluster: pr-us-east-2a
     zabbix_enabled: false
-    git_organization: openshiftio
-    git_repo: saas-openshiftio
     scm:
         - git-scm:
             git_url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            git_basedir: '{git_repo}'
         - git:
             url: https://github.com/fabric8io/fabric8-test.git
             shallow_clone: true
@@ -3108,7 +3112,6 @@
             git_repo: ngx-base
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: fabric8-ui-ngx-base
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-launcher
             git_repo: launcher-booster-catalog
@@ -3528,13 +3531,33 @@
             zabbix_host: qa_openshift.io
             zabbix_metric_prefix: "booster-bdd.{booster_runtime_id}.{scenario}"
         - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
+            git_organization: openshiftio
+            git_repo: saas-openshiftio
             feature_level: released
             osio_creds: osio-ci-e2e-003-preview
             timeout: 30m
         - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
+            git_organization: openshiftio
+            git_repo: saas-openshiftio
             feature_level: beta
             osio_creds: osio-ci-e2e-004-preview
             timeout: 30m
+        - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
+            git_organization: fabric8-ui
+            git_repo: fabric8-ui
+            feature_level: released
+            test_url: 'localhost:3000'
+            osio_creds: osio-ci-e2e-005-preview
+            timeout: 50m
+            ci_cmd: 'cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh fabric8-ui'
+        - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
+            git_organization: fabric8-ui
+            git_repo: fabric8-ui
+            feature_level: beta
+            test_url: 'localhost:3000'
+            osio_creds: osio-ci-e2e-007-preview
+            timeout: 50m
+            ci_cmd: 'cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh fabric8-ui'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
@@ -4397,8 +4420,7 @@
             git_organization: fabric8-analytics
             git_repo: victimsdb-lib
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            skip_deploy: 1
+            ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '10m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
@@ -4410,6 +4432,22 @@
             git_repo: victimsdb-lib
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: victimsdb-lib
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-analytics
+            git_repo: nvdlib
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: nvdlib
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: nvdlib
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: nvdlib
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-utils
