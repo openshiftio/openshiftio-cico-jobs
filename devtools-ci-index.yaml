@@ -3753,7 +3753,7 @@
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
             registry: 'quay.io'
-            image_name: 'openshiftio/rhel-fabric8-analytics-f8a-golang-insights'
+            image_name: 'openshiftio/fabric8-analytics-f8a-golang-insights'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
             git_repo: f8a-golang-insights
