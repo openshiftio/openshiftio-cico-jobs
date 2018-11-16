@@ -262,6 +262,32 @@
         vault-key: 'username'
       - env-var: 'RH_CHE_AUTOMATION_DOCKERHUB_PASSWORD'
         vault-key: 'password'
+        
+- rhche-periodic-2-creds: &rhche-periodic-2-creds
+    name: "rhche-periodic-2-creds"
+    secret-path: 'devtools-osio-ci/rhche-periodic-2-creds'
+    secret-values:
+      - env-var: 'USERNAME'
+        vault-key: 'username'
+      - env-var: 'PASSWORD'
+        vault-key: 'password'
+      - env-var: 'OFFLINE_TOKEN'
+        vault-key: 'token'
+      - env-var: 'EMAIL'
+        vault-key: 'email'
+        
+- rhche-periodic-2a-creds: &rhche-periodic-2a-creds
+    name: "rhche-periodic-2a-creds"
+    secret-path: 'devtools-osio-ci/rhche-periodic-2a-creds'
+    secret-values:
+      - env-var: 'USERNAME'
+        vault-key: 'username'
+      - env-var: 'PASSWORD'
+        vault-key: 'password'
+      - env-var: 'OFFLINE_TOKEN'
+        vault-key: 'token'
+      - env-var: 'EMAIL'
+        vault-key: 'email'
 
 - qe-osio-dev-cluster-SA-token: &qe-osio-dev-cluster-SA-token
     name: "qe-osio-dev-cluster-SA-token"
@@ -1779,6 +1805,28 @@
     concurrent: false
     <<: *job_template_defaults
 
+- rhche-functional-tests-template: &rhche-functional-tests-template
+    name: 'rhche-functional-tests-template'
+    wrappers:
+      - rhche_credentials_wrapper-{cluster}
+    concurrent: false
+    <<: *job_template_defaults
+    
+- wrapper:
+    name: 'rhche_credentials_wrapper-2'
+    wrappers:
+       - vault-secrets:
+           <<: *vault_defaults
+           secrets:
+             - *rhche-periodic-2-creds
+
+- wrapper:
+    name: 'rhche_credentials_wrapper-2a'
+    wrappers:
+       - vault-secrets:
+           <<: *vault_defaults
+           secrets:
+             - *rhche-periodic-2a-creds
 
 - job-template:
     name: '{ci_project}-{git_repo}-periodical-{test_url}-{cluster}'
@@ -1793,6 +1841,24 @@
             branches:
                 - origin/master
     <<: *che-functional-tests-template
+    
+
+- job-template:
+    name: '{ci_project}-{git_repo}-periodic-{env}-{cluster}'
+    triggers:
+        - timed: 'H 1,13 * * *'
+    publishers:
+        - email:
+            recipients: rhopp@redhat.com kkanova@redhat.com tdancs@redhat.com
+    scm:
+        - git:
+            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            branches:
+                - origin/master
+    <<: *rhche-functional-tests-template
+    
+    
+    
 
 - job-template:
     name: '{ci_project}-{git_repo}-prcheck-{test_url}-{cluster}'
@@ -2942,6 +3008,22 @@
             timeout: '20m'
             type: 'periodical'
             cluster: '2'
+        - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash HOST_URL="che.prod-preview.openshift.io" ./functionalTests/devscripts/prepare_env.sh && /bin/bash ./functionalTests/devscripts/run_tests.sh'
+            env: 'prod-preview'
+            timeout: '20m'
+            cluster: '2a'
+        - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash HOST_URL="che.openshift.io" ./functionalTests/devscripts/prepare_env.sh && /bin/bash ./functionalTests/devscripts/run_tests.sh'
+            env: 'prod'
+            timeout: '20m'
+            cluster: '2'
         - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
             git_organization: redhat-developer
             git_repo: rh-che
@@ -3030,7 +3112,6 @@
             git_repo: ngx-base
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            svc_name: fabric8-ui-ngx-base
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-launcher
             git_repo: launcher-booster-catalog
@@ -3054,6 +3135,14 @@
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: fabric8-launcher
             git_repo: launcher-backend
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-launchpad
+            prj_name: launchpad-preview
+            extra_target: rhel
+        - '{ci_project}-{git_repo}-generator-build-master':
+            git_organization: fabric8-launcher
+            git_repo: launcher-creator-backend
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-launchpad
@@ -3665,6 +3754,28 @@
             git_repo: fabric8-analytics-npm-insights
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-npm-insights
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: f8a-golang-insights
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+            registry: 'quay.io'
+            image_name: 'openshiftio/fabric8-analytics-f8a-golang-insights'
+        - '{ci_project}-{git_repo}-f8a-build-master':
+            git_organization: fabric8-analytics
+            git_repo: f8a-golang-insights
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-analytics
+            deployment_units: 'f8a-golang-insights'
+            deployment_configs: 'f8a-golang-insights'
+            timeout: '20m'
+            extra_target: rhel
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: f8a-golang-insights
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: f8a-golang-insights
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-worker
