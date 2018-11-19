@@ -4296,7 +4296,7 @@
             osio_token: be32035b-cdd2-441b-ab27-93d023feeb1d
             osio_creds: b310559d-91c5-469c-bb35-fc9b8333e619
             ci_project: 'devtools'
-            branch: 'UI-tests'
+            branch: 'prod-preview-tests'
             ee_test_start_time: '0 * * * *'
             ci_cmd: '/bin/bash cico_test_prod.sh --prod-preview'
             timeout: '40m'
@@ -4308,7 +4308,7 @@
             osio_creds: e53d9045-2500-498a-936f-3ecf323af800
             ci_project: 'devtools'
             test_url: 'openshift.io'
-            branch: 'UI-tests'
+            branch: 'prod-tests'
             ee_test_start_time: '0 */4 * * *'
             ci_cmd: '/bin/bash cico_test_prod.sh'
             timeout: '40m'
