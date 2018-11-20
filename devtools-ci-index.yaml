@@ -262,7 +262,7 @@
         vault-key: 'username'
       - env-var: 'RH_CHE_AUTOMATION_DOCKERHUB_PASSWORD'
         vault-key: 'password'
-        
+
 - rhche-periodic-2-creds: &rhche-periodic-2-creds
     name: "rhche-periodic-2-creds"
     secret-path: 'devtools-osio-ci/rhche-periodic-2-creds'
@@ -275,7 +275,7 @@
         vault-key: 'token'
       - env-var: 'EMAIL'
         vault-key: 'email'
-        
+
 - rhche-periodic-2a-creds: &rhche-periodic-2a-creds
     name: "rhche-periodic-2a-creds"
     secret-path: 'devtools-osio-ci/rhche-periodic-2a-creds'
@@ -1811,7 +1811,7 @@
       - rhche_credentials_wrapper-{cluster}
     concurrent: false
     <<: *job_template_defaults
-    
+
 - wrapper:
     name: 'rhche_credentials_wrapper-2'
     wrappers:
@@ -1841,7 +1841,7 @@
             branches:
                 - origin/master
     <<: *che-functional-tests-template
-    
+
 
 - job-template:
     name: '{ci_project}-{git_repo}-periodic-{env}-{cluster}'
@@ -1856,9 +1856,9 @@
             branches:
                 - origin/master
     <<: *rhche-functional-tests-template
-    
-    
-    
+
+
+
 
 - job-template:
     name: '{ci_project}-{git_repo}-prcheck-{test_url}-{cluster}'
@@ -3347,6 +3347,12 @@
             timeout: '20m'
             extra_target: rhel
             saas_git: saas-openshiftio
+        - '{ci_project}-{git_repo}-coverage':
+            git_repo: fabric8-build
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/coverage.sh'
+            timeout: '3h'
+            discarder_days: 30
         - '{ci_project}-{git_repo}-fabric8-push-prcheck':
             git_organization: fabric8-services
             git_repo: fabric8-build
