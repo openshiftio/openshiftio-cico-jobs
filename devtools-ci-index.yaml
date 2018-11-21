@@ -4585,7 +4585,7 @@
             git_repo: fabric8-analytics-release-monitor
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-release-monitor
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
