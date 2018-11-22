@@ -1,4 +1,4 @@
-== Almighty Jenkins Builder jobs
+== OpenShift.io Jenkins Builder jobs
 
 image:https://ci.centos.org/buildStatus/icon?job=devtools-jjb-service[Jenkins,link="https://ci.centos.org/view/Devtools/job/devtools-jjb-service/lastBuild/"]
 
