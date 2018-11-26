@@ -2683,6 +2683,15 @@
         - timed: '{bdd_test_start_time}'
     <<: *booster_bdd_tests_template
 
+- job-template:
+    name: 'devtools-bdd-test-booster-import-{build_tool}-{test_url}-{cluster}'
+    booster_mission: ''
+    booster_runtime_id: ''
+    booster_runtime_version: ''
+    triggers:
+        - timed: '{bdd_test_start_time}'
+    <<: *booster_bdd_tests_template
+
 - project:
     name: devtools
     disabled: false
@@ -3555,6 +3564,32 @@
             zabbix_port: 9443
             zabbix_host: qa_openshift.io
             zabbix_metric_prefix: "booster-bdd.{booster_runtime_id}.{scenario}"
+        - 'devtools-bdd-test-booster-import-{build_tool}-{test_url}-{cluster}':
+            test_url: openshift.io
+            cluster: us-east-2a
+            build_tool: maven
+            osio_creds_username: 'username_2'
+            osio_creds_password: 'password_2'
+            bdd_test_start_time: '5 2-23/4 * * *'
+            timeout: 60m
+            scenario: 'import-repo'
+            server_address: https://openshift.io
+            forge_api: https://forge.api.openshift.io
+            wit_api: https://api.openshift.io
+            auth_api: https://auth.openshift.io
+            danger_zone: true
+            pipeline: "{build_tool}-releasestageapproveandpromote"
+            blank_booster: false
+            git_repo: "bdd-booster-import-{build_tool}"
+            project_name: test123-imported
+            auth_client_id: 740650a2-9c44-4db5-b067-a3d1b2cd2d01
+            report_dir: target
+            ui_headless: true
+            zabbix_enabled: true
+            zabbix_server: zabbix.devshift.net
+            zabbix_port: 9443
+            zabbix_host: qa_openshift.io
+            zabbix_metric_prefix: "booster-bdd.{scenario}.{build_tool}"
         - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
             git_organization: openshiftio
             git_repo: saas-openshiftio
