@@ -2673,9 +2673,8 @@
             exit $rtn_code
     publishers:
         - email:
-            recipients: devtools-appcreation@redhat.com
+            recipients: pmacik@redhat.com ldimaggi@redhat.com
             notify-every-unstable-build: true
-            send-to-individuals: true
 
 - job-template:
     name: 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}'
