@@ -2685,7 +2685,6 @@
 
 - job-template:
     name: 'devtools-bdd-test-booster-import-{build_tool}-{test_url}-{cluster}'
-    scenario: 'import-repo'
     booster_mission: ''
     booster_runtime_id: ''
     booster_runtime_version: ''
@@ -3573,6 +3572,7 @@
             osio_creds_password: 'password_2'
             bdd_test_start_time: '5 2-23/4 * * *'
             timeout: 60m
+            scenario: 'import-repo'
             server_address: https://openshift.io
             forge_api: https://forge.api.openshift.io
             wit_api: https://api.openshift.io
