@@ -3832,7 +3832,7 @@
             git_repo: f8a-pypi-insights
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
+            timeout: '30m'
             registry: 'quay.io'
             image_name: 'openshiftio/fabric8-analytics-f8a-pypi-insights'
         - '{ci_project}-{git_repo}-f8a-build-master':
@@ -3843,7 +3843,7 @@
             saas_git: saas-analytics
             deployment_units: 'f8a-pypi-insights'
             deployment_configs: 'f8a-pypi-insights'
-            timeout: '20m'
+            timeout: '60m'
             extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: f8a-pypi-insights
