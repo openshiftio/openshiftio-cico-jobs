@@ -193,6 +193,13 @@
       - env-var: 'FABRIC8_HUB_TOKEN'
         vault-key: 'hub'
 
+- fabric8-hub-token: &fabric8-build-devcluster
+    name: "fabric8-build-devcluster"
+    secret-path: 'devtools-osio-ci/fabric8-build-devcluster'
+    secret-values:
+      - env-var: 'FABRIC8_DEVCLUSTER_TOKEN'
+        vault-key: 'OS_TOKEN'
+
 - fabric8-maven-settingsxml: &fabric8-maven-settingsxml
     name: "fabric8-maven-settingsxml"
     secret-path: 'devtools-osio-ci/fabric8-maven-settingsxml'
@@ -1471,6 +1478,7 @@
               - *fabric8cd-sonatype-creds
               - *npm-build-deliver-creds-gh-token
               - *fabric8-hub-token
+              - *fabric8-build-devcluster
               - *fabric8-github-ssh-key
               - *fabric8-build-dockerio-dockercfg
               - *gpgkeys-for-signing-maven-artefacts
@@ -1505,6 +1513,7 @@
           secrets:
             - *fabric8-maven-settingsxml
             - *fabric8-hub-token
+            - *fabric8-build-devcluster
             - *fabric8cd-sonatype-creds
             - *fabric8-github-ssh-key
             - *fabric8-build-dockerio-dockercfg
