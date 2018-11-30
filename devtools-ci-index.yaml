@@ -2035,6 +2035,8 @@
       {jobdescription}
     node: devtools
     timeout: 30m
+    cluster: ''
+    feature_level: ''
     zabbix_enabled: ''
     ci_cmd: 'cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh'
     properties:
@@ -2098,7 +2100,7 @@
                 fi
                 echo "'cico node get' failed, trying again in 60s ($n/5)"
                 n=$[$n+1]
-                sleep 60
+                sleep 120
             done
             echo 'Using Host' $CICO_hostname
             set -x
@@ -2555,27 +2557,25 @@
 - job-template:
     name: 'devtools-test-e2e-{test_url}-{test_suite}'
     triggers:
-      - timed: '{ee_test_start_time}'
+        - timed: '{ee_test_start_time}'
     wrappers:
-        - credentials-binding:
-            - text:
-                credential-id: "{osio_token}"
-                variable: REFRESH_TOKEN
-            - username-password-separated:
-                credential-id: "{osio_creds}"
-                username: OSIO_USERNAME
-                password: OSIO_PASSWORD
+        - ansicolor
         - vault-secrets:
             <<: *vault_defaults
             secrets:
-              - *kube-config-dsaas-stg
+                - secret-path: 'devtools-osio-ci/planner/{osio_creds}'
+                  secret-values:
+                    - env-var: 'OSIO_PASSWORD'
+                      vault-key: 'password'
+                    - env-var: 'REFRESH_TOKEN'
+                      vault-key: 'refresh_token'
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
             shallow_clone: true
             branches:
                 - '{branch}'
-    <<: *job_template_build_defaults
+    <<: *e2e_tests_template
 
 - booster_bdd_tests_template: &booster_bdd_tests_template
     name: 'booster_bdd_tests_template'
@@ -4366,9 +4366,7 @@
             git_repo: fabric8-planner
             test_url: prod-preview.openshift.io
             test_suite: planner-functional-tests
-            osio_token: be32035b-cdd2-441b-ab27-93d023feeb1d
-            osio_creds: b310559d-91c5-469c-bb35-fc9b8333e619
-            ci_project: 'devtools'
+            osio_creds: osio-ci-planner-002-preview
             branch: 'prod-preview-tests'
             ee_test_start_time: '0 * * * *'
             ci_cmd: '/bin/bash cico_test_prod.sh --prod-preview'
@@ -4377,9 +4375,7 @@
             git_organization: fabric8-ui
             git_repo: fabric8-planner
             test_suite: planner-functional-tests
-            osio_token: 37851cbe-37eb-4c2b-944f-0a875d510795
-            osio_creds: e53d9045-2500-498a-936f-3ecf323af800
-            ci_project: 'devtools'
+            osio_creds: osio-ci-planner-002
             test_url: 'openshift.io'
             branch: 'prod-tests'
             ee_test_start_time: '0 */4 * * *'
@@ -4634,22 +4630,20 @@
             git_repo: fabric8-test
             test_url: prod-preview.openshift.io
             test_suite: planner
-            osio_token: be32035b-cdd2-441b-ab27-93d023feeb1d
-            osio_creds: b310559d-91c5-469c-bb35-fc9b8333e619
-            ci_project: 'devtools'
+            osio_creds: osio-ci-planner-002-preview
             branch: 'master'
             ee_test_start_time: '35 */2 * * *'
-            ci_cmd: 'cd ee_tests && /bin/bash TEST_SUITE=$test_suite TEST_URL=$test_url ./cico_run_e2e_tests.sh'
+            zabbix_enabled: false
+            ci_cmd: 'cd payload/fabric8-tests/ee_tests && /bin/bash cico_run_e2e_tests.sh'
             timeout: '40m'
         - 'devtools-test-e2e-{test_url}-{test_suite}':
             git_organization: fabric8io
             git_repo: fabric8-test
             test_url: openshift.io
             test_suite: planner
-            osio_creds: e53d9045-2500-498a-936f-3ecf323af800
-            osio_token: 37851cbe-37eb-4c2b-944f-0a875d510795
-            ci_project: 'devtools'
+            osio_creds: osio-ci-planner-002
             branch: 'master'
             ee_test_start_time: '40 */4 * * *'
-            ci_cmd: 'cd ee_tests && /bin/bash TEST_SUITE=$test_suite TEST_URL=$test_url ./cico_run_e2e_tests.sh'
+            zabbix_enabled: false
+            ci_cmd: 'cd payload/fabric8-tests/ee_tests && /bin/bash cico_run_e2e_tests.sh'
             timeout: '40m'
