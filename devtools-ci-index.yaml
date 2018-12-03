@@ -2047,6 +2047,7 @@
     cluster: ''
     feature_level: ''
     zabbix_enabled: ''
+    secret_subpath: 'e2e'
     ci_cmd: 'cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh'
     properties:
         - github:
@@ -2056,7 +2057,7 @@
         - vault-secrets:
             <<: *vault_defaults
             secrets:
-                - secret-path: 'devtools-osio-ci/e2e/{osio_creds}'
+                - secret-path: 'devtools-osio-ci/{secret_subpath}/{osio_creds}'
                   secret-values:
                     - env-var: 'OSIO_PASSWORD'
                       vault-key: 'password'
@@ -2075,6 +2076,7 @@
             export FEATURE_LEVEL="{feature_level}"
             export ZABBIX_ENABLED="{zabbix_enabled}"
 
+            mkdir config
             (
                 # run in subshell not to affect current environment
                 set +x
@@ -2085,9 +2087,11 @@
                 cp ~/cico-tools/env-toolkit .
                 ./env-toolkit dump -f jenkins-env.json
                 env > f8tests/jenkins-env
+                env > config/jenkins-env
             )
 
             cp ~/artifacts.key f8tests
+            cp ~/artifacts.key config
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
             n=1
@@ -4434,7 +4438,7 @@
             osio_creds: osio-ci-planner-002-preview
             branch: 'prod-preview-tests'
             ee_test_start_time: '0 * * * *'
-            ci_cmd: '/bin/bash payload/cico_test_prod.sh --prod-preview'
+            ci_cmd: 'cd payload && /bin/bash cico_test_prod.sh --prod-preview'
             timeout: '40m'
         - 'devtools-test-e2e-{test_url}-{test_suite}':
             git_organization: fabric8-ui
@@ -4444,7 +4448,7 @@
             test_url: 'openshift.io'
             branch: 'prod-tests'
             ee_test_start_time: '0 */4 * * *'
-            ci_cmd: '/bin/bash payload/cico_test_prod.sh'
+            ci_cmd: 'cd payload && /bin/bash cico_test_prod.sh'
             timeout: '40m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-analytics
@@ -4690,25 +4694,23 @@
             git_repo: fabric8-analytics-release-monitor
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-release-monitor
-        - 'devtools-test-e2e-{test_url}-{test_suite}':
-            git_organization: fabric8io
-            git_repo: fabric8-test
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: prod-preview.openshift.io
             test_suite: planner
+            cluster: us-east-2a
+            feature_level: released
             osio_creds: osio-ci-planner-002-preview
-            branch: 'master'
             ee_test_start_time: '35 */2 * * *'
+            timeout: 40m
             zabbix_enabled: false
-            ci_cmd: 'cd payload/ee_tests && /bin/bash cico_run_e2e_tests.sh'
-            timeout: '40m'
-        - 'devtools-test-e2e-{test_url}-{test_suite}':
-            git_organization: fabric8io
-            git_repo: fabric8-test
+            secret_subpath: planner
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: openshift.io
             test_suite: planner
+            cluster: us-east-2a
+            feature_level: released
             osio_creds: osio-ci-planner-002
-            branch: 'master'
             ee_test_start_time: '40 */4 * * *'
+            timeout: 40m
             zabbix_enabled: false
-            ci_cmd: 'cd payload/ee_tests && /bin/bash cico_run_e2e_tests.sh'
-            timeout: '40m'
+            secret_subpath: planner
