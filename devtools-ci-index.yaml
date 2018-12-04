@@ -4698,7 +4698,7 @@
             test_url: prod-preview.openshift.io
             test_suite: planner
             cluster: us-east-2a
-            feature_level: released
+            feature_level: beta
             osio_creds: osio-ci-planner-002-preview
             ee_test_start_time: '35 */2 * * *'
             timeout: 40m
@@ -4708,7 +4708,7 @@
             test_url: openshift.io
             test_suite: planner
             cluster: us-east-2a
-            feature_level: released
+            feature_level: beta
             osio_creds: osio-ci-planner-002
             ee_test_start_time: '40 */4 * * *'
             timeout: 40m
