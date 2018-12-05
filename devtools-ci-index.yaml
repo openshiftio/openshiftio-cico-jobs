@@ -4427,7 +4427,7 @@
             branch: 'prod-preview-tests'
             ee_test_start_time: '0 * * * *'
             ci_cmd: 'cd payload && /bin/bash cico_test_prod.sh --prod-preview'
-            timeout: '40m'
+            timeout: '60m'
         - 'devtools-test-e2e-{test_url}-{test_suite}':
             git_organization: fabric8-ui
             git_repo: fabric8-planner
@@ -4437,7 +4437,7 @@
             branch: 'prod-tests'
             ee_test_start_time: '0 */4 * * *'
             ci_cmd: 'cd payload && /bin/bash cico_test_prod.sh'
-            timeout: '40m'
+            timeout: '60m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-analytics
             git_repo: cvedb
@@ -4687,7 +4687,7 @@
             test_suite: planner
             cluster: us-east-2a
             feature_level: beta
-            osio_creds: osio-ci-planner-002-preview
+            osio_creds: osio-ci-planner-003-preview
             ee_test_start_time: '35 */2 * * *'
             timeout: 40m
             zabbix_enabled: false
@@ -4695,9 +4695,9 @@
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: openshift.io
             test_suite: planner
-            cluster: us-east-2a
+            cluster: us-east-2
             feature_level: beta
-            osio_creds: osio-ci-planner-002
+            osio_creds: osio-ci-planner-003
             ee_test_start_time: '40 */4 * * *'
             timeout: 40m
             zabbix_enabled: false
