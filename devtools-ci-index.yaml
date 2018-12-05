@@ -529,6 +529,7 @@
 - job-template:
     name: '{ci_project}-{git_repo}'
     wrappers:
+      - ansicolor
       - vault-secrets:
           <<: *vault_defaults
           secrets:
@@ -1434,6 +1435,7 @@
       If all goes well, npm is published
     node: "{ci_project}"
     wrappers:
+        - ansicolor
         - vault-secrets:
             <<: *vault_defaults
             secrets:
