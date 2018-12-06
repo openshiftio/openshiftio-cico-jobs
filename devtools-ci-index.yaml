@@ -530,6 +530,7 @@
 - job-template:
     name: '{ci_project}-{git_repo}'
     wrappers:
+      - ansicolor
       - vault-secrets:
           <<: *vault_defaults
           secrets:
@@ -1435,6 +1436,7 @@
       If all goes well, npm is published
     node: "{ci_project}"
     wrappers:
+        - ansicolor
         - vault-secrets:
             <<: *vault_defaults
             secrets:
@@ -1533,22 +1535,6 @@
             - *quay-credentials
             - *registry-devshift-credentials
     <<: *job_template_defaults
-
-- job-template:
-    name: '{ci_project}-{git_repo}-build-master-update-downstream'
-    wrappers:
-      - vault-secrets:
-          <<: *vault_defaults
-          secrets:
-            - *kube-config-dsaas-stg
-            - *fabric8-hub-token
-    scm:
-        - git:
-            url: https://github.com/{git_organization}/{git_repo}.git
-            shallow_clone: true
-            branches:
-                - master
-    <<: *job_template_build_defaults
 
 - job-template:
     name: '{ci_project}-{git_repo}-build-master-push-client'
@@ -2077,6 +2063,8 @@
             export FEATURE_LEVEL="{feature_level}"
             export ZABBIX_ENABLED="{zabbix_enabled}"
 
+            pwd
+            ls -l config
             mkdir config
             (
                 # run in subshell not to affect current environment
@@ -2093,6 +2081,7 @@
 
             cp ~/artifacts.key f8tests
             cp ~/artifacts.key config
+            ls -l config
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
             n=1
@@ -3260,7 +3249,7 @@
             ci_cmd: '/bin/bash cico_build.sh'
             timeout: '20m'
             discarder_days: 30
-        - '{ci_project}-{git_repo}-build-master-update-downstream':
+        - '{ci_project}-{git_repo}-build-master':
             git_repo: fabric8-auth-client
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
@@ -3332,12 +3321,12 @@
             ci_cmd: '/bin/bash cico_build.sh'
             timeout: '20m'
             discarder_days: 30
-        - '{ci_project}-{git_repo}-build-master-update-downstream':
+        - '{ci_project}-{git_repo}-build-master':
             git_repo: fabric8-cluster-client
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-build-master-push-client':
             git_repo: fabric8-env
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
@@ -3350,6 +3339,17 @@
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
             discarder_days: 30
+        - '{ci_project}-{git_repo}':
+            git_repo: fabric8-env-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            timeout: '20m'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-build-master':
+            git_repo: fabric8-env-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: fabric8-launcher
             git_repo: launcher-documentation
