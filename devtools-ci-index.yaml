@@ -2060,6 +2060,8 @@
             export FEATURE_LEVEL="{feature_level}"
             export ZABBIX_ENABLED="{zabbix_enabled}"
 
+            pwd
+            ls -l config
             mkdir config
             (
                 # run in subshell not to affect current environment
@@ -2076,6 +2078,7 @@
 
             cp ~/artifacts.key f8tests
             cp ~/artifacts.key config
+            ls -l config
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
             n=1
