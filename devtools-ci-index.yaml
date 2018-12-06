@@ -1536,22 +1536,6 @@
     <<: *job_template_defaults
 
 - job-template:
-    name: '{ci_project}-{git_repo}-build-master-update-downstream'
-    wrappers:
-      - vault-secrets:
-          <<: *vault_defaults
-          secrets:
-            - *kube-config-dsaas-stg
-            - *fabric8-hub-token
-    scm:
-        - git:
-            url: https://github.com/{git_organization}/{git_repo}.git
-            shallow_clone: true
-            branches:
-                - master
-    <<: *job_template_build_defaults
-
-- job-template:
     name: '{ci_project}-{git_repo}-build-master-push-client'
     wrappers:
       - vault-secrets:
@@ -2078,6 +2062,8 @@
             export FEATURE_LEVEL="{feature_level}"
             export ZABBIX_ENABLED="{zabbix_enabled}"
 
+            pwd
+            ls -l config
             mkdir config
             (
                 # run in subshell not to affect current environment
@@ -2094,6 +2080,7 @@
 
             cp ~/artifacts.key f8tests
             cp ~/artifacts.key config
+            ls -l config
             export CICO_API_KEY=$(cat ~/duffy.key )
             # get node
             n=1
@@ -3261,7 +3248,7 @@
             ci_cmd: '/bin/bash cico_build.sh'
             timeout: '20m'
             discarder_days: 30
-        - '{ci_project}-{git_repo}-build-master-update-downstream':
+        - '{ci_project}-{git_repo}-build-master':
             git_repo: fabric8-auth-client
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
@@ -3333,12 +3320,12 @@
             ci_cmd: '/bin/bash cico_build.sh'
             timeout: '20m'
             discarder_days: 30
-        - '{ci_project}-{git_repo}-build-master-update-downstream':
+        - '{ci_project}-{git_repo}-build-master':
             git_repo: fabric8-cluster-client
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-build-master-push-client':
             git_repo: fabric8-env
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
@@ -3351,6 +3338,17 @@
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
             discarder_days: 30
+        - '{ci_project}-{git_repo}':
+            git_repo: fabric8-env-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            timeout: '20m'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-build-master':
+            git_repo: fabric8-env-client
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: fabric8-launcher
             git_repo: launcher-documentation
@@ -4360,18 +4358,6 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}':
-            git_organization: fabric8-launcher
-            git_repo: ngx-launcher
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
-        - '{ci_project}-{git_repo}-npm-publish-build-master':
-            git_organization: fabric8-launcher
-            git_repo: ngx-launcher
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            timeout: '20m'
-        - '{ci_project}-{git_repo}':
             git_organization: arquillian
             git_repo: ike-prow-plugins
             ci_project: 'devtools'
@@ -4441,7 +4427,7 @@
             branch: 'prod-preview-tests'
             ee_test_start_time: '0 * * * *'
             ci_cmd: 'cd payload && /bin/bash cico_test_prod.sh --prod-preview'
-            timeout: '40m'
+            timeout: '60m'
         - 'devtools-test-e2e-{test_url}-{test_suite}':
             git_organization: fabric8-ui
             git_repo: fabric8-planner
@@ -4451,7 +4437,7 @@
             branch: 'prod-tests'
             ee_test_start_time: '0 */4 * * *'
             ci_cmd: 'cd payload && /bin/bash cico_test_prod.sh'
-            timeout: '40m'
+            timeout: '60m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-analytics
             git_repo: cvedb
@@ -4701,7 +4687,7 @@
             test_suite: planner
             cluster: us-east-2a
             feature_level: beta
-            osio_creds: osio-ci-planner-002-preview
+            osio_creds: osio-ci-planner-003-preview
             ee_test_start_time: '35 */2 * * *'
             timeout: 40m
             zabbix_enabled: false
@@ -4709,9 +4695,9 @@
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: openshift.io
             test_suite: planner
-            cluster: us-east-2a
+            cluster: us-east-2
             feature_level: beta
-            osio_creds: osio-ci-planner-002
+            osio_creds: osio-ci-planner-003
             ee_test_start_time: '40 */4 * * *'
             timeout: 40m
             zabbix_enabled: false
