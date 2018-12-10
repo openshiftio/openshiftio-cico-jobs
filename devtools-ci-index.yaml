@@ -12,6 +12,7 @@
 - admin_list_defaults: &admin_list_defaults
     name: 'admin_list_defaults'
     admin-list:
+        - abhinandan13jan
         - aditya-konarde
         - akurinnoy
         - alexeykazakov
@@ -53,6 +54,7 @@
         - jiekang
         - jmelis
         - joshuawilson
+        - karthikjeeyar
         - Katka92
         - kbsingh
         - kishansagathiya
