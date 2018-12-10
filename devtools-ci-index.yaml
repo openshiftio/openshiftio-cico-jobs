@@ -607,6 +607,11 @@
             - fabric8-analytics
           success-comment: "$ghprbPullAuthorLoginMention Your image is available in the registry: `docker pull {registry}/{image_name}:SNAPSHOT-PR-$ghprbPullId`"
           <<: *github_pull_request_defaults
+    publishers:
+        - email:
+            recipients: ptisnovs@redhat.com devtools-bayesian@redhat.com
+            notify-every-unstable-build: true
+            send-to-individuals: true
     <<: *job_template_defaults
 
 - job-template:
@@ -1091,6 +1096,11 @@
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload-tests
             $ssh_cmd -t "cd payload-tests/integration-tests && /bin/bash cico_run_tests.sh"
+    publishers:
+        - email:
+            recipients: ptisnovs@redhat.com devtools-bayesian@redhat.com
+            notify-every-unstable-build: true
+            send-to-individuals: true
     <<: *job_template_defaults
 
 - job-template:
