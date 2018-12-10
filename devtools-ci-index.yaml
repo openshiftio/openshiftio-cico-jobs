@@ -376,17 +376,6 @@
             - file:
                 credential-id: 93da78ec-7785-49ab-a1ef-586424b3e94f
                 variable: creds_config_file
-- wrapper:
-    name: che_functional_tests_credentials_wrapper-periodical-prod-preview.openshift.io-2a
-    wrappers:
-        - credentials-binding:
-            - text:
-                credential-id: 45e975d5-003b-401b-96c3-be9c5117f164
-                variable: KEYCLOAK_TOKEN
-            - username-password-separated:
-                credential-id: cdd2512c-3c7c-425b-bc21-119fcba85855
-                username: OSIO_USERNAME
-                password: OSIO_PASSWORD
 
 - wrapper:
     name: che_functional_tests_credentials_wrapper-mergeCheck-prod-preview.openshift.io-2a
@@ -2997,33 +2986,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash ./.ci/cico_build_prcheck_dep.sh'
             timeout: '120m'
-        - '{ci_project}-{git_repo}-periodical-{test_url}-{cluster}':
-            git_organization: redhat-developer
-            git_repo: che-functional-tests
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh ./cico/config_prod_preview'
-            test_url: 'prod-preview.openshift.io'
-            timeout: '20m'
-            type: 'periodical'
-            cluster: '2a'
-        - '{ci_project}-{git_repo}-periodical-{test_url}-{cluster}':
-            git_organization: redhat-developer
-            git_repo: che-functional-tests
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh ./cico/config_prod_preview'
-            test_url: 'prod-preview.openshift.io'
-            timeout: '20m'
-            type: 'periodical'
-            cluster: 'free-stg'
-        - '{ci_project}-{git_repo}-periodical-{test_url}-{cluster}':
-            git_organization: redhat-developer
-            git_repo: che-functional-tests
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh'
-            test_url: 'openshift.io'
-            timeout: '20m'
-            type: 'periodical'
-            cluster: '2'
         - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
             git_organization: redhat-developer
             git_repo: rh-che
