@@ -263,6 +263,8 @@
         vault-key: 'che_preview_username'
       - env-var: 'RH_CHE_AUTOMATION_CHE_PREVIEW_PASSWORD'
         vault-key: 'che_preview_password'
+      - env-var: 'RH_CHE_AUTOMATION_CHE_PREVIEW_EMAIL'
+        vault-key: 'che_preview_email'
 
 - rh-che-automation-credentials-dockerhub: &rh-che-automation-credentials-dockerhub
     name: "rh-che-automation-credentials-dockerhub"
