@@ -3566,7 +3566,7 @@
             wit_api: https://api.openshift.io
             auth_api: https://auth.openshift.io
             danger_zone: true
-            pipeline: maven-releasestageapproveandpromote
+            pipeline: node-releasestageapproveandpromote
             booster_mission: rest-http
             booster_runtime_id: nodejs
             booster_runtime_version: v10-community
