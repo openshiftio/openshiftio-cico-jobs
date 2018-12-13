@@ -3054,6 +3054,17 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-ui
+            git_repo: fabric8-admin-console
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-npm-publish-build-master':
+            git_organization: fabric8-ui
+            git_repo: fabric8-admin-console
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
         - '{ci_project}-{git_repo}-wit-go-benchmarks':
             git_organization: fabric8-services
             git_repo: fabric8-wit
