@@ -4725,6 +4725,14 @@
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-github-events-monitor
             discarder_days: 30
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: pmacik
+            git_repo: pact-broker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            saas_git: saas-contracts
+            prj_name: dsaas-pact-broker
+            timeout: '20m'
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: prod-preview.openshift.io
             test_suite: planner
