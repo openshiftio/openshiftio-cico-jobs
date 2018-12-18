@@ -4726,7 +4726,7 @@
             git_repo: fabric8-analytics-github-events-monitor
             discarder_days: 30
         - '{ci_project}-{git_repo}-build-master':
-            git_organization: pmacik
+            git_organization: rhdt
             git_repo: pact-broker
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
