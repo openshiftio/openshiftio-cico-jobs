@@ -745,6 +745,7 @@
     svc_name: none
     prj_name: dsaas-preview
     saas_git: none
+    saas_organization: openshiftio
     saas_service_name: none
     saasherder_prepare: |
         if [ "$SAAS_GIT" != "none" ]; then
@@ -758,7 +759,7 @@
             if [ "$SUBDIR" != "" ]; then
                 SAAS_SERVICE_NAME=$SAAS_SERVICE_NAME"-"$SUBDIR
             fi
-            git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
+            git clone --depth 1 https://github.com/$SAAS_ORGANIZATION/$SAAS_GIT saas.git
             cd saas.git
             [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
             export DEVSHIFT_TAG_LEN=$(saasherder --environment $SAAS_ENV get hash_length $SAAS_SERVICE_NAME)
@@ -822,6 +823,7 @@
                 SUBDIR="{subdir}"
                 GIT_REPO={git_repo}
                 PRJ_NAME={prj_name}
+                SAAS_ORGANIZATION={saas_organization}
                 SAAS_GIT={saas_git}
                 {saasherder_prepare}
             fi
@@ -905,7 +907,7 @@
         PATH=$PATH:~/.local/bin/
         CONTEXT=$(echo $SAAS_GIT | sed 's/.*://')
         SAAS_GIT=$(echo $SAAS_GIT | sed 's/:.*//')
-        git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
+        git clone --depth 1 https://github.com/$SAAS_ORGANIZATION/$SAAS_GIT saas.git
         cd saas.git
         [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
 
@@ -1018,6 +1020,7 @@
             cat > deploy-e2e-test-params << EOF
             GIT_ORGANIZATION={git_organization}
             UPSTREAM_GIT_COMMIT=$GIT_COMMIT
+            SAAS_ORGANIZATION={saas_organization}
             SAAS_GIT={saas_git}
             DEPLOYMENT_UNITS={deployment_units}
             DEPLOYMENT_CONFIGS={deployment_configs}
@@ -1229,6 +1232,9 @@
       - string:
           name: UPSTREAM_GIT_COMMIT
       - string:
+          name: SAAS_ORGANIZATION
+          default: '{saas_organization}'
+      - string:
           name: SAAS_GIT
           default: '{saas_git}'
       - string:
@@ -1392,6 +1398,7 @@
             SVC_NAME={svc_name}
             GIT_REPO={git_repo}
             PRJ_NAME={prj_name}
+            SAAS_ORGANIZATION={saas_organization}
             SAAS_GIT={saas_git}
             SAAS_SERVICE_NAME={saas_service_name}
             {saasherder_prepare}
