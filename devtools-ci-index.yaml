@@ -4705,6 +4705,12 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '10m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: fabric8-analytics-github-events-monitor
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: fabric8-analytics-github-events-monitor
+            discarder_days: 30
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: prod-preview.openshift.io
             test_suite: planner
