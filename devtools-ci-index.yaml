@@ -615,7 +615,7 @@
           <<: *github_pull_request_defaults
     publishers:
         - email:
-            recipients: ptisnovs@redhat.com devtools-bayesian@redhat.com
+            recipients: ptisnovs@redhat.com
             notify-every-unstable-build: true
             send-to-individuals: true
     <<: *job_template_defaults
