@@ -484,12 +484,12 @@
                     fi
                     echo "'cico node get' succeed, but can't get hostname from output"
                 fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
                     echo "giving up on 'cico node get'"
                     exit 1
                 fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
                 n=$[$n+1]
                 sleep 60
             done
@@ -800,12 +800,12 @@
                         fi
                         echo "'cico node get' succeed, but can't get hostname from output" >&2
                     fi
-                    if [ $n -gt 5 ]; then
-                        # give up after 5 tries
+                    if [ $n -gt 15 ]; then
+                        # give up after 15 tries
                         echo "giving up on 'cico node get'" >&2
                         return 1
                     fi
-                    echo "'cico node get' failed, trying again in 60s ($n/5)" >&2
+                    echo "'cico node get' failed, trying again in 60s ($n/15)" >&2
                     n=$[$n+1]
                     sleep 60
                 done
@@ -968,12 +968,12 @@
                     fi
                     echo "'cico node get' succeed, but can't get hostname from output"
                 fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
                     echo "giving up on 'cico node get'"
                     exit 1
                 fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
                 n=$[$n+1]
                 sleep 60
             done
@@ -1073,12 +1073,12 @@
                     fi
                     echo "'cico node get' succeed, but can't get hostname from output"
                 fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
                     echo "giving up on 'cico node get'"
                     exit 1
                 fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
                 n=$[$n+1]
                 sleep 60
             done
@@ -1144,12 +1144,12 @@
                     fi
                     echo "'cico node get' succeed, but can't get hostname from output"
                 fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
                     echo "giving up on 'cico node get'"
                     exit 1
                 fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
                 n=$[$n+1]
                 sleep 60
             done
@@ -1349,12 +1349,12 @@
                     fi
                     echo "'cico node get' succeed, but can't get hostname from output"
                 fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
                     echo "giving up on 'cico node get'"
                     exit 1
                 fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
                 n=$[$n+1]
                 sleep 60
             done
@@ -1614,12 +1614,12 @@
                     fi
                     echo "'cico node get' succeed, but can't get hostname from output"
                 fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
                     echo "giving up on 'cico node get'"
                     exit 1
                 fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
                 n=$[$n+1]
                 sleep 60
             done
@@ -1999,12 +1999,12 @@
                     fi
                     echo "'cico node get' succeed, but can't get hostname from output"
                 fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
                     echo "giving up on 'cico node get'"
                     exit 1
                 fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
                 n=$[$n+1]
                 sleep 60
             done
@@ -2101,12 +2101,12 @@
                     fi
                     echo "'cico node get' succeed, but can't get hostname from output"
                 fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
                     echo "giving up on 'cico node get'"
                     exit 1
                 fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
                 n=$[$n+1]
                 sleep 120
             done
@@ -2256,12 +2256,12 @@
                     fi
                     echo "'cico node get' succeed, but can't get hostname from output"
                 fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
                     echo "giving up on 'cico node get'"
                     exit 1
                 fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
                 n=$[$n+1]
                 sleep 60
             done
@@ -2329,12 +2329,12 @@
                     fi
                     echo "'cico node get' succeed, but can't get hostname from output"
                 fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
                     echo "giving up on 'cico node get'"
                     exit 1
                 fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
                 n=$[$n+1]
                 sleep 60
             done
@@ -2438,12 +2438,12 @@
                     fi
                     echo "'cico node get' succeed, but can't get hostname from output"
                 fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
                     echo "giving up on 'cico node get'"
                     exit 1
                 fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
                 n=$[$n+1]
                 sleep 60
             done
@@ -2509,12 +2509,12 @@
                     fi
                     echo "'cico node get' succeed, but can't get hostname from output"
                 fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
                     echo "giving up on 'cico node get'"
                     exit 1
                 fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
                 n=$[$n+1]
                 sleep 60
             done
@@ -2655,12 +2655,12 @@
                     fi
                     echo "'cico node get' succeed, but can't get hostname from output"
                 fi
-                if [ $n -gt 5 ]; then
-                    # give up after 5 tries
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
                     echo "giving up on 'cico node get'"
                     exit 1
                 fi
-                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
                 n=$[$n+1]
                 sleep 60
             done
