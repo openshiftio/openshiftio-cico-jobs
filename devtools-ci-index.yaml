@@ -31,6 +31,7 @@
         - chrislessard
         - christianvogt
         - corinnekrych
+        - davidfestal
         - dependabot[bot]
         - dgutride
         - DhritiShikhar
@@ -102,7 +103,8 @@
         - tsmaeder
         - vikram-raj
         - xcoulon
-        - davidfestal
+        - YuriyHorobey
+
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
