@@ -1673,7 +1673,7 @@
     secret-values:
       - env-var: 'QUAY_SECRET_JSON'
         vault-key: 'secret'
-
+        
 - rh-che-automation-template: &rh-che-automation-template
     name: 'rh-che-automation-template'
     concurrent: false
@@ -1687,6 +1687,7 @@
             - *rh-che-automation-credentials-prod-preview-openshift-io
             - *rh-che-automation-credentials-dockerhub
             - *rh-che-automation-quay-secret
+            - *fabric8-hub-token
             - *qe-osio-dev-cluster-SA-token
     <<: *job_template_defaults
 
