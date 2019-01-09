@@ -1673,7 +1673,7 @@
     secret-values:
       - env-var: 'QUAY_SECRET_JSON'
         vault-key: 'secret'
-        
+
 - rh-che-automation-template: &rh-che-automation-template
     name: 'rh-che-automation-template'
     concurrent: false
