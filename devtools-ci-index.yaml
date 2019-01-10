@@ -4758,7 +4758,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
             saas_organization: rhdt
-            saas_git: saas-contracts
+            saas_git: saas-qe
             prj_name: dsaas-pact-broker
             timeout: '20m'
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
