@@ -2771,7 +2771,7 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             timeout: '30m'
-         - '{ci_project}-{git_repo}-build-master':
+        - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: fabric8-notification
             ci_project: 'devtools'
