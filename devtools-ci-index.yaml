@@ -2728,6 +2728,98 @@
         - timed: '{bdd_test_start_time}'
     <<: *booster_bdd_tests_template
 
+- contract_tests_provider_template: &contract_tests_provider_template
+    name: 'contract_tests_provider_template'
+    defaults: global
+    node: devtools
+    timeout: 60m
+    zabbix_enabled: true
+    scm_git_branch: master
+    properties:
+        - github:
+            url: '{github_url}'
+    scm:
+        - git:
+            url: '{scm_git_url}'
+            shallow_clone: true
+            branches:
+                - '{scm_git_branch}'
+    wrappers:
+        - ansicolor
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:               
+              - secret-path: 'devtools-osio-ci/contract-tests-creds'
+                secret-values:
+                    - env-var: 'OSIO_USERNAME'
+                      vault-key: '{osio_creds_username}'
+                    - env-var: 'OSIO_PASSWORD'
+                      vault-key: '{osio_creds_password}'
+                    - env-var: 'PACT_BROKER_USERNAME'
+                      vault-key: '{pact_broker_creds_username}'
+                    - env-var: 'PACT_BROKER_PASSWORD'
+                      vault-key: '{pact_broker_creds_password}'
+    builders:
+        - shell: |
+            set +e
+            set +x
+            export PACT_CONSUMER="{pact_consumer}"
+            export PACT_BROKER_URL="{pact_broker_url}"
+
+            cp ~/cico-tools/env-toolkit .
+            ./env-toolkit dump -f jenkins-env.json
+            env > jenkins-env
+
+            cp ~/artifacts.key .
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            # get node
+            n=1
+            while true
+            do
+                cico_output=$(cico node get -f value -c ip_address -c comment)
+                if [ $? -eq 0 ]; then
+                    read CICO_hostname CICO_ssid <<< $cico_output
+                    if  [ ! -z "$CICO_hostname" ]; then
+                        # we got hostname from cico
+                        break
+                    fi
+                    echo "'cico node get' succeed, but can't get hostname from output"
+                fi
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
+                n=$[$n+1]
+                sleep 60
+            done
+            echo 'Using Host' $CICO_hostname
+            set -x
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd "yum -y -d1 --setopt tsflags='nodocs' install rsync"
+            rsync --delete -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && /bin/bash cico_run_contract_tests_provider.sh"
+            rtn_code=$?
+            if [[ $rtn_code -eq 124 ]]; then
+               echo "BUILD TIMEOUT";
+            else
+               rsync --delete -Ha -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
+            fi
+            cico node done $CICO_ssid
+            exit $rtn_code
+    publishers:
+        - email:
+            recipients: pmacik@redhat.com
+            notify-every-unstable-build: true
+
+- job-template:
+    name: 'devtools-contract-test-provider-{consumer}-{provider}'
+    triggers:
+        - timed: '{contract_test_start_time}'
+    <<: *contract_tests_provider_template
+
 - project:
     name: devtools
     disabled: false
@@ -3761,6 +3853,29 @@
             zabbix_port: 9443
             zabbix_host: qa_openshift.io
             zabbix_metric_prefix: "booster-bdd.{scenario}.{build_tool}"
+        - 'devtools-contract-test-provider-{consumer}-{provider}':
+            consumer: fabric8wit
+            provider: fabric8auth
+            contract_test_start_time: '*/15 * * * *'
+            github_url: 'https://github.com/fabric8-services/fabric8-auth'
+            scm_git_url: 'https://github.com/fabric8-services/fabric8-auth.git'
+            scm_git_branch: 'master'
+            pact_broker_url: 'http://pact_broker/'
+            pact_broker_creds_username: 'pact_broker_username'
+            pact_broker_creds_password: 'pact_broker_password'
+            pact_consumer: 'Fabric8Wit'
+            osio_creds_username: 'osio_username'
+            osio_creds_password: 'osio_password'
+            wrappers:
+                - vault-secrets:
+                    <<: *vault_defaults
+                    secrets:               
+                      - secret-path: 'devtools-osio-ci/contract-tests-creds'
+                        secret-values:
+                          - env-var: 'AUTH_SERVICE_ACCOUNT_CLIENT_ID'
+                            vault-key: 'auth_service_account_client_id'
+                          - env-var: 'AUTH_SERVICE_ACCOUNT_CLIENT_SECRET'
+                            vault-key: 'auth_service_account_client_secret'
         - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
             git_organization: openshiftio
             git_repo: saas-openshiftio
