@@ -2808,6 +2808,32 @@
             extra_target: rhel
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-services
+            git_repo: toolchain-operator
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-coverage':
+            git_organization: fabric8-services
+            git_repo: toolchain-operator
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-build-master-coverage':
+            git_organization: fabric8-services
+            git_repo: toolchain-operator
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-services
+            git_repo: toolchain-operator
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-openshiftio
+            timeout: '10m'
+            extra_target: rhel
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-services
             git_repo: fabric8-toggles
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
