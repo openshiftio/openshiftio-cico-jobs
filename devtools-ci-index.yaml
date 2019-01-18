@@ -3547,6 +3547,24 @@
             osio_creds: osio-ci-e2e-002-preview
             ee_test_start_time: '40 * * * *'
             zabbix_enabled: false
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: openshift.io
+            test_suite: che
+            cluster: us-east-1b
+            feature_level: released
+            osio_creds: osio-ci-e2e-che-001
+            ee_test_start_time: '20 0,12 * * *'
+            timeout: 60m
+            zabbix_enabled: false
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: prod-preview.openshift.io
+            test_suite: che
+            cluster: pr-us-east-2a
+            feature_level: released
+            osio_creds: osio-ci-preview-e2e-che
+            ee_test_start_time: '20 6,18 * * *'
+            timeout: 60m
+            zabbix_enabled: false
         - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}':
             test_url: openshift.io
             cluster: us-east-2a
