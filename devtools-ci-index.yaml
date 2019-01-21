@@ -103,6 +103,7 @@
         - vikram-raj
         - xcoulon
         - davidfestal
+        - rajatsingh25aug
 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
