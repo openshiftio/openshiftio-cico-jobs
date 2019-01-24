@@ -3966,9 +3966,9 @@
                       - secret-path: 'devtools-osio-ci/contract-tests-creds'
                         secret-values:
                           - env-var: 'OSIO_USERNAME'
-                            vault-key: 'osio_username'
+                            vault-key: 'osio_username_1'
                           - env-var: 'OSIO_PASSWORD'
-                            vault-key: 'osio_password'
+                            vault-key: 'osio_password_1'
                           - env-var: 'AUTH_SERVICE_ACCOUNT_CLIENT_ID'
                             vault-key: 'auth_service_account_client_id'
                           - env-var: 'AUTH_SERVICE_ACCOUNT_CLIENT_SECRET'
