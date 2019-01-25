@@ -1773,6 +1773,9 @@
     name: '{ci_project}-{git_repo}-prcheck-cleanup'
     triggers:
         - timed: 'H 3 * * *'
+    publishers:
+        - email:
+            recipients: rhopp@redhat.com kkanova@redhat.com tdancs@redhat.com
     wrappers:
       - vault-secrets:
           <<: *vault_defaults
