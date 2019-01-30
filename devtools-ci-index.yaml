@@ -3137,6 +3137,9 @@
             git_repo: fabric8-admin-console
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-openshiftio
+            timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-wit-go-benchmarks':
             git_organization: fabric8-services
             git_repo: fabric8-wit
