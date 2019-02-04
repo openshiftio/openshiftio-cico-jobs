@@ -4504,7 +4504,7 @@
             git_repo: f8a-hpf-insights
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
+            timeout: '30m'
             registry: 'quay.io'
             image_name: 'openshiftio/rhel-fabric8-analytics-f8a-hpf-insights'
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
@@ -4519,7 +4519,7 @@
             saas_git: saas-analytics
             deployment_units: 'f8a-hpf-insights-maven'
             deployment_configs: 'f8a-hpf-insights-maven'
-            timeout: '20m'
+            timeout: '60m'
             extra_target: rhel
         - '{ci_project}-{git_repo}-npm-publish-build-master':
             git_organization: fabric8-ui
