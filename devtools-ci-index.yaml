@@ -3783,7 +3783,7 @@
             git_organization: fabric8-ui
             git_repo: fabric8-ui
             feature_level: released
-            test_url: 'localhost:3000'
+            test_url: 'localhost:8080'
             osio_creds: osio-ci-e2e-005-preview
             timeout: 50m
             ci_cmd: 'cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh fabric8-ui'
@@ -3791,7 +3791,7 @@
             git_organization: fabric8-ui
             git_repo: fabric8-ui
             feature_level: beta
-            test_url: 'localhost:3000'
+            test_url: 'localhost:8080'
             osio_creds: osio-ci-e2e-007-preview
             timeout: 50m
             ci_cmd: 'cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh fabric8-ui'
