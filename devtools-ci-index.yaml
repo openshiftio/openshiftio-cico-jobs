@@ -1773,6 +1773,9 @@
     name: '{ci_project}-{git_repo}-prcheck-cleanup'
     triggers:
         - timed: 'H 3 * * *'
+    publishers:
+        - email:
+            recipients: rhopp@redhat.com kkanova@redhat.com tdancs@redhat.com
     wrappers:
       - vault-secrets:
           <<: *vault_defaults
@@ -3251,7 +3254,7 @@
             ci_project: 'devtools'
             ci_cmd: 'export HOST_URL="che.prod-preview.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
             env: 'prod-preview'
-            timeout: '20m'
+            timeout: '40m'
             cluster: '2a'
         - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
             git_organization: redhat-developer
@@ -3259,7 +3262,7 @@
             ci_project: 'devtools'
             ci_cmd: 'export HOST_URL="che.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
             env: 'prod'
-            timeout: '20m'
+            timeout: '40m'
             cluster: '2'
         - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
             git_organization: redhat-developer
@@ -3310,6 +3313,9 @@
             git_repo: fabric8-admin-console
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-openshiftio
+            timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-wit-go-benchmarks':
             git_organization: fabric8-services
             git_repo: fabric8-wit
