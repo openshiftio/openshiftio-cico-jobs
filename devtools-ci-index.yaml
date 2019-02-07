@@ -60,6 +60,7 @@
         - Katka92
         - kbsingh
         - kishansagathiya
+        - khrm
         - kwk
         - l0rd
         - ldimaggi
@@ -3095,7 +3096,6 @@
             saas_git: saas-openshiftio
             timeout: '10m'
             extra_target: rhel
-            build_branch: develop
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: fabric8-toggles
@@ -3631,6 +3631,33 @@
             ci_cmd: '/bin/bash .cico/test.sh'
             timeout: '20m'
             discarder_days: 30
+        - '{ci_project}-{git_repo}-fabric8-push-build-master':
+            git_organization: fabric8-services
+            git_repo: fabric8-webhook
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/deploy.sh'
+            timeout: '20m'
+            extra_target: rhel
+            saas_git: saas-openshiftio
+        - '{ci_project}-{git_repo}-build-master-coverage':
+            git_repo: fabric8-webhook
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/coverage.sh'
+            timeout: '3h'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-coverage':
+            git_repo: fabric8-webhook
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/coverage.sh'
+            timeout: '3h'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-fabric8-push-prcheck':
+            git_organization: fabric8-services
+            git_repo: fabric8-webhook
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/test.sh'
+            timeout: '20m'
+            discarder_days: 30
         - '{ci_project}-{git_repo}-fabric8-docs-prcheck':
             git_repo: fabric8-online-docs
             git_organization: fabric8io
@@ -3995,7 +4022,7 @@
             git_organization: fabric8-ui
             git_repo: fabric8-ui
             feature_level: released
-            test_url: 'localhost:3000'
+            test_url: 'localhost:8080'
             osio_creds: osio-ci-e2e-005-preview
             timeout: 50m
             ci_cmd: 'cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh fabric8-ui'
@@ -4003,7 +4030,7 @@
             git_organization: fabric8-ui
             git_repo: fabric8-ui
             feature_level: beta
-            test_url: 'localhost:3000'
+            test_url: 'localhost:8080'
             osio_creds: osio-ci-e2e-007-preview
             timeout: 50m
             ci_cmd: 'cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh fabric8-ui'
@@ -4716,7 +4743,7 @@
             git_repo: f8a-hpf-insights
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
+            timeout: '30m'
             registry: 'quay.io'
             image_name: 'openshiftio/rhel-fabric8-analytics-f8a-hpf-insights'
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
@@ -4731,7 +4758,7 @@
             saas_git: saas-analytics
             deployment_units: 'f8a-hpf-insights-maven'
             deployment_configs: 'f8a-hpf-insights-maven'
-            timeout: '20m'
+            timeout: '60m'
             extra_target: rhel
         - '{ci_project}-{git_repo}-npm-publish-build-master':
             git_organization: fabric8-ui
