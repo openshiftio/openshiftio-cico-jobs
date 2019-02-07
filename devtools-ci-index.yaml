@@ -2920,7 +2920,6 @@
             saas_git: saas-openshiftio
             timeout: '10m'
             extra_target: rhel
-            build_branch: develop
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: fabric8-toggles
