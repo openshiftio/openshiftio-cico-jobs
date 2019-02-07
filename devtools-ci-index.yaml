@@ -8,6 +8,7 @@
     branch: master
     discarder_days: -1
     discarder_num: -1
+    build_branch: master
 
 - admin_list_defaults: &admin_list_defaults
     name: 'admin_list_defaults'
@@ -60,6 +61,7 @@
         - Katka92
         - kbsingh
         - kishansagathiya
+        - khrm
         - kwk
         - l0rd
         - ldimaggi
@@ -893,7 +895,7 @@
             url: https://github.com/{git_organization}/{git_repo}.git
             shallow_clone: true
             branches:
-                - master
+                - '{build_branch}'
     <<: *job_template_build_defaults
 
 - job-template:
@@ -1039,6 +1041,33 @@
                       property-file: deploy-e2e-test-params
                       block: true
     <<: *job_template_build_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-saasorg-build-master'
+    saas_organization: openshiftio
+    parameters:
+        - string:
+            name: SAAS_ORGANIZATION
+            default: '{saas_organization}'
+    saasherder_prepare: |
+        if [ "$SAAS_GIT" != "none" ]; then
+            SAAS_ENV=staging
+            PATH=$PATH:~/.local/bin/
+            CONTEXT=$(echo $SAAS_GIT | sed 's/.*://')
+            SAAS_GIT=$(echo $SAAS_GIT | sed 's/:.*//')
+            if [[ -z "$SAAS_SERVICE_NAME" || "$SAAS_SERVICE_NAME" == "none" ]]; then
+                SAAS_SERVICE_NAME=$GIT_REPO
+            fi
+            if [ "$SUBDIR" != "" ]; then
+                SAAS_SERVICE_NAME=$SAAS_SERVICE_NAME"-"$SUBDIR
+            fi
+            git clone --depth 1 https://github.com/$SAAS_ORGANIZATION/$SAAS_GIT saas.git
+            cd saas.git
+            [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
+            export DEVSHIFT_TAG_LEN=$(saasherder --environment $SAAS_ENV get hash_length $SAAS_SERVICE_NAME)
+            cd ..
+        fi
+    <<: *job_template_build_master
 
 - job-template:
     name: '{ci_project}-e2e-fabric8-analytics'
@@ -1747,6 +1776,9 @@
     name: '{ci_project}-{git_repo}-prcheck-cleanup'
     triggers:
         - timed: 'H 3 * * *'
+    publishers:
+        - email:
+            recipients: rhopp@redhat.com kkanova@redhat.com tdancs@redhat.com
     wrappers:
       - vault-secrets:
           <<: *vault_defaults
@@ -2702,6 +2734,182 @@
         - timed: '{bdd_test_start_time}'
     <<: *booster_bdd_tests_template
 
+- contract_tests_consumer_template: &contract_tests_consumer_template
+    name: 'contract_tests_consumer_template'
+    defaults: global
+    node: devtools
+    timeout: 60m
+    scm_git_branch: master
+    properties:
+        - github:
+            url: '{github_url}'
+    scm:
+        - git:
+            url: '{scm_git_url}'
+            shallow_clone: true
+            branches:
+                - '{scm_git_branch}'
+    wrappers:
+        - ansicolor
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+              - secret-path: 'devtools-osio-ci/contract-tests-creds'
+                secret-values:
+                    - env-var: 'PACT_BROKER_USERNAME'
+                      vault-key: '{pact_broker_creds_username}'
+                    - env-var: 'PACT_BROKER_PASSWORD'
+                      vault-key: '{pact_broker_creds_password}'
+    builders:
+        - shell: |
+            set +e
+            set +x
+            export PACT_BROKER_URL="{pact_broker_url}"
+
+             cp ~/cico-tools/env-toolkit .
+            ./env-toolkit dump -f jenkins-env.json
+            env > jenkins-env
+             cp ~/artifacts.key .
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            # get node
+            n=1
+            while true
+            do
+                cico_output=$(cico node get -f value -c ip_address -c comment)
+                if [ $? -eq 0 ]; then
+                    read CICO_hostname CICO_ssid <<< $cico_output
+                    if  [ ! -z "$CICO_hostname" ]; then
+                        # we got hostname from cico
+                        break
+                    fi
+                    echo "'cico node get' succeed, but can't get hostname from output"
+                fi
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
+                n=$[$n+1]
+                sleep 60
+            done
+            echo 'Using Host' $CICO_hostname
+            set -x
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd "yum -y -d1 --setopt tsflags='nodocs' install rsync"
+            rsync --delete -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && /bin/bash cico_run_contract_tests_consumer.sh"
+            rtn_code=$?
+            if [[ $rtn_code -eq 124 ]]; then
+               echo "BUILD TIMEOUT";
+            else
+               rsync --delete -Ha -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
+            fi
+            cico node done $CICO_ssid
+            exit $rtn_code
+    publishers:
+        - email:
+            recipients: pmacik@redhat.com
+            notify-every-unstable-build: true
+
+- job-template:
+    name: 'devtools-contract-test-consumer-{consumer}-{provider}'
+    triggers:
+        - github
+    <<: *contract_tests_consumer_template
+
+- contract_tests_provider_template: &contract_tests_provider_template
+    name: 'contract_tests_provider_template'
+    defaults: global
+    node: devtools
+    timeout: 60m
+    zabbix_enabled: true
+    scm_git_branch: master
+    archive_artifacts: 'true'
+    properties:
+        - github:
+            url: '{github_url}'
+    scm:
+        - git:
+            url: '{scm_git_url}'
+            shallow_clone: true
+            branches:
+                - '{scm_git_branch}'
+    wrappers:
+        - ansicolor
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:               
+              - secret-path: 'devtools-osio-ci/contract-tests-creds'
+                secret-values:
+                    - env-var: 'PACT_BROKER_USERNAME'
+                      vault-key: '{pact_broker_creds_username}'
+                    - env-var: 'PACT_BROKER_PASSWORD'
+                      vault-key: '{pact_broker_creds_password}'
+    builders:
+        - shell: |
+            set +e
+            set +x
+            export PACT_CONSUMER="{pact_consumer}"
+            export PACT_BROKER_URL="{pact_broker_url}"
+            export OUTPUT_DIR="{output_dir}"
+            export ARCHIVE_ARTIFACTS="{archive_artifacts}"
+
+            cp ~/cico-tools/env-toolkit .
+            ./env-toolkit dump -f jenkins-env.json
+            env > jenkins-env
+
+            cp ~/artifacts.key .
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            # get node
+            n=1
+            while true
+            do
+                cico_output=$(cico node get -f value -c ip_address -c comment)
+                if [ $? -eq 0 ]; then
+                    read CICO_hostname CICO_ssid <<< $cico_output
+                    if  [ ! -z "$CICO_hostname" ]; then
+                        # we got hostname from cico
+                        break
+                    fi
+                    echo "'cico node get' succeed, but can't get hostname from output"
+                fi
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
+                n=$[$n+1]
+                sleep 60
+            done
+            echo 'Using Host' $CICO_hostname
+            set -x
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd "yum -y -d1 --setopt tsflags='nodocs' install rsync"
+            rsync --delete -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && /bin/bash cico_run_contract_tests_provider.sh"
+            rtn_code=$?
+            if [[ $rtn_code -eq 124 ]]; then
+               echo "BUILD TIMEOUT";
+            else
+               rsync --delete -Ha -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
+            fi
+            cico node done $CICO_ssid
+            exit $rtn_code
+    publishers:
+        - email:
+            recipients: pmacik@redhat.com
+            notify-every-unstable-build: true
+
+- job-template:
+    name: 'devtools-contract-test-provider-{consumer}-{provider}'
+    triggers:
+        - timed: '{contract_test_start_time}'
+    <<: *contract_tests_provider_template
+
 - project:
     name: devtools
     disabled: false
@@ -2761,6 +2969,51 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '10m'
+        - '{ci_project}-{git_repo}-coverage':
+            git_organization: fabric8-services
+            git_repo: fabric8-notification
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-build-master-coverage':
+            git_organization: fabric8-services
+            git_repo: fabric8-notification
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-services
+            git_repo: fabric8-notification
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-openshiftio
+            timeout: '10m'
+            extra_target: rhel
+        - '{ci_project}-{git_repo}':
+            git_organization: fabric8-services
+            git_repo: toolchain-operator
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-coverage':
+            git_organization: fabric8-services
+            git_repo: toolchain-operator
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-build-master-coverage':
+            git_organization: fabric8-services
+            git_repo: toolchain-operator
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_coverage.sh'
+            timeout: '30m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-services
+            git_repo: toolchain-operator
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '10m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-services
             git_repo: fabric8-toggles
@@ -2840,14 +3093,6 @@
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-services
             git_repo: fabric8-tenant
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-openshiftio
-            timeout: '10m'
-            extra_target: rhel
-        - '{ci_project}-{git_repo}-build-master':
-            git_organization: fabric8-services
-            git_repo: fabric8-notification
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-openshiftio
@@ -3011,7 +3256,7 @@
             ci_project: 'devtools'
             ci_cmd: 'export HOST_URL="che.prod-preview.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
             env: 'prod-preview'
-            timeout: '20m'
+            timeout: '40m'
             cluster: '2a'
         - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
             git_organization: redhat-developer
@@ -3019,7 +3264,7 @@
             ci_project: 'devtools'
             ci_cmd: 'export HOST_URL="che.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
             env: 'prod'
-            timeout: '20m'
+            timeout: '40m'
             cluster: '2'
         - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
             git_organization: redhat-developer
@@ -3070,6 +3315,9 @@
             git_repo: fabric8-admin-console
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-openshiftio
+            timeout: '20m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-wit-go-benchmarks':
             git_organization: fabric8-services
             git_repo: fabric8-wit
@@ -3385,6 +3633,33 @@
             ci_cmd: '/bin/bash .cico/test.sh'
             timeout: '20m'
             discarder_days: 30
+        - '{ci_project}-{git_repo}-fabric8-push-build-master':
+            git_organization: fabric8-services
+            git_repo: fabric8-webhook
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/deploy.sh'
+            timeout: '20m'
+            extra_target: rhel
+            saas_git: saas-openshiftio
+        - '{ci_project}-{git_repo}-build-master-coverage':
+            git_repo: fabric8-webhook
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/coverage.sh'
+            timeout: '3h'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-coverage':
+            git_repo: fabric8-webhook
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/coverage.sh'
+            timeout: '3h'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-fabric8-push-prcheck':
+            git_organization: fabric8-services
+            git_repo: fabric8-webhook
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/test.sh'
+            timeout: '20m'
+            discarder_days: 30
         - '{ci_project}-{git_repo}-fabric8-docs-prcheck':
             git_repo: fabric8-online-docs
             git_organization: fabric8io
@@ -3484,6 +3759,24 @@
             feature_level: beta
             osio_creds: osio-ci-e2e-002-preview
             ee_test_start_time: '40 * * * *'
+            zabbix_enabled: false
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: openshift.io
+            test_suite: che
+            cluster: us-east-1b
+            feature_level: released
+            osio_creds: osio-ci-e2e-che-001
+            ee_test_start_time: '20 0,12 * * *'
+            timeout: 60m
+            zabbix_enabled: false
+        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
+            test_url: prod-preview.openshift.io
+            test_suite: che
+            cluster: pr-us-east-2a
+            feature_level: released
+            osio_creds: osio-ci-preview-e2e-che
+            ee_test_start_time: '20 6,18 * * *'
+            timeout: 60m
             zabbix_enabled: false
         - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}':
             test_url: openshift.io
@@ -3679,6 +3972,42 @@
             zabbix_port: 9443
             zabbix_host: qa_openshift.io
             zabbix_metric_prefix: "booster-bdd.{scenario}.{build_tool}"
+        - 'devtools-contract-test-consumer-{consumer}-{provider}':
+            consumer: fabric8-wit
+            provider: fabric8-auth
+            github_url: 'https://github.com/fabric8-services/fabric8-wit'
+            scm_git_url: 'https://github.com/fabric8-services/fabric8-wit.git'
+            scm_git_branch: 'master'
+            pact_broker_url: 'https://contracts.prod-preview.openshift.io/'
+            pact_broker_creds_username: 'pact_broker_username'
+            pact_broker_creds_password: 'pact_broker_password'
+        - 'devtools-contract-test-provider-{consumer}-{provider}':
+            consumer: fabric8-wit
+            provider: fabric8-auth
+            contract_test_start_time: '*/15 * * * *'
+            github_url: 'https://github.com/fabric8-services/fabric8-auth'
+            scm_git_url: 'https://github.com/fabric8-services/fabric8-auth.git'
+            scm_git_branch: 'master'
+            pact_broker_url: 'https://contracts.prod-preview.openshift.io/'
+            pact_broker_creds_username: 'pact_broker_username'
+            pact_broker_creds_password: 'pact_broker_password'
+            pact_consumer: 'fabric8-wit'
+            output_dir: 'test/contract/output'
+            archive_artifacts: 'true'
+            wrappers:
+                - vault-secrets:
+                    <<: *vault_defaults
+                    secrets:
+                      - secret-path: 'devtools-osio-ci/contract-tests-creds'
+                        secret-values:
+                          - env-var: 'OSIO_USERNAME'
+                            vault-key: 'osio_username_1'
+                          - env-var: 'OSIO_PASSWORD'
+                            vault-key: 'osio_password_1'
+                          - env-var: 'AUTH_SERVICE_ACCOUNT_CLIENT_ID'
+                            vault-key: 'auth_service_account_client_id'
+                          - env-var: 'AUTH_SERVICE_ACCOUNT_CLIENT_SECRET'
+                            vault-key: 'auth_service_account_client_secret'
         - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
             git_organization: openshiftio
             git_repo: saas-openshiftio
@@ -3695,7 +4024,7 @@
             git_organization: fabric8-ui
             git_repo: fabric8-ui
             feature_level: released
-            test_url: 'localhost:3000'
+            test_url: 'localhost:8080'
             osio_creds: osio-ci-e2e-005-preview
             timeout: 50m
             ci_cmd: 'cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh fabric8-ui'
@@ -3703,7 +4032,7 @@
             git_organization: fabric8-ui
             git_repo: fabric8-ui
             feature_level: beta
-            test_url: 'localhost:3000'
+            test_url: 'localhost:8080'
             osio_creds: osio-ci-e2e-007-preview
             timeout: 50m
             ci_cmd: 'cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh fabric8-ui'
@@ -4416,7 +4745,7 @@
             git_repo: f8a-hpf-insights
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
+            timeout: '30m'
             registry: 'quay.io'
             image_name: 'openshiftio/rhel-fabric8-analytics-f8a-hpf-insights'
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
@@ -4431,7 +4760,7 @@
             saas_git: saas-analytics
             deployment_units: 'f8a-hpf-insights-maven'
             deployment_configs: 'f8a-hpf-insights-maven'
-            timeout: '20m'
+            timeout: '60m'
             extra_target: rhel
         - '{ci_project}-{git_repo}-npm-publish-build-master':
             git_organization: fabric8-ui
@@ -4703,18 +5032,36 @@
             git_repo: fabric8-analytics-release-monitor
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-release-monitor
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-analytics
+            git_repo: fabric8-analytics-github-events-monitor
+            saas_git: saas-analytics
+            prj_name: bayesian-preview
+            saas_service_name: github-events-monitor
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-github-events-monitor
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '10m'
+            timeout: '20m'
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-github-events-monitor
             discarder_days: 30
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-github-events-monitor
             discarder_days: 30
+        - '{ci_project}-{git_repo}-saasorg-build-master':
+            git_organization: rhdt
+            git_repo: pact-broker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            saas_organization: rhdt
+            saas_git: saas-qe
+            prj_name: dsaas-pact-broker
+            timeout: '20m'
         - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
             test_url: prod-preview.openshift.io
             test_suite: planner
