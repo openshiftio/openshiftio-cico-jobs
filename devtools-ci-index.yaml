@@ -60,6 +60,7 @@
         - Katka92
         - kbsingh
         - kishansagathiya
+        - khrm
         - kwk
         - l0rd
         - ldimaggi
@@ -3451,6 +3452,33 @@
         - '{ci_project}-{git_repo}-fabric8-push-prcheck':
             git_organization: fabric8-services
             git_repo: fabric8-build
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/test.sh'
+            timeout: '20m'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-fabric8-push-build-master':
+            git_organization: fabric8-services
+            git_repo: fabric8-webhook
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/deploy.sh'
+            timeout: '20m'
+            extra_target: rhel
+            saas_git: saas-openshiftio
+        - '{ci_project}-{git_repo}-build-master-coverage':
+            git_repo: fabric8-webhook
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/coverage.sh'
+            timeout: '3h'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-coverage':
+            git_repo: fabric8-webhook
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/coverage.sh'
+            timeout: '3h'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}-fabric8-push-prcheck':
+            git_organization: fabric8-services
+            git_repo: fabric8-webhook
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .cico/test.sh'
             timeout: '20m'
