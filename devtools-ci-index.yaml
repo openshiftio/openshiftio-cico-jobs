@@ -2744,7 +2744,7 @@
         - vault-secrets:
             <<: *vault_defaults
             secrets:
-              - secret-path: 'devtools-osio-ci/osio-ci-prebooster-creds'
+              - secret-path: 'devtools-osio-ci/osio-ci-preboost-creds'
                 secret-values:
                     - env-var: 'OS_USERNAME'
                       vault-key: '{os_creds_username}'
