@@ -3879,7 +3879,7 @@
             prebooster_test_start_time: '5 0-23/4 * * *'
             os_creds_username: 'username_1'
             os_creds_password: 'password_1'
-            project_name: osio-ci-boost1-stage
+            project_name: osio-ci-preboost1-stage
             booster_name: golang-health-check
             cluster: https://api.starter-us-east-2.openshift.com
             booster_repo: golang-starters
