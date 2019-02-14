@@ -3285,6 +3285,13 @@
             saas_service_name: rh-che6
             timeout: '30m'
             extra_target: rhel
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: redhat-developer
+            git_repo: kubernetes-image-puller
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            extra_target: rhel
+            timeout: 15m
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
             git_repo: ngx-widgets
