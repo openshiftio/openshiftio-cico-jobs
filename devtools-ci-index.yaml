@@ -2823,7 +2823,7 @@
     name: 'devtools-contract-test-consumer-{consumer}-{provider}'
     triggers:
         - githubprb:
-            github-hooks: false
+            github_hooks: false
     <<: *contract_tests_consumer_template
 
 - contract_tests_provider_template: &contract_tests_provider_template
@@ -2916,7 +2916,7 @@
     name: 'devtools-contract-test-provider-{consumer}-{provider}'
     triggers:
         - githubprb:
-            github-hooks: false
+            github_hooks: false
     <<: *contract_tests_provider_template
 
 - project:
