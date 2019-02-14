@@ -77,6 +77,7 @@
         - nurali-techie
         - pbergene
         - piyush-garg
+        - pmacik
         - ppitonak
         - Preeticp
         - quintesse
@@ -2832,6 +2833,7 @@
     zabbix_enabled: true
     scm_git_branch: master
     archive_artifacts: 'true'
+    pact_version: latest
     properties:
         - github:
             url: '{github_url}'
@@ -2857,8 +2859,8 @@
             set +e
             set +x
             export PACT_CONSUMER="{pact_consumer}"
+            export PACT_VERSION="{pact_version}"
             export PACT_BROKER_URL="{pact_broker_url}"
-            export OUTPUT_DIR="{output_dir}"
             export ARCHIVE_ARTIFACTS="{archive_artifacts}"
 
             cp ~/cico-tools/env-toolkit .
@@ -3997,7 +3999,7 @@
             pact_broker_creds_username: 'pact_broker_username'
             pact_broker_creds_password: 'pact_broker_password'
             pact_consumer: 'fabric8-wit'
-            output_dir: 'test/contract/output'
+            pact_version: 'latest'
             archive_artifacts: 'true'
             wrappers:
                 - vault-secrets:
