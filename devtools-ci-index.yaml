@@ -2170,6 +2170,11 @@
             branches:
                 - master
             basedir: f8tests
+    publishers:
+        - email:
+            recipients: ljelinko@redhat.com ppitonak@redhat.com
+            notify-every-unstable-build: true
+            send-to-individuals: true
     triggers:
         - timed: '{ee_test_start_time}'
     <<: *e2e_tests_template
