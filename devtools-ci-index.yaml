@@ -2750,11 +2750,9 @@
         - github:
             url: '{github_url}'
     scm:
-        - git:
-            url: '{scm_git_url}'
-            shallow_clone: true
-            branches:
-                - '{scm_git_branch}'
+        - git-scm:
+            git_url: '{scm_git_url}'
+            git_basedir: ''
     wrappers:
         - ansicolor
         - vault-secrets:
@@ -2771,6 +2769,7 @@
             set +e
             set +x
             export PACT_BROKER_URL="{pact_broker_url}"
+            export PACT_VERSION="${{ghprbActualCommit}}"
 
              cp ~/cico-tools/env-toolkit .
             ./env-toolkit dump -f jenkins-env.json
@@ -2839,11 +2838,9 @@
         - github:
             url: '{github_url}'
     scm:
-        - git:
-            url: '{scm_git_url}'
-            shallow_clone: true
-            branches:
-                - '{scm_git_branch}'
+        - git-scm:
+            git_url: '{scm_git_url}'
+            git_basedir: ''
     wrappers:
         - ansicolor
         - vault-secrets:
