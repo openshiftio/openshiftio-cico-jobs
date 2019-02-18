@@ -1662,7 +1662,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            /usr/bin/timeout 90m $ssh_cmd -t "cd payload && /bin/bash cico_build_publish_images.sh"
+            /usr/bin/timeout 180m $ssh_cmd -t "cd payload && /bin/bash cico_build_publish_images.sh"
             rtn_code=$?
             if [[ $rtn_code -eq 124 ]]; then
                echo "BUILD TIMEOUT";
@@ -2751,11 +2751,9 @@
         - github:
             url: '{github_url}'
     scm:
-        - git:
-            url: '{scm_git_url}'
-            shallow_clone: true
-            branches:
-                - '{scm_git_branch}'
+        - git-scm:
+            git_url: '{scm_git_url}'
+            git_basedir: ''
     wrappers:
         - ansicolor
         - vault-secrets:
@@ -2772,6 +2770,7 @@
             set +e
             set +x
             export PACT_BROKER_URL="{pact_broker_url}"
+            export PACT_VERSION="${{ghprbActualCommit}}"
 
              cp ~/cico-tools/env-toolkit .
             ./env-toolkit dump -f jenkins-env.json
@@ -2840,11 +2839,9 @@
         - github:
             url: '{github_url}'
     scm:
-        - git:
-            url: '{scm_git_url}'
-            shallow_clone: true
-            branches:
-                - '{scm_git_branch}'
+        - git-scm:
+            git_url: '{scm_git_url}'
+            git_basedir: ''
     wrappers:
         - ansicolor
         - vault-secrets:
@@ -4987,6 +4984,26 @@
             git_repo: fabric8-analytics-utils
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-utils
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-analytics
+            git_repo: f8a-stacks-report
+            saas_git: saas-analytics
+            prj_name: bayesian-preview
+            saas_service_name: f8a-stacks-report
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '20m'
+            extra_target: rhel
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: f8a-stacks-report
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: f8a-stacks-report
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: f8a-stacks-report
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-analytics
             git_repo: graph-cve-sync
