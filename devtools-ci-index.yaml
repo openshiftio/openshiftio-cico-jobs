@@ -2770,6 +2770,7 @@
             set +x
             export PACT_BROKER_URL="{pact_broker_url}"
             export PACT_VERSION="${{ghprbActualCommit}}"
+            export PACT_TAGS="PR-${{ghprbPullId}}"
 
              cp ~/cico-tools/env-toolkit .
             ./env-toolkit dump -f jenkins-env.json
