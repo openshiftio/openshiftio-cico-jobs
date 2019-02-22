@@ -5007,6 +5007,29 @@
             git_repo: f8a-stacks-report
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-analytics
+            git_repo: f8a-emr-deployment
+            saas_git: saas-analytics
+            saas_service_name: f8a-emr-deployment
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            deployment_units: 'f8a-emr-deployment'
+            deployment_configs: 'f8a-emr-deployment'
+            timeout: '20m'
+            extra_target: rhel
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: f8a-emr-deployment
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+            registry: 'quay.io'
+            image_name: 'openshiftio/fabric8-analytics-f8a-emr-deployment'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: f8a-emr-deployment
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: f8a-emr-deployment
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-analytics
             git_repo: graph-cve-sync
             saas_git: saas-analytics
             prj_name: bayesian-preview
