@@ -2823,6 +2823,7 @@
     triggers:
         - githubprb:
             github_hooks: false
+            status-context: "ci.centos.org PR build (contract tests)"
     <<: *contract_tests_consumer_template
 
 - contract_tests_provider_template: &contract_tests_provider_template
@@ -2914,6 +2915,7 @@
     triggers:
         - githubprb:
             github_hooks: false
+            status-context: "ci.centos.org PR build (contract tests)"
     <<: *contract_tests_provider_template
 
 - project:
