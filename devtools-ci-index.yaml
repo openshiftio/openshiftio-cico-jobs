@@ -2770,6 +2770,7 @@
             set +x
             export PACT_BROKER_URL="{pact_broker_url}"
             export PACT_VERSION="${{ghprbActualCommit}}"
+            export PACT_TAGS="PR-${{ghprbPullId}}"
 
              cp ~/cico-tools/env-toolkit .
             ./env-toolkit dump -f jenkins-env.json
@@ -3992,7 +3993,6 @@
             provider: fabric8-auth
             github_url: 'https://github.com/fabric8-services/fabric8-wit'
             scm_git_url: 'https://github.com/fabric8-services/fabric8-wit.git'
-            scm_git_branch: 'master'
             pact_broker_url: 'https://contracts.prod-preview.openshift.io/'
             pact_broker_creds_username: 'pact_broker_username'
             pact_broker_creds_password: 'pact_broker_password'
@@ -4001,7 +4001,6 @@
             provider: fabric8-auth
             github_url: 'https://github.com/fabric8-services/fabric8-auth'
             scm_git_url: 'https://github.com/fabric8-services/fabric8-auth.git'
-            scm_git_branch: 'master'
             pact_broker_url: 'https://contracts.prod-preview.openshift.io/'
             pact_broker_creds_username: 'pact_broker_username'
             pact_broker_creds_password: 'pact_broker_password'
