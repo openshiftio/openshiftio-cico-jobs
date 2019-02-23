@@ -5000,6 +5000,8 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'quay.io'
+            image_name: 'openshiftio/rhel-fabric8-analytics-f8a-stacks-report'
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: f8a-stacks-report
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
