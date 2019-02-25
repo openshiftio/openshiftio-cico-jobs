@@ -77,6 +77,7 @@
         - nurali-techie
         - pbergene
         - piyush-garg
+        - pmacik
         - ppitonak
         - Preeticp
         - quintesse
@@ -103,6 +104,7 @@
         - tradej
         - tsmaeder
         - vikram-raj
+        - waveywaves
         - xcoulon
         - YuriyHorobey
 
@@ -1659,7 +1661,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
             $ssh_cmd yum -y install rsync
             rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            /usr/bin/timeout 90m $ssh_cmd -t "cd payload && /bin/bash cico_build_publish_images.sh"
+            /usr/bin/timeout 180m $ssh_cmd -t "cd payload && /bin/bash cico_build_publish_images.sh"
             rtn_code=$?
             if [[ $rtn_code -eq 124 ]]; then
                echo "BUILD TIMEOUT";
@@ -2169,6 +2171,11 @@
             branches:
                 - master
             basedir: f8tests
+    publishers:
+        - email:
+            recipients: ljelinko@redhat.com ppitonak@redhat.com
+            notify-every-unstable-build: true
+            send-to-individuals: true
     triggers:
         - timed: '{ee_test_start_time}'
     <<: *e2e_tests_template
@@ -2840,11 +2847,9 @@
         - github:
             url: '{github_url}'
     scm:
-        - git:
-            url: '{scm_git_url}'
-            shallow_clone: true
-            branches:
-                - '{scm_git_branch}'
+        - git-scm:
+            git_url: '{scm_git_url}'
+            git_basedir: ''
     wrappers:
         - ansicolor
         - vault-secrets:
@@ -2861,6 +2866,8 @@
             set +e
             set +x
             export PACT_BROKER_URL="{pact_broker_url}"
+            export PACT_VERSION="${{ghprbActualCommit}}"
+            export PACT_TAGS="PR-${{ghprbPullId}}"
 
              cp ~/cico-tools/env-toolkit .
             ./env-toolkit dump -f jenkins-env.json
@@ -2912,7 +2919,9 @@
 - job-template:
     name: 'devtools-contract-test-consumer-{consumer}-{provider}'
     triggers:
-        - github
+        - githubprb:
+            github_hooks: false
+            status-context: "ci.centos.org PR build (contract tests)"
     <<: *contract_tests_consumer_template
 
 - contract_tests_provider_template: &contract_tests_provider_template
@@ -2923,15 +2932,14 @@
     zabbix_enabled: true
     scm_git_branch: master
     archive_artifacts: 'true'
+    pact_version: latest
     properties:
         - github:
             url: '{github_url}'
     scm:
-        - git:
-            url: '{scm_git_url}'
-            shallow_clone: true
-            branches:
-                - '{scm_git_branch}'
+        - git-scm:
+            git_url: '{scm_git_url}'
+            git_basedir: ''
     wrappers:
         - ansicolor
         - vault-secrets:
@@ -2948,8 +2956,8 @@
             set +e
             set +x
             export PACT_CONSUMER="{pact_consumer}"
+            export PACT_VERSION="{pact_version}"
             export PACT_BROKER_URL="{pact_broker_url}"
-            export OUTPUT_DIR="{output_dir}"
             export ARCHIVE_ARTIFACTS="{archive_artifacts}"
 
             cp ~/cico-tools/env-toolkit .
@@ -3003,7 +3011,9 @@
 - job-template:
     name: 'devtools-contract-test-provider-{consumer}-{provider}'
     triggers:
-        - timed: '{contract_test_start_time}'
+        - githubprb:
+            github_hooks: false
+            status-context: "ci.centos.org PR build (contract tests)"
     <<: *contract_tests_provider_template
 
 - project:
@@ -3372,6 +3382,13 @@
             saas_service_name: rh-che6
             timeout: '30m'
             extra_target: rhel
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: redhat-developer
+            git_repo: kubernetes-image-puller
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            extra_target: rhel
+            timeout: 15m
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
             git_repo: ngx-widgets
@@ -4089,22 +4106,19 @@
             provider: fabric8-auth
             github_url: 'https://github.com/fabric8-services/fabric8-wit'
             scm_git_url: 'https://github.com/fabric8-services/fabric8-wit.git'
-            scm_git_branch: 'master'
             pact_broker_url: 'https://contracts.prod-preview.openshift.io/'
             pact_broker_creds_username: 'pact_broker_username'
             pact_broker_creds_password: 'pact_broker_password'
         - 'devtools-contract-test-provider-{consumer}-{provider}':
             consumer: fabric8-wit
             provider: fabric8-auth
-            contract_test_start_time: '*/15 * * * *'
             github_url: 'https://github.com/fabric8-services/fabric8-auth'
             scm_git_url: 'https://github.com/fabric8-services/fabric8-auth.git'
-            scm_git_branch: 'master'
             pact_broker_url: 'https://contracts.prod-preview.openshift.io/'
             pact_broker_creds_username: 'pact_broker_username'
             pact_broker_creds_password: 'pact_broker_password'
             pact_consumer: 'fabric8-wit'
-            output_dir: 'test/contract/output'
+            pact_version: 'latest'
             archive_artifacts: 'true'
             wrappers:
                 - vault-secrets:
@@ -5083,6 +5097,52 @@
             git_repo: fabric8-analytics-utils
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-analytics-utils
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-analytics
+            git_repo: f8a-stacks-report
+            saas_git: saas-analytics
+            prj_name: bayesian-preview
+            saas_service_name: f8a-stacks-report
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '20m'
+            extra_target: rhel
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: f8a-stacks-report
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+            registry: 'quay.io'
+            image_name: 'openshiftio/rhel-fabric8-analytics-f8a-stacks-report'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: f8a-stacks-report
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: f8a-stacks-report
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-analytics
+            git_repo: f8a-emr-deployment
+            saas_git: saas-analytics
+            prj_name: bayesian-preview
+            saas_service_name: f8a-emr-deployment
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            deployment_units: 'f8a-emr-deployment'
+            deployment_configs: 'f8a-emr-deployment'
+            timeout: '20m'
+            extra_target: rhel
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: f8a-emr-deployment
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+            registry: 'quay.io'
+            image_name: 'openshiftio/fabric8-analytics-f8a-emr-deployment'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: f8a-emr-deployment
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: f8a-emr-deployment
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-analytics
             git_repo: graph-cve-sync
