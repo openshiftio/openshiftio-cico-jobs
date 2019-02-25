@@ -5010,6 +5010,7 @@
             git_organization: fabric8-analytics
             git_repo: f8a-emr-deployment
             saas_git: saas-analytics
+            prj_name: bayesian-preview
             saas_service_name: f8a-emr-deployment
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
