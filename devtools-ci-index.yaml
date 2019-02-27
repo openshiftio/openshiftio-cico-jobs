@@ -307,6 +307,19 @@
         vault-key: 'token'
       - env-var: 'EMAIL'
         vault-key: 'email'
+
+- rhche-periodic-2a-creds: &rhche-periodic-2aProd-creds
+    name: "rhche-periodic-2aProd-creds"
+    secret-path: 'devtools-osio-ci/rhche-periodic-2aProd-creds'
+    secret-values:
+      - env-var: 'USERNAME'
+        vault-key: 'username'
+      - env-var: 'PASSWORD'
+        vault-key: 'password'
+      - env-var: 'OFFLINE_TOKEN'
+        vault-key: 'token'
+      - env-var: 'EMAIL'
+        vault-key: 'email'
         
 - rhche-periodic-1b-creds: &rhche-periodic-1b-creds
     name: "rhche-periodic-1b-creds"
@@ -1888,6 +1901,15 @@
              - *rhche-periodic-2a-creds
 
 - wrapper:
+    name: 'rhche_credentials_wrapper-2aProd'
+    wrappers:
+       - vault-secrets:
+           <<: *vault_defaults
+           secrets:
+             - *rhche-periodic-2aProd-creds
+
+
+- wrapper:
     name: 'rhche_credentials_wrapper-1a'
     wrappers:
        - vault-secrets:
@@ -3402,6 +3424,14 @@
             env: 'prod-preview'
             timeout: '40m'
             cluster: '2a'
+        - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: 'export HOST_URL="che.prod-preview.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
+            env: 'prod'
+            timeout: '40m'
+            cluster: '2aProd'
         - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
             git_organization: redhat-developer
             git_repo: rh-che
