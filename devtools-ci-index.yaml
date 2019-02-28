@@ -2919,9 +2919,9 @@
 - job-template:
     name: 'devtools-contract-test-consumer-{consumer}-{provider}'
     triggers:
-        - githubprb:
-            github_hooks: false
+        - github-pull-request:
             status-context: "ci.centos.org PR build (contract tests)"
+            <<: *github_pull_request_defaults
     <<: *contract_tests_consumer_template
 
 - contract_tests_provider_template: &contract_tests_provider_template
@@ -3011,9 +3011,9 @@
 - job-template:
     name: 'devtools-contract-test-provider-{consumer}-{provider}'
     triggers:
-        - githubprb:
-            github_hooks: false
+        - github-pull-request:
             status-context: "ci.centos.org PR build (contract tests)"
+            <<: *github_pull_request_defaults
     <<: *contract_tests_provider_template
 
 - project:
