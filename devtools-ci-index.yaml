@@ -2732,6 +2732,103 @@
         - timed: '{bdd_test_start_time}'
     <<: *booster_bdd_tests_template
 
+- prebooster_tests_template: &prebooster_tests_template
+    name: 'prebooster_tests_template'
+    defaults: global
+    node: devtools
+    timeout: 60m
+    zabbix_enabled: true
+    properties:
+        - github:
+            url: https://github.com/fabric8io/fabric8-test
+    scm:
+        - git:
+            url: https://github.com/fabric8io/fabric8-test.git
+            shallow_clone: true
+            branches:
+                - master
+    wrappers:
+        - ansicolor
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+              - secret-path: 'devtools-osio-ci/osio-ci-preboost-creds'
+                secret-values:
+                    - env-var: 'OS_USERNAME'
+                      vault-key: '{os_creds_username}'
+                    - env-var: 'OS_PASSWORD'
+                      vault-key: '{os_creds_password}'
+    builders:
+        - shell: |
+            set +e
+            set +x
+            export PROJECT_NAME="{project_name}"
+            export BOOSTER_NAME="{booster_name}"
+            export CLUSTER="{cluster}"
+            export BOOSTER_REPO="{booster_repo}"
+            export REPORT_DIR="{report_dir}"
+            export UI_HEADLESS="{ui_headless}"
+            export ZABBIX_ENABLED="{zabbix_enabled}"
+            export ZABBIX_SERVER="{zabbix_server}"
+            export ZABBIX_PORT="{zabbix_port}"
+            export ZABBIX_HOST="{zabbix_host}"
+            export ZABBIX_METRIC_PREFIX="{zabbix_metric_prefix}"
+
+            cp ~/cico-tools/env-toolkit .
+            ./env-toolkit dump -f jenkins-env.json
+            env > jenkins-env
+
+            cp ~/artifacts.key .
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            # get node
+            n=1
+            while true
+            do
+                cico_output=$(cico node get -f value -c ip_address -c comment)
+                if [ $? -eq 0 ]; then
+                    read CICO_hostname CICO_ssid <<< $cico_output
+                    if  [ ! -z "$CICO_hostname" ]; then
+                        # we got hostname from cico
+                        break
+                    fi
+                    echo "'cico node get' succeed, but can't get hostname from output"
+                fi
+                if [ $n -gt 15 ]; then
+                    # give up after 15 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, trying again in 60s ($n/15)"
+                n=$[$n+1]
+                sleep 60
+            done
+            echo 'Using Host' $CICO_hostname
+            set -x
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd "yum -y -d1 --setopt tsflags='nodocs' install rsync"
+            rsync --delete -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
+            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/booster_upstream && /bin/bash cico_run_prebooster_tests.sh"
+            rtn_code=$?
+            if [[ $rtn_code -eq 124 ]]; then
+               echo "BUILD TIMEOUT";
+            else
+               rsync --delete -Ha -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
+            fi
+            cico node done $CICO_ssid
+            exit $rtn_code
+    publishers:
+        - email:
+            recipients: pmacik@redhat.com ldimaggi@redhat.com
+            notify-every-unstable-build: true
+
+- job-template:
+    name: 'devtools-prebooster-test-{test_url}-{booster_name}'
+    triggers:
+        - timed: '{prebooster_test_start_time}'
+    <<: *prebooster_tests_template
+
+
 - job-template:
     name: 'devtools-bdd-test-booster-import-{build_tool}-{test_url}-{cluster}'
     booster_mission: ''
@@ -2771,6 +2868,7 @@
             set +x
             export PACT_BROKER_URL="{pact_broker_url}"
             export PACT_VERSION="${{ghprbActualCommit}}"
+            export PACT_TAGS="PR-${{ghprbPullId}}"
 
              cp ~/cico-tools/env-toolkit .
             ./env-toolkit dump -f jenkins-env.json
@@ -2824,6 +2922,7 @@
     triggers:
         - githubprb:
             github_hooks: false
+            status-context: "ci.centos.org PR build (contract tests)"
     <<: *contract_tests_consumer_template
 
 - contract_tests_provider_template: &contract_tests_provider_template
@@ -2915,6 +3014,7 @@
     triggers:
         - githubprb:
             github_hooks: false
+            status-context: "ci.centos.org PR build (contract tests)"
     <<: *contract_tests_provider_template
 
 - project:
@@ -3792,6 +3892,22 @@
             ee_test_start_time: '20 6,18 * * *'
             timeout: 60m
             zabbix_enabled: false
+        - 'devtools-prebooster-test-{test_url}-{booster_name}':
+            test_url: openshift.io
+            prebooster_test_start_time: '5 0-23/4 * * *'
+            os_creds_username: 'username_1'
+            os_creds_password: 'password_1'
+            project_name: osio-ci-preboost1-stage
+            booster_name: golang-health-check
+            cluster: https://api.starter-us-east-2.openshift.com
+            booster_repo: golang-starters
+            report_dir: target
+            ui_headless: true
+            zabbix_enabled: true
+            zabbix_server: zabbix.devshift.net
+            zabbix_port: 9443
+            zabbix_host: qa_openshift.io
+            zabbix_metric_prefix: "prebooster.{booster_name}"
         - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}':
             test_url: openshift.io
             cluster: us-east-2a
@@ -3991,7 +4107,6 @@
             provider: fabric8-auth
             github_url: 'https://github.com/fabric8-services/fabric8-wit'
             scm_git_url: 'https://github.com/fabric8-services/fabric8-wit.git'
-            scm_git_branch: 'master'
             pact_broker_url: 'https://contracts.prod-preview.openshift.io/'
             pact_broker_creds_username: 'pact_broker_username'
             pact_broker_creds_password: 'pact_broker_password'
@@ -4000,7 +4115,6 @@
             provider: fabric8-auth
             github_url: 'https://github.com/fabric8-services/fabric8-auth'
             scm_git_url: 'https://github.com/fabric8-services/fabric8-auth.git'
-            scm_git_branch: 'master'
             pact_broker_url: 'https://contracts.prod-preview.openshift.io/'
             pact_broker_creds_username: 'pact_broker_username'
             pact_broker_creds_password: 'pact_broker_password'
@@ -5000,10 +5114,36 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
+            registry: 'quay.io'
+            image_name: 'openshiftio/rhel-fabric8-analytics-f8a-stacks-report'
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: f8a-stacks-report
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: f8a-stacks-report
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: fabric8-analytics
+            git_repo: f8a-emr-deployment
+            saas_git: saas-analytics
+            prj_name: bayesian-preview
+            saas_service_name: f8a-emr-deployment
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            deployment_units: 'f8a-emr-deployment'
+            deployment_configs: 'f8a-emr-deployment'
+            timeout: '20m'
+            extra_target: rhel
+        - '{ci_project}-{git_repo}-fabric8-analytics':
+            git_organization: fabric8-analytics
+            git_repo: f8a-emr-deployment
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+            registry: 'quay.io'
+            image_name: 'openshiftio/fabric8-analytics-f8a-emr-deployment'
+        - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
+            git_repo: f8a-emr-deployment
+        - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
+            git_repo: f8a-emr-deployment
         - '{ci_project}-{git_repo}-build-master':
             git_organization: fabric8-analytics
             git_repo: graph-cve-sync
@@ -5095,23 +5235,3 @@
             saas_git: saas-qe
             prj_name: dsaas-pact-broker
             timeout: '20m'
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: prod-preview.openshift.io
-            test_suite: planner
-            cluster: us-east-2a
-            feature_level: beta
-            osio_creds: osio-ci-planner-003-preview
-            ee_test_start_time: '35 */2 * * *'
-            timeout: 40m
-            zabbix_enabled: false
-            secret_subpath: planner
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: openshift.io
-            test_suite: planner
-            cluster: us-east-2
-            feature_level: beta
-            osio_creds: osio-ci-planner-003
-            ee_test_start_time: '40 */4 * * *'
-            timeout: 40m
-            zabbix_enabled: false
-            secret_subpath: planner
