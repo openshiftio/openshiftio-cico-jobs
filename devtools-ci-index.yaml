@@ -308,6 +308,41 @@
       - env-var: 'EMAIL'
         vault-key: 'email'
 
+- rhche-periodic-2a-creds: &rhche-periodic-2aProd-creds
+    name: "rhche-periodic-2aProd-creds"
+    secret-path: 'devtools-osio-ci/rhche-periodic-2aProd-creds'
+    secret-values:
+      - env-var: 'USERNAME'
+        vault-key: 'username'
+      - env-var: 'PASSWORD'
+        vault-key: 'password'
+      - env-var: 'OFFLINE_TOKEN'
+        vault-key: 'token'
+      - env-var: 'EMAIL'
+        vault-key: 'email'
+        
+- rhche-periodic-1b-creds: &rhche-periodic-1b-creds
+    name: "rhche-periodic-1b-creds"
+    secret-path: 'devtools-osio-ci/rhche-periodic-1b-creds'
+    secret-values:
+      - env-var: 'USERNAME'
+        vault-key: 'username'
+      - env-var: 'PASSWORD'
+        vault-key: 'password'
+      - env-var: 'EMAIL'
+        vault-key: 'email'
+
+- rhche-periodic-1a-creds: &rhche-periodic-1a-creds
+    name: "rhche-periodic-1a-creds"
+    secret-path: 'devtools-osio-ci/rhche-periodic-1a-creds'
+    secret-values:
+      - env-var: 'USERNAME'
+        vault-key: 'username'
+      - env-var: 'PASSWORD'
+        vault-key: 'password'
+      - env-var: 'EMAIL'
+        vault-key: 'email'
+
 - qe-osio-dev-cluster-SA-token: &qe-osio-dev-cluster-SA-token
     name: "qe-osio-dev-cluster-SA-token"
     secret-path: "devtools-osio-ci/qe-osio-dev-cluster-SA-token"
@@ -1865,6 +1900,31 @@
            secrets:
              - *rhche-periodic-2a-creds
 
+- wrapper:
+    name: 'rhche_credentials_wrapper-2aProd'
+    wrappers:
+       - vault-secrets:
+           <<: *vault_defaults
+           secrets:
+             - *rhche-periodic-2aProd-creds
+
+
+- wrapper:
+    name: 'rhche_credentials_wrapper-1a'
+    wrappers:
+       - vault-secrets:
+           <<: *vault_defaults
+           secrets:
+             - *rhche-periodic-1a-creds
+             
+- wrapper:
+    name: 'rhche_credentials_wrapper-1b'
+    wrappers:
+       - vault-secrets:
+           <<: *vault_defaults
+           secrets:
+             - *rhche-periodic-1b-creds
+             
 - job-template:
     name: '{ci_project}-{git_repo}-periodical-{test_url}-{cluster}'
     triggers:
@@ -1883,7 +1943,7 @@
 - job-template:
     name: '{ci_project}-{git_repo}-periodic-{env}-{cluster}'
     triggers:
-        - timed: 'H 1,13 * * *'
+        - timed: 'H 2,6,10,14,18,22 * * *'
     publishers:
         - email:
             recipients: rhopp@redhat.com kkanova@redhat.com tdancs@redhat.com
@@ -3368,10 +3428,34 @@
             git_organization: redhat-developer
             git_repo: rh-che
             ci_project: 'devtools'
+            ci_cmd: 'export HOST_URL="che.prod-preview.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
+            env: 'prod'
+            timeout: '40m'
+            cluster: '2aProd'
+        - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
             ci_cmd: 'export HOST_URL="che.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
             env: 'prod'
             timeout: '40m'
             cluster: '2'
+        - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: 'export HOST_URL="che.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
+            env: 'prod'
+            timeout: '40m'
+            cluster: '1b'
+        - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: 'export HOST_URL="che.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
+            env: 'prod'
+            timeout: '40m'
+            cluster: '1a'
         - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
             git_organization: redhat-developer
             git_repo: rh-che
