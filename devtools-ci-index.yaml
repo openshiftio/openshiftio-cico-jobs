@@ -2979,9 +2979,9 @@
 - job-template:
     name: 'devtools-contract-test-consumer-{consumer}-{provider}'
     triggers:
-        - githubprb:
-            github_hooks: false
+        - github-pull-request:
             status-context: "ci.centos.org PR build (contract tests)"
+            <<: *github_pull_request_defaults
     <<: *contract_tests_consumer_template
 
 - contract_tests_provider_template: &contract_tests_provider_template
@@ -3071,9 +3071,9 @@
 - job-template:
     name: 'devtools-contract-test-provider-{consumer}-{provider}'
     triggers:
-        - githubprb:
-            github_hooks: false
+        - github-pull-request:
             status-context: "ci.centos.org PR build (contract tests)"
+            <<: *github_pull_request_defaults
     <<: *contract_tests_provider_template
 
 - project:
@@ -5318,23 +5318,3 @@
             saas_git: saas-qe
             prj_name: dsaas-pact-broker
             timeout: '20m'
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: prod-preview.openshift.io
-            test_suite: planner
-            cluster: us-east-2a
-            feature_level: beta
-            osio_creds: osio-ci-planner-003-preview
-            ee_test_start_time: '35 */2 * * *'
-            timeout: 40m
-            zabbix_enabled: false
-            secret_subpath: planner
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: openshift.io
-            test_suite: planner
-            cluster: us-east-2
-            feature_level: beta
-            osio_creds: osio-ci-planner-003
-            ee_test_start_time: '40 */4 * * *'
-            timeout: 40m
-            zabbix_enabled: false
-            secret_subpath: planner
