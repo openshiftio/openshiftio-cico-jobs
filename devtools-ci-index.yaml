@@ -145,7 +145,7 @@
 
 - kube-config-dsaas-stg: &kube-config-dsaas-stg
     name: "kube-config-dsaas-stg"
-    secret-path: 'devtools-osio-ci/hsd/kube-configs/dsaas-stg'
+    secret-path: 'app-sre/cico/kube-configs/dsaas-stg'
     secret-values:
       - env-var: 'KUBE_SERVER'
         vault-key: 'server'
@@ -154,7 +154,7 @@
 
 - kube-config-dsaas: &kube-config-dsaas
     name: "kube-config-dsaas-stg"
-    secret-path: 'devtools-osio-ci/hsd/kube-configs/dsaas'
+    secret-path: 'app-sre/cico/kube-configs/dsaas'
     secret-values:
       - env-var: 'KUBE_SERVER'
         vault-key: 'server'
@@ -219,7 +219,7 @@
 
 - registry-devshift-credentials: &registry-devshift-credentials
     name: "registry-devshift-credentials"
-    secret-path: 'devtools-osio-ci/hsd/registry-devshift-credentials'
+    secret-path: 'app-sre/cico/registry-devshift-credentials'
     secret-values:
       - env-var: 'DEVSHIFT_USERNAME'
         vault-key: 'devshift_username'
@@ -228,7 +228,7 @@
 
 - quay-credentials: &quay-credentials
     name: "quay-credentials"
-    secret-path: 'devtools-osio-ci/hsd/quay-credentials'
+    secret-path: 'app-sre/cico/quay-credentials'
     secret-values:
       - env-var: 'QUAY_USERNAME'
         vault-key: 'quay_username'
@@ -3580,6 +3580,13 @@
             extra_target: rhel
         - '{ci_project}-{git_repo}':
             git_repo: build-tool-detector
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}':
+            git_organization: redhat-developer
+            git_repo: devopsconsole-operator
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
