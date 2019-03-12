@@ -3466,6 +3466,7 @@
             git_repo: kubernetes-image-puller
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-openshiftio
             extra_target: rhel
             timeout: 15m
         - '{ci_project}-{git_repo}':
