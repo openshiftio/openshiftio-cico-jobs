@@ -3711,13 +3711,6 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
             extra_target: rhel
-        - '{ci_project}-{git_repo}':
-            git_organization: redhat-developer
-            git_repo: devopsconsole-operator
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
-            discarder_days: 30
         - '{ci_project}-{git_repo}-build-master':
             git_repo: admin-console
             ci_project: 'devtools'
