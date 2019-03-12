@@ -145,7 +145,7 @@
 
 - kube-config-dsaas-stg: &kube-config-dsaas-stg
     name: "kube-config-dsaas-stg"
-    secret-path: 'devtools-osio-ci/hsd/kube-configs/dsaas-stg'
+    secret-path: 'app-sre/cico/kube-configs/dsaas-stg'
     secret-values:
       - env-var: 'KUBE_SERVER'
         vault-key: 'server'
@@ -154,7 +154,7 @@
 
 - kube-config-dsaas: &kube-config-dsaas
     name: "kube-config-dsaas-stg"
-    secret-path: 'devtools-osio-ci/hsd/kube-configs/dsaas'
+    secret-path: 'app-sre/cico/kube-configs/dsaas'
     secret-values:
       - env-var: 'KUBE_SERVER'
         vault-key: 'server'
@@ -219,7 +219,7 @@
 
 - registry-devshift-credentials: &registry-devshift-credentials
     name: "registry-devshift-credentials"
-    secret-path: 'devtools-osio-ci/hsd/registry-devshift-credentials'
+    secret-path: 'app-sre/cico/registry-devshift-credentials'
     secret-values:
       - env-var: 'DEVSHIFT_USERNAME'
         vault-key: 'devshift_username'
@@ -228,7 +228,7 @@
 
 - quay-credentials: &quay-credentials
     name: "quay-credentials"
-    secret-path: 'devtools-osio-ci/hsd/quay-credentials'
+    secret-path: 'app-sre/cico/quay-credentials'
     secret-values:
       - env-var: 'QUAY_USERNAME'
         vault-key: 'quay_username'
@@ -2231,11 +2231,6 @@
             branches:
                 - master
             basedir: f8tests
-    publishers:
-        - email:
-            recipients: ljelinko@redhat.com ppitonak@redhat.com
-            notify-every-unstable-build: true
-            send-to-individuals: true
     triggers:
         - timed: '{ee_test_start_time}'
     <<: *e2e_tests_template
@@ -3471,6 +3466,7 @@
             git_repo: kubernetes-image-puller
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
+            saas_git: saas-openshiftio
             extra_target: rhel
             timeout: 15m
         - '{ci_project}-{git_repo}':
@@ -3570,7 +3566,7 @@
             git_repo: launcher-booster-catalog
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '60m'
+            timeout: '3h'
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: fabric8-launcher
             git_repo: launcher-frontend
@@ -3700,6 +3696,13 @@
             extra_target: rhel
         - '{ci_project}-{git_repo}':
             git_repo: build-tool-detector
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_tests.sh'
+            timeout: '20m'
+            discarder_days: 30
+        - '{ci_project}-{git_repo}':
+            git_organization: redhat-developer
+            git_repo: devopsconsole-operator
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
@@ -3964,24 +3967,6 @@
             osio_creds: osio-ci-e2e-002-preview
             ee_test_start_time: '40 * * * *'
             zabbix_enabled: false
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: openshift.io
-            test_suite: che
-            cluster: us-east-1b
-            feature_level: released
-            osio_creds: osio-ci-e2e-che-001
-            ee_test_start_time: '20 0,12 * * *'
-            timeout: 60m
-            zabbix_enabled: false
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: prod-preview.openshift.io
-            test_suite: che
-            cluster: pr-us-east-2a
-            feature_level: released
-            osio_creds: osio-ci-preview-e2e-che
-            ee_test_start_time: '20 6,18 * * *'
-            timeout: 60m
-            zabbix_enabled: false
         - 'devtools-prebooster-test-{test_url}-{booster_name}':
             test_url: openshift.io
             prebooster_test_start_time: '5 0-23/4 * * *'
@@ -4237,22 +4222,6 @@
             feature_level: beta
             osio_creds: osio-ci-e2e-004-preview
             timeout: 30m
-        - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
-            git_organization: fabric8-ui
-            git_repo: fabric8-ui
-            feature_level: released
-            test_url: 'localhost:8080'
-            osio_creds: osio-ci-e2e-005-preview
-            timeout: 50m
-            ci_cmd: 'cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh fabric8-ui'
-        - 'devtools-{git_repo}-e2e-{test_suite}-{feature_level}':
-            git_organization: fabric8-ui
-            git_repo: fabric8-ui
-            feature_level: beta
-            test_url: 'localhost:8080'
-            osio_creds: osio-ci-e2e-007-preview
-            timeout: 50m
-            ci_cmd: 'cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh fabric8-ui'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
