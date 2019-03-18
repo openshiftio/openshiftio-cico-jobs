@@ -4156,9 +4156,9 @@
                             vault-key: 'osio_username_1'
                           - env-var: 'OSIO_PASSWORD'
                             vault-key: 'osio_password_1'
-                          - env-var: 'AUTH_SERVICE_ACCOUNT_CLIENT_ID'
+                          - env-var: 'ONLINE_REGISTRATION_SERVICE_ACCOUNT_CLIENT_ID'
                             vault-key: 'auth_service_account_client_id'
-                          - env-var: 'AUTH_SERVICE_ACCOUNT_CLIENT_SECRET'
+                          - env-var: 'ONLINE_REGISTRATION_SERVICE_ACCOUNT_CLIENT_SECRET'
                             vault-key: 'auth_service_account_client_secret'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
