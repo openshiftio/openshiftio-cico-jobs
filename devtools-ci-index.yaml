@@ -424,36 +424,11 @@
                 variable: creds_config_file
 
 - wrapper:
-    name: che_functional_tests_credentials_wrapper-mergeCheck-prod-preview.openshift.io-2a
-    wrappers:
-        - credentials-binding:
-            - text:
-                credential-id: 058ecc2b-e95e-40e7-8de6-a1e788c4ccce
-                variable: KEYCLOAK_TOKEN
-            - username-password-separated:
-                credential-id: 850d91eb-4a35-4691-a679-3e48b963c6f5
-                username: OSIO_USERNAME
-                password: OSIO_PASSWORD
-
-- wrapper:
     name: che_functional_tests_credentials_wrapper-periodical-prod-preview.openshift.io-free-stg
     wrappers:
         - credentials-binding:
             - text:
                 credential-id: 1e0bbb30-cddd-4b6f-bc61-bb4ebd2706e5
-                variable: KEYCLOAK_TOKEN
-            - username-password-separated:
-                credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
-                username: OSIO_USERNAME
-                password: OSIO_PASSWORD
-
-
-- wrapper:
-    name: che_functional_tests_credentials_wrapper-periodical-openshift.io-2
-    wrappers:
-        - credentials-binding:
-            - text:
-                credential-id: de793dce-5821-4182-af4f-6c7b42b5c21d
                 variable: KEYCLOAK_TOKEN
             - username-password-separated:
                 credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
@@ -1786,13 +1761,13 @@
             | Link | URL |\n
             | ---- | :-: |\n
             | console | https://ci.centos.org/view/Devtools/job/devtools-rh-che-rh-che-prcheck-dev.rdu2c.fabric8.io/$BUILD_NUMBER/console |\n
-            | artifacts | http://artifacts.ci.centos.org/devtools/che-functional-tests/{ci_project}-{git_repo}-rh-che-prcheck-{test_url}/$BUILD_NUMBER/ |\n
+            | artifacts | http://artifacts.ci.centos.org/devtools/rhche/devtools-rh-che-rh-che-prcheck-dev.rdu2c.fabric8.io/$BUILD_NUMBER/ |\n
             ### *If the build or deployment fails, the artifacts will not be present. Don't panic, just grab a towel.*"
             error-comment: "### $ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] failed.\n
             | Link | URL |\n
             | ---- | :-: |\n
             | console | https://ci.centos.org/view/Devtools/job/devtools-rh-che-rh-che-prcheck-dev.rdu2c.fabric8.io/$BUILD_NUMBER/console |\n
-            | artifacts | http://artifacts.ci.centos.org/devtools/che-functional-tests/{ci_project}-{git_repo}-rh-che-prcheck-{test_url}/$BUILD_NUMBER/ |\n
+            | artifacts | http://artifacts.ci.centos.org/devtools/rhche/devtools-rh-che-rh-che-prcheck-dev.rdu2c.fabric8.io/$BUILD_NUMBER/ |\n
             ### *If the build or deployment fails, the artifacts will not be present. Don't panic, just grab a towel.*"
             <<: *github_pull_request_defaults
     <<: *rh-che-automation-template
@@ -1864,19 +1839,6 @@
             - *qe-osio-dev-cluster-SA-token
     <<: *job_template_defaults
 
-
-- che-functional-tests-template: &che-functional-tests-template
-    name: 'che-functional-tests-template'
-    wrappers:
-      - vault-secrets:
-          <<: *vault_defaults
-          secrets:
-            - *quay-credentials
-            - *kube-config-dsaas-stg
-      - che_functional_tests_credentials_wrapper-{type}-{test_url}-{cluster}
-    concurrent: false
-    <<: *job_template_defaults
-
 - rhche-functional-tests-template: &rhche-functional-tests-template
     name: 'rhche-functional-tests-template'
     wrappers:
@@ -1926,21 +1888,6 @@
              - *rhche-periodic-1b-creds
              
 - job-template:
-    name: '{ci_project}-{git_repo}-periodical-{test_url}-{cluster}'
-    triggers:
-        - timed: 'H 2,14 * * *'
-    publishers:
-        - email:
-            recipients: rhopp@redhat.com kkanova@redhat.com tdancs@redhat.com
-    scm:
-        - git:
-            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
-            branches:
-                - origin/master
-    <<: *che-functional-tests-template
-
-
-- job-template:
     name: '{ci_project}-{git_repo}-periodic-{env}-{cluster}'
     triggers:
         - timed: 'H 2,6,10,14,18,22 * * *'
@@ -1958,15 +1905,6 @@
 
 
 - job-template:
-    name: '{ci_project}-{git_repo}-prcheck-{test_url}-{cluster}'
-    triggers:
-        - github-pull-request:
-            github_hooks: '{github_hooks}'
-            status-context: 'ci.centos.org PR check on {test_url}'
-            <<: *github_pull_request_defaults
-    <<: *che-functional-tests-template
-
-- job-template:
     name: '{ci_project}-{git_repo}-prcheck-build-dep'
     triggers:
         - build-result:
@@ -1977,51 +1915,6 @@
                 results:
                     - success
     <<: *rh-che-automation-depbuild-template
-
-- job-template:
-    name: '{ci_project}-{git_repo}-after-rh-che-build-{test_url}'
-    triggers:
-        - build-result:
-            cron: '* * * * *'
-            groups:
-              - jobs:
-                    - 'devtools-rh-che-build-che-credentials-master'
-                results:
-                    - success
-                    - failure
-    scm:
-        - git:
-            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
-            branches:
-                - origin/master
-    beforeGetNode: |
-        #Wait for correct rh-che version to be deployed & running on prod-preview
-        isPodRunning () (
-            echo "Getting status of pod with image tag $IMAGE_TAG"
-            STATUS=`oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" get pod -l app=rhche -o json -n dsaas-preview | jq -r ".items[] | select (.spec.containers[0].image | contains(\"$IMAGE_TAG\")).status.phase"`
-            echo "Status is $STATUS"
-            if [ $STATUS = "Running" ]; then
-                return 0
-            fi
-            return 1
-        )
-        IMAGE_TAG=$(git ls-remote https://github.com/redhat-developer/rh-che.git master|cut -c1-7) #get image tag
-        TIMEOUT=60 #wait for ~ two minutes
-        CURRENT_TIME=0
-        while true
-        do
-            if [ $CURRENT_TIME -ge $TIMEOUT ]; then
-                echo "Timeout reached"
-                exit 1
-            fi
-            if isPodRunning; then
-                break
-            fi
-            echo "Pod with IMAGE_TAG=$IMAGE_TAG is not running. CURRENT_TIME=$CURRENT_TIME"
-            sleep 5
-            CURRENT_TIME=$((CURRENT_TIME+5))
-        done
-    <<: *che-functional-tests-template
 
 - job-template: &job_template_end_to_end_tests_defaults
     name: 'devtools-test-end-to-end-{test_url}-{test_suite}'
@@ -3335,33 +3228,6 @@
             ci_cmd: '/bin/bash ./.ci/cico_rollout_test.sh'
             test_url: 'devtools-dev.ext.devshift.net'
             timeout: '60m'
-        - '{ci_project}-{git_repo}-prcheck-{test_url}-{cluster}':
-            git_organization: redhat-developer
-            git_repo: che-functional-tests
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh'
-            test_url: 'openshift.io'
-            timeout: '20m'
-            type: 'prcheck'
-            cluster: '2'
-        - '{ci_project}-{git_repo}-prcheck-{test_url}-{cluster}':
-            git_organization: redhat-developer
-            git_repo: che-functional-tests
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh ./cico/config_prod_preview'
-            test_url: 'prod-preview.openshift.io'
-            timeout: '20m'
-            type: 'prcheck'
-            cluster: '2a'
-        - '{ci_project}-{git_repo}-after-rh-che-build-{test_url}':
-            git_organization: redhat-developer
-            git_repo: che-functional-tests
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash ./cico/cico_run_EE_tests.sh ./cico/config_prod_preview'
-            test_url: 'prod-preview.openshift.io'
-            timeout: '20m'
-            type: 'mergeCheck'
-            cluster: '2a'
         - '{ci_project}-{git_repo}-prcheck-build-dep':
             git_organization: redhat-developer
             git_repo: rh-che
