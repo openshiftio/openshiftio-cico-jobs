@@ -2806,6 +2806,32 @@
             <<: *github_pull_request_defaults
     <<: *contract_tests_provider_template
 
+- job-template:
+    name: 'devtools-contract-test-provider-{consumer}-fabric8-auth'
+    triggers:
+        - github-pull-request:
+            status-context: "ci.centos.org PR build (contract tests)"
+            <<: *github_pull_request_defaults
+    wrappers:
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+                - secret-path: 'devtools-osio-ci/contract-tests-creds'
+                  secret-values:
+                        - env-var: 'PACT_BROKER_USERNAME'
+                          vault-key: '{pact_broker_creds_username}'
+                        - env-var: 'PACT_BROKER_PASSWORD'
+                          vault-key: '{pact_broker_creds_password}'
+                        - env-var: 'OSIO_USERNAME'
+                          vault-key: '{osio_username_cred}'
+                        - env-var: 'OSIO_PASSWORD'
+                          vault-key: '{osio_password_cred}'
+                        - env-var: 'ONLINE_REGISTRATION_SERVICE_ACCOUNT_CLIENT_ID'
+                          vault-key: '{service_account_client_id_cred}'
+                        - env-var: 'ONLINE_REGISTRATION_SERVICE_ACCOUNT_CLIENT_SECRET'
+                          vault-key: '{service_account_client_secret_cred}'
+    <<: *contract_tests_provider_template
+
 - project:
     name: devtools
     disabled: false
@@ -3692,7 +3718,7 @@
             pact_broker_url: 'https://contracts.prod-preview.openshift.io/'
             pact_broker_creds_username: 'pact_broker_username'
             pact_broker_creds_password: 'pact_broker_password'
-        - 'devtools-contract-test-provider-{consumer}-{provider}':
+        - 'devtools-contract-test-provider-{consumer}-fabric8-auth':
             consumer: fabric8-wit
             provider: fabric8-auth
             github_url: 'https://github.com/fabric8-services/fabric8-auth'
@@ -3702,21 +3728,11 @@
             pact_broker_creds_password: 'pact_broker_password'
             pact_consumer: 'fabric8-wit'
             pact_version: 'latest'
+            osio_username_cred: 'osio_username_1'
+            osio_password_cred: 'osio_password_1'
+            service_account_client_id_cred: 'online_registration_service_account_client_id'
+            service_account_client_secret_cred: 'online_registration_service_account_client_secret'
             archive_artifacts: 'true'
-            wrappers:
-                - vault-secrets:
-                    <<: *vault_defaults
-                    secrets:
-                      - secret-path: 'devtools-osio-ci/contract-tests-creds'
-                        secret-values:
-                          - env-var: 'OSIO_USERNAME'
-                            vault-key: 'osio_username_1'
-                          - env-var: 'OSIO_PASSWORD'
-                            vault-key: 'osio_password_1'
-                          - env-var: 'AUTH_SERVICE_ACCOUNT_CLIENT_ID'
-                            vault-key: 'auth_service_account_client_id'
-                          - env-var: 'AUTH_SERVICE_ACCOUNT_CLIENT_SECRET'
-                            vault-key: 'auth_service_account_client_secret'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-pgbouncer
