@@ -308,7 +308,7 @@
       - env-var: 'EMAIL'
         vault-key: 'email'
 
-- rhche-periodic-2a-creds: &rhche-periodic-2aProd-creds
+- rhche-periodic-2aProd-creds: &rhche-periodic-2aProd-creds
     name: "rhche-periodic-2aProd-creds"
     secret-path: 'devtools-osio-ci/rhche-periodic-2aProd-creds'
     secret-values:
