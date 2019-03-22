@@ -290,8 +290,6 @@
         vault-key: 'username'
       - env-var: 'PASSWORD'
         vault-key: 'password'
-      - env-var: 'OFFLINE_TOKEN'
-        vault-key: 'token'
       - env-var: 'EMAIL'
         vault-key: 'email'
 
@@ -303,8 +301,6 @@
         vault-key: 'username'
       - env-var: 'PASSWORD'
         vault-key: 'password'
-      - env-var: 'OFFLINE_TOKEN'
-        vault-key: 'token'
       - env-var: 'EMAIL'
         vault-key: 'email'
 
@@ -316,8 +312,6 @@
         vault-key: 'username'
       - env-var: 'PASSWORD'
         vault-key: 'password'
-      - env-var: 'OFFLINE_TOKEN'
-        vault-key: 'token'
       - env-var: 'EMAIL'
         vault-key: 'email'
         
