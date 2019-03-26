@@ -3266,7 +3266,7 @@
             git_organization: redhat-developer
             git_repo: rh-che
             ci_project: 'devtools'
-            ci_cmd: 'export HOST_URL="che.prod-preview.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
+            ci_cmd: 'export HOST_URL="che.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
             env: 'prod'
             timeout: '40m'
             cluster: '2aProd'
