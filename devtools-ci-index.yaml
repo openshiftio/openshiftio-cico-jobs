@@ -282,6 +282,17 @@
       - env-var: 'RH_CHE_AUTOMATION_DOCKERHUB_PASSWORD'
         vault-key: 'password'
 
+- rhche-periodic-free-stg-creds: &rhche-periodic-free-stg-creds
+    name: "rhche-periodic-free-stg-creds"
+    secret-path: 'devtools-osio-ci/rhche-periodic-free-stg-creds'
+    secret-values:
+      - env-var: 'USERNAME'
+        vault-key: 'username'
+      - env-var: 'PASSWORD'
+        vault-key: 'password'
+      - env-var: 'EMAIL'
+        vault-key: 'email'
+
 - rhche-periodic-2-creds: &rhche-periodic-2-creds
     name: "rhche-periodic-2-creds"
     secret-path: 'devtools-osio-ci/rhche-periodic-2-creds'
@@ -1881,6 +1892,14 @@
            secrets:
              - *rhche-periodic-1b-creds
              
+- wrapper:
+    name: 'rhche_credentials_wrapper-free-stg'
+    wrappers:
+       - vault-secrets:
+           <<: *vault_defaults
+           secrets:
+             - *rhche-periodic-free-stg-creds
+             
 - job-template:
     name: '{ci_project}-{git_repo}-periodic-{env}-{cluster}'
     triggers:
@@ -3254,6 +3273,14 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash ./.ci/cico_build_prcheck_dep.sh'
             timeout: '120m'
+        - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: 'export HOST_URL="che.prod-preview.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
+            env: 'prod-preview'
+            timeout: '40m'
+            cluster: 'free-stg'
         - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
             git_organization: redhat-developer
             git_repo: rh-che
