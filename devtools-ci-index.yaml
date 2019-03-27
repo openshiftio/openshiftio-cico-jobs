@@ -524,6 +524,11 @@
             $ssh_cmd yum -y install rsync
             if [ -n "${{ghprbTargetBranch}}" ]; then
                 git rebase --preserve-merges origin/${{ghprbTargetBranch}}
+                rtn_code=$?
+                if [ $rtn_code -ne 0 ]; then
+                    echo "The branch can not be reabased onto origin/${{ghprbTargetBranch}}." 
+                    exit $rtn_code
+                fi
             else
                 echo "Not a PR build, using master"
             fi
