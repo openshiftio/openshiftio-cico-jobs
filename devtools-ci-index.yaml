@@ -283,6 +283,17 @@
       - env-var: 'RH_CHE_AUTOMATION_DOCKERHUB_PASSWORD'
         vault-key: 'password'
 
+- rhche-flaky-2-creds: &rhche-flaky-2-creds
+    name: "rhche-flaky-2-creds"
+    secret-path: 'devtools-osio-ci/rhche-flaky-2-creds'
+    secret-values:
+      - env-var: 'USERNAME'
+        vault-key: 'username'
+      - env-var: 'PASSWORD'
+        vault-key: 'password'
+      - env-var: 'EMAIL'
+        vault-key: 'email'
+
 - rhche-periodic-2-creds: &rhche-periodic-2-creds
     name: "rhche-periodic-2-creds"
     secret-path: 'devtools-osio-ci/rhche-periodic-2-creds'
@@ -1834,6 +1845,21 @@
             - *qe-osio-dev-cluster-SA-token
     <<: *job_template_defaults
 
+- rhche-flaky-tests-template: &rhche-flaky-tests-template
+    name: 'rhche-flaky-tests-template'
+    wrappers:
+      - rhche_credentials_wrapper-flaky-{cluster}
+    concurrent: false
+    <<: *job_template_defaults
+
+- wrapper:
+    name: 'rhche_credentials_wrapper-flaky-2'
+    wrappers:
+       - vault-secrets:
+           <<: *vault_defaults
+           secrets:
+             - *rhche-flaky-2-creds
+
 - rhche-functional-tests-template: &rhche-functional-tests-template
     name: 'rhche-functional-tests-template'
     wrappers:
@@ -1896,7 +1922,19 @@
                 - origin/master
     <<: *rhche-functional-tests-template
 
-
+- job-template:
+    name: '{ci_project}-{git_repo}-flaky-{env}-{cluster}'
+    triggers:
+        - timed: 'H 3,9,15,21 * * *'
+    publishers:
+        - email:
+            recipients: rhopp@redhat.com kkanova@redhat.com tdancs@redhat.com
+    scm:
+        - git:
+            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            branches:
+                - origin/master
+    <<: *rhche-functional-tests-template
 
 
 - job-template:
@@ -3255,6 +3293,14 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash ./.ci/cico_build_prcheck_dep.sh'
             timeout: '120m'
+        - '{ci_project}-{git_repo}-flaky-{env}-{cluster}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: 'export HOST_URL="che.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
+            env: 'prod'
+            timeout: '40m'
+            cluster: '2'
         - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
             git_organization: redhat-developer
             git_repo: rh-che
