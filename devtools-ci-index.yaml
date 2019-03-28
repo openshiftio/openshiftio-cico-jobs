@@ -2685,6 +2685,90 @@
                           vault-key: '{service_account_client_secret_cred}'
     <<: *contract_tests_provider_template
 
+- job-template: 
+    name: '{ci_project}-{git_repo}-pr-check-rh-che'  
+    scm:  
+        - git-scm:  
+            git_url: https://github.com/openshiftio/{git_repo}.git
+            git_basedir: '{git_repo}' 
+    beforeScript: | 
+        # if the PR to saas-openshiftio is done immediatelly after the commit 
+        # to dependency's master, it might be still deploying to prod-preview 
+        echo "Sleeping for 1 min" 
+        sleep 60
+    triggers:  
+        - github-pull-request:  
+            github_hooks: '{github_hooks}'  
+            status-context: 'ci.centos.org rh-che test against prod-preview'  
+            failure-comment: "**The rh-che test against prod-preview failed.**\n\n  
+            | Link | URL |\n  
+            | ---- | :-: |\n  
+            | job log | https://ci.centos.org/job/$JOB_NAME/$BUILD_NUMBER/console |\n 
+            | artifacts | http://artifacts.ci.centos.org/devtools/saas-openshiftio/$JOB_NAME/$BUILD_NUMBER |\n\n 
+            **Please review the job results and re-run the job by commenting [test] if necessary.**"  
+            error-comment: "**The rh-che test against prod-preview failed.**\n\n  
+            | Link | URL |\n  
+            | ---- | :-: |\n  
+            | job log | https://ci.centos.org/job/$JOB_NAME/$BUILD_NUMBER/console |\n 
+            | artifacts | http://artifacts.ci.centos.org/devtools/saas-openshiftio/$JOB_NAME/$BUILD_NUMBER |\n\n 
+            **Please review the job results and re-run the job by commenting [test] if necessary.**"  
+            <<: *github_pull_request_defaults 
+    properties:
+        - github:
+            url: https://github.com/openshiftio/{git_repo}
+    wrappers:
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+                - secret-path: 'devtools-osio-ci/rhche-saas-prcheck'
+                  secret-values:
+                    - env-var: 'PASSWORD'
+                      vault-key: 'password'
+                    - env-var: 'USERNAME'
+                      valut-key: 'username'
+                    - env-var: 'EMAIL'
+                      valut-key: email
+    builders:
+        - shell: |
+            {beforeScript}
+        
+            echo "Installing docker..."
+            yum install -y docker | cat # Suppress multiple-line output for package installation
+            systemctl start docker
+            docker pull quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep | cat # Suppress multiple-line output for docker pull
+        
+            set +e
+            docker run --name functional-tests-dep --privileged \
+                   -v /var/run/docker.sock:/var/run/docker.sock \
+                   -v /root/payload/logs:/root/logs \
+                   -e "RHCHE_SCREENSHOTS_DIR=/root/logs/screenshots" \
+                   -e "RHCHE_ACC_USERNAME=$USERNAME" \
+                   -e "RHCHE_ACC_PASSWORD=$PASSWORD" \
+                   -e "RHCHE_ACC_EMAIL=$EMAIL" \
+                   -e "CHE_OSIO_AUTH_ENDPOINT=https://auth.prod-preview.openshift.io" \
+                   -e "RHCHE_OPENSHIFT_TOKEN_URL=https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker" \
+                   -e "RHCHE_HOST_URL=che.prod-preview.openshift.io" \
+                   -e "TEST_SUITE=saasPrCheck.xml" \
+                 quay.io/openshiftio/rhchestage-rh-che-functional-tests-dep
+            RESULT=$?
+        
+            echo "Archiving artifacts for $JOB_NAME/$BUILD_NUMBER"
+            ls -la ./artifacts.key
+            chmod 600 ./artifacts.key
+            chown $(whoami) ./artifacts.key
+            mkdir -p ./saas-openshiftio/$JOB_NAME/$BUILD_NUMBER/surefire-reports
+            cp ./logs/*.log ./saas-openshiftio/$JOB_NAME/$BUILD_NUMBER/
+            cp -R ./logs/artifacts/screenshots/ ./saas-openshiftio/$JOB_NAME/$BUILD_NUMBER/
+            cp -R ./logs/artifacts/failsafe-reports/ ./saas-openshiftio/$JOB_NAME/$BUILD_NUMBER/
+            rsync --password-file=./artifacts.key -PHva --relative ./saas-openshiftio/$JOB_NAME/$BUILD_NUMBER devtools@artifacts.ci.centos.org::devtools/
+
+            if [[ $RESULT -eq 0 ]]; then
+                echo "Tests result: SUCCESS"
+            else
+                echo "Tests result: FAILURE"
+            fi
+            exit $RESULT  
+
 - project:
     name: devtools
     disabled: false
