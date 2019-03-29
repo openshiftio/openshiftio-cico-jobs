@@ -898,6 +898,61 @@
 
             exit $rtn_code
 
+- job-template:
+    name: '{ci_project}-{git_repo}-fabric8-analytics-build-master'
+    wrappers:
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *kube-config-dsaas-stg
+            - *quay-credentials
+            - *registry-devshift-credentials
+    scm:
+        - git:
+            url: https://github.com/{git_organization}/{git_repo}.git
+            shallow_clone: true
+            branches:
+                - '{build_branch}'
+    saas_service_names: none
+    saasherder_prepare: |
+        if [ "$SAAS_GIT" != "none" ]; then
+            SAAS_ENV=staging
+            PATH=$PATH:~/.local/bin/
+            CONTEXT=$(echo $SAAS_GIT | sed 's/.*://')
+            SAAS_GIT=$(echo $SAAS_GIT | sed 's/:.*//')
+            if [[ -z "$SAAS_SERVICE_NAME" || "$SAAS_SERVICE_NAME" == "none" ]]; then
+                SAAS_SERVICE_NAME=$GIT_REPO
+            fi
+            if [[ -z "$SAAS_SERVICE_NAMES" || "$SAAS_SERVICE_NAMES" == "none" ]]; then
+                SAAS_SERVICE_NAMES="$SAAS_SERVICE_NAME"
+            fi
+            if [ "$SUBDIR" != "" ]; then
+                SAAS_SERVICE_NAME=$SAAS_SERVICE_NAME"-"$SUBDIR
+            fi
+            git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
+            cd saas.git
+            [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
+            cd ..
+        fi
+    saasherder_deploy: |
+        if [ "$SVC_NAME" != "none" ]; then
+            oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" rollout latest $SVC_NAME -n $PRJ_NAME
+            rtn_code=$?
+        fi
+        if [ "$SAAS_GIT" != "none" ]; then
+            cd saas.git
+            for SAAS_SERVICE_NAME in $SAAS_SERVICE_NAMES; do
+                export DEVSHIFT_TAG_LEN=$(saasherder --environment $SAAS_ENV get hash_length $SAAS_SERVICE_NAME
+                saasherder --environment $SAAS_ENV update hash $SAAS_SERVICE_NAME $GIT_COMMIT
+                saasherder --environment $SAAS_ENV pull $SAAS_SERVICE_NAME
+                saasherder --environment $SAAS_ENV template --filter Route --output-dir $GIT_REPO-processed tag $SAAS_SERVICE_NAME
+                oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
+                rtn_code=$(($rtn_code + $?))
+            done
+            cd ..
+        fi
+    <<: *job_template_build_defaults
+
 - job-template: &job_template_build_master
     name: '{ci_project}-{git_repo}-build-master'
     wrappers:
@@ -4861,13 +4916,16 @@
             git_repo: cvejob
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '30m'
-        - '{ci_project}-{git_repo}-build-master':
+            timeout: '60m'
+        - '{ci_project}-{git_repo}-fabric8-analytics-build-master':
             git_organization: fabric8-analytics
             git_repo: cvejob
+            saas_git: saas-analytics
+            prj_name: bayesian-preview
+            saas_service_names: 'cvejob-pypi cvejob-npm cvejob-maven'
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '30m'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
+            timeout: '60m'
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: cvejob
             discarder_days: 30
