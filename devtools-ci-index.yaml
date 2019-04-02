@@ -942,7 +942,7 @@
         if [ "$SAAS_GIT" != "none" ]; then
             cd saas.git
             for SAAS_SERVICE_NAME in $SAAS_SERVICE_NAMES; do
-                export DEVSHIFT_TAG_LEN=$(saasherder --environment $SAAS_ENV get hash_length $SAAS_SERVICE_NAME
+                export DEVSHIFT_TAG_LEN=$(saasherder --environment $SAAS_ENV get hash_length $SAAS_SERVICE_NAME)
                 saasherder --environment $SAAS_ENV update hash $SAAS_SERVICE_NAME $GIT_COMMIT
                 saasherder --environment $SAAS_ENV pull $SAAS_SERVICE_NAME
                 saasherder --environment $SAAS_ENV template --filter Route --output-dir $GIT_REPO-processed tag $SAAS_SERVICE_NAME
