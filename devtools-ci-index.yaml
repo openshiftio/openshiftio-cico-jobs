@@ -2948,13 +2948,6 @@
             timeout: '3h'
             discarder_days: 30
         - '{ci_project}-{git_repo}':
-            git_organization: fabric8-ui
-            git_repo: fabric8-ui
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '50m'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}':
             git_organization: openshiftio
             git_repo: openshift.io
             ci_project: 'devtools'
@@ -3061,20 +3054,6 @@
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             svc_name: core
             timeout: '3h'
-        - '{ci_project}-{git_repo}-npm-publish-build-master':
-            git_organization: fabric8-ui
-            git_repo: fabric8-ui
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-openshiftio
-            timeout: '20m'
-            extra_target: rhel
-        - '{ci_project}-{git_repo}-npm-publish-build-master':
-            git_organization: fabric8-ui
-            git_repo: fabric8-planner
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            timeout: '1h'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: openshiftio
             git_repo: openshift.io
@@ -3149,30 +3128,6 @@
             timeout: '10m'
             extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
-            git_repo: fabric8-jenkins-idler
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-openshiftio
-            timeout: '20m'
-            extra_target: rhel
-        - '{ci_project}-{git_repo}-build-master':
-            git_repo: fabric8-jenkins-proxy
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-openshiftio
-            timeout: '20m'
-            extra_target: rhel
-        - '{ci_project}-{git_repo}':
-            git_repo: fabric8-jenkins-proxy
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            timeout: '20m'
-        - '{ci_project}-{git_repo}':
-            git_repo: fabric8-jenkins-idler
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master':
             git_organization: openshiftio
             git_repo: tenant-log-indirector
             ci_project: 'devtools'
@@ -3180,25 +3135,11 @@
             saas_git: saas-openshiftio
             timeout: '10m'
             extra_target: rhel
-        - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
-            git_organization: redhat-developer
-            git_repo: che-starter
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-openshiftio
-            timeout: '20m'
-            extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
             git_organization: redhat-developer
             git_repo: che-vertx-server
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            timeout: '20m'
-        - '{ci_project}-{git_repo}-prcheck':
-            git_organization: redhat-developer
-            git_repo: che-starter
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}-rh-che-compatibility-test-{test_url}':
             git_organization: redhat-developer
@@ -3517,19 +3458,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master':
-            git_repo: build-tool-detector
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-openshiftio
-            timeout: '20m'
-            extra_target: rhel
-        - '{ci_project}-{git_repo}':
-            git_repo: build-tool-detector
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
-            discarder_days: 30
         - '{ci_project}-{git_repo}':
             git_organization: redhat-developer
             git_repo: devopsconsole-operator
@@ -3602,30 +3530,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master-push-client':
-            git_repo: fabric8-env
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-openshiftio
-            timeout: '20m'
-            extra_target: rhel
-        - '{ci_project}-{git_repo}':
-            git_repo: fabric8-env
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}':
-            git_repo: fabric8-env-client
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build.sh'
-            timeout: '20m'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}-build-master':
-            git_repo: fabric8-env-client
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build.sh'
-            timeout: '20m'
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: fabric8-launcher
             git_repo: launcher-documentation
@@ -3642,60 +3546,6 @@
             saas_git: saas-openshiftio
             timeout: '20m'
             extra_target: rhel
-        - '{ci_project}-{git_repo}-fabric8-push-build-master':
-            git_organization: fabric8-services
-            git_repo: fabric8-build
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/deploy.sh'
-            timeout: '20m'
-            extra_target: rhel
-            saas_git: saas-openshiftio
-        - '{ci_project}-{git_repo}-build-master-coverage':
-            git_repo: fabric8-build
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/coverage.sh'
-            timeout: '3h'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}-coverage':
-            git_repo: fabric8-build
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/coverage.sh'
-            timeout: '3h'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}-fabric8-push-prcheck':
-            git_organization: fabric8-services
-            git_repo: fabric8-build
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/test.sh'
-            timeout: '20m'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}-fabric8-push-build-master':
-            git_organization: fabric8-services
-            git_repo: fabric8-webhook
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/deploy.sh'
-            timeout: '20m'
-            extra_target: rhel
-            saas_git: saas-openshiftio
-        - '{ci_project}-{git_repo}-build-master-coverage':
-            git_repo: fabric8-webhook
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/coverage.sh'
-            timeout: '3h'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}-coverage':
-            git_repo: fabric8-webhook
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/coverage.sh'
-            timeout: '3h'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}-fabric8-push-prcheck':
-            git_organization: fabric8-services
-            git_repo: fabric8-webhook
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/test.sh'
-            timeout: '20m'
-            discarder_days: 30
         - '{ci_project}-{git_repo}-fabric8-docs-prcheck':
             git_repo: fabric8-online-docs
             git_organization: fabric8io
@@ -4445,15 +4295,6 @@
             saas_git: saas-errortracking
             prj_name: sentry-preview
             timeout: '20m'
-        - '{ci_project}-{git_repo}-f8planner':
-            git_organization: fabric8-ui
-            git_repo: fabric8-planner
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            registry: 'quay.io'
-            image_name: 'openshiftio/fabric8-ui-fabric8-planner'
-            timeout: '1h'
-            discarder_days: 30
         - 'devtools-test-end-to-end-{test_url}-planner-api-test':
             test_url: openshift.io
             git_organization: fabric8io
@@ -4567,26 +4408,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
-        - 'devtools-test-e2e-{test_url}-{test_suite}':
-            git_organization: fabric8-ui
-            git_repo: fabric8-planner
-            test_url: prod-preview.openshift.io
-            test_suite: planner-functional-tests
-            osio_creds: osio-ci-planner-002-preview
-            branch: 'prod-preview-tests'
-            ee_test_start_time: '0 * * * *'
-            ci_cmd: 'cd payload && /bin/bash cico_test_prod.sh --prod-preview'
-            timeout: '60m'
-        - 'devtools-test-e2e-{test_url}-{test_suite}':
-            git_organization: fabric8-ui
-            git_repo: fabric8-planner
-            test_suite: planner-functional-tests
-            osio_creds: osio-ci-planner-002
-            test_url: 'openshift.io'
-            branch: 'prod-tests'
-            ee_test_start_time: '0 */4 * * *'
-            ci_cmd: 'cd payload && /bin/bash cico_test_prod.sh'
-            timeout: '60m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-analytics
             git_repo: cvedb
