@@ -3215,6 +3215,14 @@
             git_organization: openshiftio
             ci_project: 'devtools'
             image_pattern: '^quay\.io/openshiftio/rhel-'
+        - '{ci_project}-{git_repo}-pr-check-rh-che':
+            git_repo: saas-openshiftio
+            git_organization: openshiftio
+            ci_project: 'devtools'
+            ci_cmd: 'export HOST_URL="che.prod-preview.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
+            env: 'prod-preview'
+            timeout: '40m'
+            cluster: '2a'
         - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-analytics
             git_organization: openshiftio
