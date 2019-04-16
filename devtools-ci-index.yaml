@@ -915,6 +915,7 @@
                 - '{build_branch}'
     saas_service_names: none
     saasherder_prepare: |
+        set -x
         if [ "$SAAS_GIT" != "none" ]; then
             SAAS_ENV=staging
             PATH=$PATH:~/.local/bin/
@@ -923,6 +924,7 @@
             if [[ -z "$SAAS_SERVICE_NAME" || "$SAAS_SERVICE_NAME" == "none" ]]; then
                 SAAS_SERVICE_NAME=$GIT_REPO
             fi
+            SAAS_SERVICE_NAMES={saas_service_names}
             if [[ -z "$SAAS_SERVICE_NAMES" || "$SAAS_SERVICE_NAMES" == "none" ]]; then
                 SAAS_SERVICE_NAMES="$SAAS_SERVICE_NAME"
             fi
@@ -934,6 +936,7 @@
             [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
             cd ..
         fi
+        set +x
     saasherder_deploy: |
         if [ "$SVC_NAME" != "none" ]; then
             oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" rollout latest $SVC_NAME -n $PRJ_NAME
