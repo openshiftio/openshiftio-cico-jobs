@@ -930,7 +930,7 @@
             if [[ -z "$SAAS_SERVICE_NAME" || "$SAAS_SERVICE_NAME" == "none" ]]; then
                 SAAS_SERVICE_NAME=$GIT_REPO
             fi
-            SAAS_SERVICE_NAMES={saas_service_names}
+            SAAS_SERVICE_NAMES='{saas_service_names}'
             if [[ -z "$SAAS_SERVICE_NAMES" || "$SAAS_SERVICE_NAMES" == "none" ]]; then
                 SAAS_SERVICE_NAMES="$SAAS_SERVICE_NAME"
             fi
