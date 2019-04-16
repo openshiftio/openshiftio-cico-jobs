@@ -2688,6 +2688,50 @@
                           vault-key: '{service_account_client_secret_cred}'
     <<: *contract_tests_provider_template
 
+- job-template: 
+    name: '{ci_project}-{git_repo}-pr-check-rh-che'  
+    scm:  
+        - git-scm:
+            git_url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            git_basedir: '{git_repo}'
+        - git: 
+            url: https://github.com/redhat-developer/rh-che/
+            shallow_clone: true 
+            branches: 
+                - master  
+            basedir: rhche
+    triggers:  
+        - github-pull-request:  
+            github_hooks: '{github_hooks}'  
+            status-context: 'ci.centos.org rh-che test against prod-preview'  
+            failure-comment: "**The rh-che test against prod-preview failed.**\n\n  
+            | Link | URL |\n  
+            | ---- | :-: |\n  
+            | job log | https://ci.centos.org/job/$JOB_NAME/$BUILD_NUMBER/console |\n 
+            | artifacts | http://artifacts.ci.centos.org/devtools/saas-openshiftio/$JOB_NAME/$BUILD_NUMBER |\n\n 
+            **Please review the job results and re-run the job by commenting [test] if necessary.**"  
+            error-comment: "**The rh-che test against prod-preview failed.**\n\n  
+            | Link | URL |\n  
+            | ---- | :-: |\n  
+            | job log | https://ci.centos.org/job/$JOB_NAME/$BUILD_NUMBER/console |\n 
+            | artifacts | http://artifacts.ci.centos.org/devtools/saas-openshiftio/$JOB_NAME/$BUILD_NUMBER |\n\n 
+            **Please review the job results and re-run the job by commenting [test] if necessary.**"  
+            <<: *github_pull_request_defaults 
+    wrappers:
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+                - secret-path: 'devtools-osio-ci/rhche-saas-prcheck'
+                  secret-values:
+                    - env-var: 'PASSWORD'
+                      vault-key: 'password'
+                    - env-var: 'USERNAME'
+                      valut-key: 'username'
+                    - env-var: 'EMAIL'
+                      valut-key: email
+    <<: *job_template_defaults
+
+
 - project:
     name: devtools
     disabled: false
@@ -3174,6 +3218,14 @@
             git_organization: openshiftio
             ci_project: 'devtools'
             image_pattern: '^quay\.io/openshiftio/rhel-'
+        - '{ci_project}-{git_repo}-pr-check-rh-che':
+            git_repo: saas-openshiftio
+            git_organization: openshiftio
+            ci_project: 'devtools'
+            ci_cmd: 'export HOST_URL="che.prod-preview.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
+            env: 'prod-preview'
+            timeout: '40m'
+            cluster: '2a'
         - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-analytics
             git_organization: openshiftio
