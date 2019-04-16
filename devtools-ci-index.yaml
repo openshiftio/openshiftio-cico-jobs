@@ -524,6 +524,11 @@
             $ssh_cmd yum -y install rsync
             if [ -n "${{ghprbTargetBranch}}" ]; then
                 git rebase --preserve-merges origin/${{ghprbTargetBranch}}
+                rtn_code=$?
+                if [ $rtn_code -ne 0 ]; then
+                    echo "The branch can not be rebased onto origin/${{ghprbTargetBranch}}." 
+                    exit $rtn_code
+                fi
             else
                 echo "Not a PR build, using master"
             fi
@@ -915,6 +920,7 @@
                 - '{build_branch}'
     saas_service_names: none
     saasherder_prepare: |
+        set -x
         if [ "$SAAS_GIT" != "none" ]; then
             SAAS_ENV=staging
             PATH=$PATH:~/.local/bin/
@@ -923,6 +929,7 @@
             if [[ -z "$SAAS_SERVICE_NAME" || "$SAAS_SERVICE_NAME" == "none" ]]; then
                 SAAS_SERVICE_NAME=$GIT_REPO
             fi
+            SAAS_SERVICE_NAMES={saas_service_names}
             if [[ -z "$SAAS_SERVICE_NAMES" || "$SAAS_SERVICE_NAMES" == "none" ]]; then
                 SAAS_SERVICE_NAMES="$SAAS_SERVICE_NAME"
             fi
@@ -934,6 +941,7 @@
             [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
             cd ..
         fi
+        set +x
     saasherder_deploy: |
         if [ "$SVC_NAME" != "none" ]; then
             oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" rollout latest $SVC_NAME -n $PRJ_NAME
@@ -1910,10 +1918,10 @@
 - wrapper:
     name: 'rhche_credentials_wrapper-flaky-2'
     wrappers:
-       - vault-secrets:
-           <<: *vault_defaults
-           secrets:
-             - *rhche-flaky-2-creds
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *rhche-flaky-2-creds
 
 - rhche-functional-tests-template: &rhche-functional-tests-template
     name: 'rhche-functional-tests-template'
@@ -1989,7 +1997,7 @@
             url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
             branches:
                 - origin/master
-    <<: *rhche-functional-tests-template
+    <<: *rhche-flaky-tests-template
 
 
 - job-template:
@@ -2003,218 +2011,6 @@
                 results:
                     - success
     <<: *rh-che-automation-depbuild-template
-
-- job-template: &job_template_end_to_end_tests_defaults
-    name: 'devtools-test-end-to-end-{test_url}-{test_suite}'
-    defaults: global
-    node: devtools
-    after: fabric8io-fabric8-test-build-master
-    disabled: '{obj:disabled}'
-    gh_username: osiotestmachine
-    properties:
-        - github:
-            url: https://github.com/fabric8io/fabric8-test
-    scm:
-        - git:
-            url: https://github.com/fabric8io/fabric8-test.git
-
-            shallow_clone: true
-            branches:
-                - master
-    triggers:
-        - timed: '{ee_test_start_time}'
-        - build-result:
-            cron: '* * * * *'
-            groups:
-              - jobs:
-                    - '{after}'
-                results:
-                    - success
-                    - failure
-    wrappers:
-        - credentials-binding:
-            - username-password-separated:
-                credential-id: 9d2a233c-4350-49ab-983d-5b8d0de95f44
-                username: EE_TEST_USERNAME
-                password: EE_TEST_PASSWORD
-            - text:
-                credential-id: "{oso_token_creds}"
-                variable: EE_TEST_OSO_TOKEN
-            - text:
-                credential-id: "{kc_refresh_token_creds}"
-                variable: EE_TEST_KC_TOKEN
-    builders:
-        - shell: |
-            set +e
-            set +x
-            export EE_TEST_GITHUB_USERNAME="{gh_username}"
-
-            (
-                # run in subshell not to affect current environment
-                set +x
-
-                # load creds_config_file
-                eval "$(sed '/^\s*$/d;s/^/export /' $creds_config_file)"
-
-                cp ~/cico-tools/env-toolkit .
-                ./env-toolkit dump -f jenkins-env.json
-                env > jenkins-env
-            )
-
-            cp ~/artifacts.key .
-            export CICO_API_KEY=$(cat ~/duffy.key )
-            # get node
-            n=1
-            while true
-            do
-                cico_output=$(cico node get -f value -c ip_address -c comment)
-                if [ $? -eq 0 ]; then
-                    read CICO_hostname CICO_ssid <<< $cico_output
-                    if  [ ! -z "$CICO_hostname" ]; then
-                        # we got hostname from cico
-                        break
-                    fi
-                    echo "'cico node get' succeed, but can't get hostname from output"
-                fi
-                if [ $n -gt 15 ]; then
-                    # give up after 15 tries
-                    echo "giving up on 'cico node get'"
-                    exit 1
-                fi
-                echo "'cico node get' failed, trying again in 60s ($n/15)"
-                n=$[$n+1]
-                sleep 60
-            done
-            echo 'Using Host' $CICO_hostname
-            set -x
-            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
-            ssh_cmd="ssh $sshopts $CICO_hostname"
-            $ssh_cmd yum -y install rsync
-            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/ee_tests && /bin/bash cico_run_EE_tests.sh https://{test_url} ${{BUILD_NUMBER}} {test_suite}"
-            rtn_code=$?
-            if [[ $rtn_code -eq 124 ]]; then
-               echo "BUILD TIMEOUT";
-            else
-               rsync --delete -PHva -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
-            fi
-            cico node done $CICO_ssid
-            exit $rtn_code
-    publishers:
-      - archive:
-           artifacts: './ee_tests/target/screenshots/*.*'
-           allow-empty: true
-           fingerprint: true
-
-- e2e_tests_template: &e2e_tests_template
-    name: 'e2e_tests_template'
-    defaults: global
-    description: |
-      {jobdescription}
-    node: devtools
-    timeout: 30m
-    cluster: ''
-    feature_level: ''
-    zabbix_enabled: ''
-    secret_subpath: 'e2e'
-    ci_cmd: 'cd payload/f8tests/ee_tests && /bin/bash cico_run_e2e_tests.sh'
-    properties:
-        - github:
-            url: https://github.com/{git_organization}/{git_repo}
-    wrappers:
-        - ansicolor
-        - vault-secrets:
-            <<: *vault_defaults
-            secrets:
-                - secret-path: 'devtools-osio-ci/{secret_subpath}/{osio_creds}'
-                  secret-values:
-                    - env-var: 'OSIO_PASSWORD'
-                      vault-key: 'password'
-    beforeScript: ''
-    builders:
-        - shell: |
-            set +e
-            set +x
-
-            {beforeScript}
-
-            export OSIO_USERNAME="{osio_creds}"
-            export OSIO_CLUSTER="{cluster}"
-            export OSIO_URL="http://{test_url}"
-            export TEST_SUITE="{test_suite}"
-            export FEATURE_LEVEL="{feature_level}"
-            export ZABBIX_ENABLED="{zabbix_enabled}"
-
-            pwd
-            ls -l config
-            mkdir config
-            (
-                # run in subshell not to affect current environment
-                set +x
-
-                # load creds_config_file
-                eval "$(sed '/^\s*$/d;s/^/export /' $creds_config_file)"
-
-                cp ~/cico-tools/env-toolkit .
-                ./env-toolkit dump -f jenkins-env.json
-                env > f8tests/jenkins-env
-                env > config/jenkins-env
-            )
-
-            cp ~/artifacts.key f8tests
-            cp ~/artifacts.key config
-            ls -l config
-            export CICO_API_KEY=$(cat ~/duffy.key )
-            # get node
-            n=1
-            while true
-            do
-                cico_output=$(cico node get -f value -c ip_address -c comment)
-                if [ $? -eq 0 ]; then
-                    read CICO_hostname CICO_ssid <<< $cico_output
-                    if  [ ! -z "$CICO_hostname" ]; then
-                        # we got hostname from cico
-                        break
-                    fi
-                    echo "'cico node get' succeed, but can't get hostname from output"
-                fi
-                if [ $n -gt 15 ]; then
-                    # give up after 15 tries
-                    echo "giving up on 'cico node get'"
-                    exit 1
-                fi
-                echo "'cico node get' failed, trying again in 60s ($n/15)"
-                n=$[$n+1]
-                sleep 120
-            done
-            echo 'Using Host' $CICO_hostname
-            set -x
-            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
-            ssh_cmd="ssh $sshopts $CICO_hostname"
-            $ssh_cmd yum -y install rsync
-            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            /usr/bin/timeout {timeout} $ssh_cmd -t "{ci_cmd}"
-            rtn_code=$?
-            if [[ $rtn_code -eq 124 ]]; then
-               echo "BUILD TIMEOUT";
-            fi
-            cico node done $CICO_ssid
-            exit $rtn_code
-
-- job-template:
-    name: 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}'
-    git_organization: fabric8io
-    git_repo: fabric8-test
-    scm:
-        - git:
-            url: https://github.com/{git_organization}/{git_repo}.git
-            shallow_clone: true
-            branches:
-                - master
-            basedir: f8tests
-    triggers:
-        - timed: '{ee_test_start_time}'
-    <<: *e2e_tests_template
 
 - job-template:
     name: 'devtools-test-e2e-cleanup'
@@ -2596,134 +2392,6 @@
                 - master
     <<: *job_template_build_defaults
 
-- job-template:
-    name: 'devtools-test-e2e-{test_url}-{test_suite}'
-    triggers:
-        - timed: '{ee_test_start_time}'
-    wrappers:
-        - ansicolor
-        - vault-secrets:
-            <<: *vault_defaults
-            secrets:
-                - secret-path: 'devtools-osio-ci/planner/{osio_creds}'
-                  secret-values:
-                    - env-var: 'OSIO_PASSWORD'
-                      vault-key: 'password'
-                    - env-var: 'REFRESH_TOKEN'
-                      vault-key: 'refresh_token'
-    scm:
-        - git:
-            url: https://github.com/{git_organization}/{git_repo}.git
-            shallow_clone: true
-            branches:
-                - '{branch}'
-    <<: *e2e_tests_template
-
-- booster_bdd_tests_template: &booster_bdd_tests_template
-    name: 'booster_bdd_tests_template'
-    defaults: global
-    node: devtools
-    timeout: 60m
-    zabbix_enabled: true
-    properties:
-        - github:
-            url: https://github.com/fabric8io/fabric8-test
-    scm:
-        - git:
-            url: https://github.com/fabric8io/fabric8-test.git
-            shallow_clone: true
-            branches:
-                - master
-    wrappers:
-        - ansicolor
-        - vault-secrets:
-            <<: *vault_defaults
-            secrets:
-              - secret-path: 'devtools-osio-ci/osio-ci-boost-creds'
-                secret-values:
-                    - env-var: 'OSIO_USERNAME'
-                      vault-key: '{osio_creds_username}'
-                    - env-var: 'OSIO_PASSWORD'
-                      vault-key: '{osio_creds_password}'
-    builders:
-        - shell: |
-            set +e
-            set +x
-            export SCENARIO="{scenario}"
-            export SERVER_ADDRESS="{server_address}"
-            export FORGE_API="{forge_api}"
-            export WIT_API="{wit_api}"
-            export AUTH_API="{auth_api}"
-            export OSIO_DANGER_ZONE="{danger_zone}"
-            export PIPELINE="{pipeline}"
-            export BOOSTER_MISSION="{booster_mission}"
-            export BOOSTER_RUNTIME="{booster_runtime_id}:{booster_runtime_version}"
-            export BLANK_BOOSTER="{blank_booster}"
-            export GIT_REPO="{git_repo}"
-            export PROJECT_NAME="{project_name}"
-            export AUTH_CLIENT_ID="{auth_client_id}"
-            export REPORT_DIR="{report_dir}"
-            export UI_HEADLESS="{ui_headless}"
-            export ZABBIX_ENABLED="{zabbix_enabled}"
-            export ZABBIX_SERVER="{zabbix_server}"
-            export ZABBIX_PORT="{zabbix_port}"
-            export ZABBIX_HOST="{zabbix_host}"
-            export ZABBIX_METRIC_PREFIX="{zabbix_metric_prefix}"
-
-            cp ~/cico-tools/env-toolkit .
-            ./env-toolkit dump -f jenkins-env.json
-            env > jenkins-env
-
-            cp ~/artifacts.key .
-            export CICO_API_KEY=$(cat ~/duffy.key )
-            # get node
-            n=1
-            while true
-            do
-                cico_output=$(cico node get -f value -c ip_address -c comment)
-                if [ $? -eq 0 ]; then
-                    read CICO_hostname CICO_ssid <<< $cico_output
-                    if  [ ! -z "$CICO_hostname" ]; then
-                        # we got hostname from cico
-                        break
-                    fi
-                    echo "'cico node get' succeed, but can't get hostname from output"
-                fi
-                if [ $n -gt 15 ]; then
-                    # give up after 15 tries
-                    echo "giving up on 'cico node get'"
-                    exit 1
-                fi
-                echo "'cico node get' failed, trying again in 60s ($n/15)"
-                n=$[$n+1]
-                sleep 60
-            done
-            echo 'Using Host' $CICO_hostname
-            set -x
-            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
-            ssh_cmd="ssh $sshopts $CICO_hostname"
-            $ssh_cmd "yum -y -d1 --setopt tsflags='nodocs' install rsync"
-            rsync --delete -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload
-            /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload/booster_bdd && /bin/bash cico_run_booster_tests.sh"
-            rtn_code=$?
-            if [[ $rtn_code -eq 124 ]]; then
-               echo "BUILD TIMEOUT";
-            else
-               rsync --delete -Ha -e "ssh $sshopts" $CICO_hostname:payload/ $(pwd) || rtn_code=$?
-            fi
-            cico node done $CICO_ssid
-            exit $rtn_code
-    publishers:
-        - email:
-            recipients: pmacik@redhat.com ldimaggi@redhat.com
-            notify-every-unstable-build: true
-
-- job-template:
-    name: 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}'
-    triggers:
-        - timed: '{bdd_test_start_time}'
-    <<: *booster_bdd_tests_template
-
 - prebooster_tests_template: &prebooster_tests_template
     name: 'prebooster_tests_template'
     defaults: global
@@ -2819,16 +2487,6 @@
     triggers:
         - timed: '{prebooster_test_start_time}'
     <<: *prebooster_tests_template
-
-
-- job-template:
-    name: 'devtools-bdd-test-booster-import-{build_tool}-{test_url}-{cluster}'
-    booster_mission: ''
-    booster_runtime_id: ''
-    booster_runtime_version: ''
-    triggers:
-        - timed: '{bdd_test_start_time}'
-    <<: *booster_bdd_tests_template
 
 - contract_tests_consumer_template: &contract_tests_consumer_template
     name: 'contract_tests_consumer_template'
@@ -3029,11 +2687,57 @@
                           vault-key: '{osio_username_cred}'
                         - env-var: 'OSIO_PASSWORD'
                           vault-key: '{osio_password_cred}'
+                        - env-var: 'OSIO_CLUSTER_URL'
+                          vault-key: '{osio_cluster_url_cred}'
                         - env-var: 'ONLINE_REGISTRATION_SERVICE_ACCOUNT_CLIENT_ID'
                           vault-key: '{service_account_client_id_cred}'
                         - env-var: 'ONLINE_REGISTRATION_SERVICE_ACCOUNT_CLIENT_SECRET'
                           vault-key: '{service_account_client_secret_cred}'
     <<: *contract_tests_provider_template
+
+- job-template: 
+    name: '{ci_project}-{git_repo}-pr-check-rh-che'  
+    scm:  
+        - git-scm:
+            git_url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            git_basedir: '{git_repo}'
+        - git: 
+            url: https://github.com/redhat-developer/rh-che/
+            shallow_clone: true 
+            branches: 
+                - master  
+            basedir: rhche
+    triggers:  
+        - github-pull-request:  
+            github_hooks: '{github_hooks}'  
+            status-context: 'ci.centos.org rh-che test against prod-preview'  
+            failure-comment: "**The rh-che test against prod-preview failed.**\n\n  
+            | Link | URL |\n  
+            | ---- | :-: |\n  
+            | job log | https://ci.centos.org/job/$JOB_NAME/$BUILD_NUMBER/console |\n 
+            | artifacts | http://artifacts.ci.centos.org/devtools/saas-openshiftio/$JOB_NAME/$BUILD_NUMBER |\n\n 
+            **Please review the job results and re-run the job by commenting [test] if necessary.**"  
+            error-comment: "**The rh-che test against prod-preview failed.**\n\n  
+            | Link | URL |\n  
+            | ---- | :-: |\n  
+            | job log | https://ci.centos.org/job/$JOB_NAME/$BUILD_NUMBER/console |\n 
+            | artifacts | http://artifacts.ci.centos.org/devtools/saas-openshiftio/$JOB_NAME/$BUILD_NUMBER |\n\n 
+            **Please review the job results and re-run the job by commenting [test] if necessary.**"  
+            <<: *github_pull_request_defaults 
+    wrappers:
+        - vault-secrets:
+            <<: *vault_defaults
+            secrets:
+                - secret-path: 'devtools-osio-ci/rhche-saas-prcheck'
+                  secret-values:
+                    - env-var: 'PASSWORD'
+                      vault-key: 'password'
+                    - env-var: 'USERNAME'
+                      valut-key: 'username'
+                    - env-var: 'EMAIL'
+                      valut-key: email
+    <<: *job_template_defaults
+
 
 - project:
     name: devtools
@@ -3061,13 +2765,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_e2e_tests.sh'
             timeout: '3h'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}':
-            git_organization: fabric8-ui
-            git_repo: fabric8-ui
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '50m'
             discarder_days: 30
         - '{ci_project}-{git_repo}':
             git_organization: openshiftio
@@ -3176,20 +2873,6 @@
             ci_cmd: '/bin/bash cico_run_coverage.sh'
             svc_name: core
             timeout: '3h'
-        - '{ci_project}-{git_repo}-npm-publish-build-master':
-            git_organization: fabric8-ui
-            git_repo: fabric8-ui
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-openshiftio
-            timeout: '20m'
-            extra_target: rhel
-        - '{ci_project}-{git_repo}-npm-publish-build-master':
-            git_organization: fabric8-ui
-            git_repo: fabric8-planner
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            timeout: '1h'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: openshiftio
             git_repo: openshift.io
@@ -3264,30 +2947,6 @@
             timeout: '10m'
             extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
-            git_repo: fabric8-jenkins-idler
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-openshiftio
-            timeout: '20m'
-            extra_target: rhel
-        - '{ci_project}-{git_repo}-build-master':
-            git_repo: fabric8-jenkins-proxy
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-openshiftio
-            timeout: '20m'
-            extra_target: rhel
-        - '{ci_project}-{git_repo}':
-            git_repo: fabric8-jenkins-proxy
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            timeout: '20m'
-        - '{ci_project}-{git_repo}':
-            git_repo: fabric8-jenkins-idler
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master':
             git_organization: openshiftio
             git_repo: tenant-log-indirector
             ci_project: 'devtools'
@@ -3295,25 +2954,11 @@
             saas_git: saas-openshiftio
             timeout: '10m'
             extra_target: rhel
-        - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
-            git_organization: redhat-developer
-            git_repo: che-starter
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-openshiftio
-            timeout: '20m'
-            extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
             git_organization: redhat-developer
             git_repo: che-vertx-server
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
-            timeout: '20m'
-        - '{ci_project}-{git_repo}-prcheck':
-            git_organization: redhat-developer
-            git_repo: che-starter
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}-rh-che-compatibility-test-{test_url}':
             git_organization: redhat-developer
@@ -3580,6 +3225,14 @@
             git_organization: openshiftio
             ci_project: 'devtools'
             image_pattern: '^quay\.io/openshiftio/rhel-'
+        - '{ci_project}-{git_repo}-pr-check-rh-che':
+            git_repo: saas-openshiftio
+            git_organization: openshiftio
+            ci_project: 'devtools'
+            ci_cmd: 'export HOST_URL="che.prod-preview.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
+            env: 'prod-preview'
+            timeout: '40m'
+            cluster: '2a'
         - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-analytics
             git_organization: openshiftio
@@ -3632,19 +3285,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master':
-            git_repo: build-tool-detector
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-openshiftio
-            timeout: '20m'
-            extra_target: rhel
-        - '{ci_project}-{git_repo}':
-            git_repo: build-tool-detector
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
-            discarder_days: 30
         - '{ci_project}-{git_repo}':
             git_organization: redhat-developer
             git_repo: devopsconsole-operator
@@ -3717,30 +3357,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master-push-client':
-            git_repo: fabric8-env
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-openshiftio
-            timeout: '20m'
-            extra_target: rhel
-        - '{ci_project}-{git_repo}':
-            git_repo: fabric8-env
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}':
-            git_repo: fabric8-env-client
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build.sh'
-            timeout: '20m'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}-build-master':
-            git_repo: fabric8-env-client
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build.sh'
-            timeout: '20m'
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: fabric8-launcher
             git_repo: launcher-documentation
@@ -3757,160 +3373,13 @@
             saas_git: saas-openshiftio
             timeout: '20m'
             extra_target: rhel
-        - '{ci_project}-{git_repo}-fabric8-push-build-master':
-            git_organization: fabric8-services
-            git_repo: fabric8-build
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/deploy.sh'
-            timeout: '20m'
-            extra_target: rhel
-            saas_git: saas-openshiftio
-        - '{ci_project}-{git_repo}-build-master-coverage':
-            git_repo: fabric8-build
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/coverage.sh'
-            timeout: '3h'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}-coverage':
-            git_repo: fabric8-build
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/coverage.sh'
-            timeout: '3h'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}-fabric8-push-prcheck':
-            git_organization: fabric8-services
-            git_repo: fabric8-build
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/test.sh'
-            timeout: '20m'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}-fabric8-push-build-master':
-            git_organization: fabric8-services
-            git_repo: fabric8-webhook
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/deploy.sh'
-            timeout: '20m'
-            extra_target: rhel
-            saas_git: saas-openshiftio
-        - '{ci_project}-{git_repo}-build-master-coverage':
-            git_repo: fabric8-webhook
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/coverage.sh'
-            timeout: '3h'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}-coverage':
-            git_repo: fabric8-webhook
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/coverage.sh'
-            timeout: '3h'
-            discarder_days: 30
-        - '{ci_project}-{git_repo}-fabric8-push-prcheck':
-            git_organization: fabric8-services
-            git_repo: fabric8-webhook
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash .cico/test.sh'
-            timeout: '20m'
-            discarder_days: 30
         - '{ci_project}-{git_repo}-fabric8-docs-prcheck':
             git_repo: fabric8-online-docs
             git_organization: fabric8io
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_pr_build.sh'
             timeout: '20m'
-        - '{ci_project}-{git_repo}-build-master':
-            git_organization: fabric8io
-            git_repo: fabric8-test
-            ci_project: 'devtools'
-            ci_cmd: 'cd ee_tests/ && /bin/bash cico_build_deploy.sh'
-            timeout: '30m'
         - 'devtools-test-e2e-cleanup'
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: openshift.io
-            test_suite: logintest
-            cluster: us-east-1a
-            feature_level: released
-            osio_creds: osio-ci-e2e-001
-            ee_test_start_time: '2-59/20 * * * *'
-            timeout: 6m
-            zabbix_enabled: false
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: openshift.io
-            test_suite: smoketest
-            cluster: us-east-1a
-            feature_level: released
-            osio_creds: osio-ci-e2e-001
-            ee_test_start_time: '5 0-23/4 * * *'
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: openshift.io
-            test_suite: smoketest
-            cluster: us-east-1a
-            feature_level: beta
-            osio_creds: osio-ci-e2e-002
-            ee_test_start_time: '35 0-23/2 * * *'
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: openshift.io
-            test_suite: logintest
-            cluster: us-east-1b
-            feature_level: released
-            osio_creds: osio-ci-e2e-003
-            ee_test_start_time: '4-59/20 * * * *'
-            timeout: 6m
-            zabbix_enabled: false
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: openshift.io
-            test_suite: smoketest
-            cluster: us-east-1b
-            feature_level: released
-            osio_creds: osio-ci-e2e-003
-            ee_test_start_time: '5 1-23/4 * * *'
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: openshift.io
-            test_suite: logintest
-            cluster: us-east-2
-            feature_level: released
-            osio_creds: osio-ci-e2e-005
-            ee_test_start_time: '8-59/20 * * * *'
-            timeout: 6m
-            zabbix_enabled: false
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: openshift.io
-            test_suite: smoketest
-            cluster: us-east-2
-            feature_level: released
-            osio_creds: osio-ci-e2e-005
-            ee_test_start_time: '5 2-23/4 * * *'
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: openshift.io
-            test_suite: logintest
-            cluster: us-east-2a
-            feature_level: released
-            osio_creds: osio-ci-e2e-007
-            ee_test_start_time: '12-59/20 * * * *'
-            timeout: 6m
-            zabbix_enabled: false
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: openshift.io
-            test_suite: smoketest
-            cluster: us-east-2a
-            feature_level: released
-            osio_creds: osio-ci-e2e-007
-            ee_test_start_time: '5 3-23/4 * * *'
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: prod-preview.openshift.io
-            test_suite: smoketest
-            cluster: pr-us-east-2a
-            feature_level: released
-            osio_creds: osio-ci-e2e-001-preview
-            ee_test_start_time: '10 * * * *'
-            zabbix_enabled: false
-        - 'devtools-test-e2e-{test_url}-{test_suite}-{cluster}-{feature_level}':
-            test_url: prod-preview.openshift.io
-            test_suite: smoketest
-            cluster: pr-us-east-2a
-            feature_level: beta
-            osio_creds: osio-ci-e2e-002-preview
-            ee_test_start_time: '40 * * * *'
-            zabbix_enabled: false
         - 'devtools-prebooster-test-{test_url}-{booster_name}':
             test_url: openshift.io
             prebooster_test_start_time: '5 0-23/4 * * *'
@@ -3927,200 +3396,6 @@
             zabbix_port: 9443
             zabbix_host: qa_openshift.io
             zabbix_metric_prefix: "prebooster.{booster_name}"
-        - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}':
-            test_url: openshift.io
-            cluster: us-east-2a
-            osio_creds_username: 'username_1'
-            osio_creds_password: 'password_1'
-            bdd_test_start_time: '5 0-23/4 * * *'
-            timeout: 60m
-            scenario: launch-booster
-            server_address: https://openshift.io
-            forge_api: https://forge.api.openshift.io
-            wit_api: https://api.openshift.io
-            auth_api: https://auth.openshift.io
-            danger_zone: true
-            pipeline: maven-releasestageapproveandpromote
-            booster_mission: rest-http
-            booster_runtime_id: vert.x
-            booster_runtime_version: redhat
-            blank_booster: false
-            git_repo: test123
-            project_name: test123
-            auth_client_id: 740650a2-9c44-4db5-b067-a3d1b2cd2d01
-            report_dir: target
-            ui_headless: true
-            zabbix_enabled: true
-            zabbix_server: zabbix.devshift.net
-            zabbix_port: 9443
-            zabbix_host: qa_openshift.io
-            zabbix_metric_prefix: "booster-bdd.{booster_runtime_id}.{scenario}"
-        - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}':
-            test_url: openshift.io
-            cluster: us-east-2a
-            osio_creds_username: 'username_2'
-            osio_creds_password: 'password_2'
-            bdd_test_start_time: '5 0-23/4 * * *'
-            timeout: 60m
-            scenario: launch-booster
-            server_address: https://openshift.io
-            forge_api: https://forge.api.openshift.io
-            wit_api: https://api.openshift.io
-            auth_api: https://auth.openshift.io
-            danger_zone: true
-            pipeline: maven-releasestageapproveandpromote
-            booster_mission: rest-http
-            booster_runtime_id: spring-boot
-            booster_runtime_version: current-redhat
-            blank_booster: false
-            git_repo: test123
-            project_name: test123
-            auth_client_id: 740650a2-9c44-4db5-b067-a3d1b2cd2d01
-            report_dir: target
-            ui_headless: true
-            zabbix_enabled: true
-            zabbix_server: zabbix.devshift.net
-            zabbix_port: 9443
-            zabbix_host: qa_openshift.io
-            zabbix_metric_prefix: "booster-bdd.{booster_runtime_id}.{scenario}"
-        - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}':
-            test_url: openshift.io
-            cluster: us-east-2a
-            osio_creds_username: 'username_3'
-            osio_creds_password: 'password_3'
-            bdd_test_start_time: '5 0-23/4 * * *'
-            timeout: 60m
-            scenario: launch-booster
-            server_address: https://openshift.io
-            forge_api: https://forge.api.openshift.io
-            wit_api: https://api.openshift.io
-            auth_api: https://auth.openshift.io
-            danger_zone: true
-            pipeline: maven-releasestageapproveandpromote
-            booster_mission: rest-http
-            booster_runtime_id: thorntail
-            booster_runtime_version: community
-            blank_booster: false
-            git_repo: test123
-            project_name: test123
-            auth_client_id: 740650a2-9c44-4db5-b067-a3d1b2cd2d01
-            report_dir: target
-            ui_headless: true
-            zabbix_enabled: true
-            zabbix_server: zabbix.devshift.net
-            zabbix_port: 9443
-            zabbix_host: qa_openshift.io
-            zabbix_metric_prefix: "booster-bdd.{booster_runtime_id}.{scenario}"
-        - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}':
-            test_url: openshift.io
-            cluster: us-east-2a
-            osio_creds_username: 'username_4'
-            osio_creds_password: 'password_4'
-            bdd_test_start_time: '5 0-23/4 * * *'
-            timeout: 60m
-            scenario: launch-booster
-            server_address: https://openshift.io
-            forge_api: https://forge.api.openshift.io
-            wit_api: https://api.openshift.io
-            auth_api: https://auth.openshift.io
-            danger_zone: true
-            pipeline: node-releasestageapproveandpromote
-            booster_mission: rest-http
-            booster_runtime_id: nodejs
-            booster_runtime_version: v10-community
-            blank_booster: false
-            git_repo: test123
-            project_name: test123
-            auth_client_id: 740650a2-9c44-4db5-b067-a3d1b2cd2d01
-            report_dir: target
-            ui_headless: true
-            zabbix_enabled: true
-            zabbix_server: zabbix.devshift.net
-            zabbix_port: 9443
-            zabbix_host: qa_openshift.io
-            zabbix_metric_prefix: "booster-bdd.{booster_runtime_id}.{scenario}"
-        - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}':
-            test_url: openshift.io
-            cluster: us-east-2a
-            osio_creds_username: 'username_1'
-            osio_creds_password: 'password_1'
-            bdd_test_start_time: '5 1-23/4 * * *'
-            timeout: 60m
-            scenario: launch-booster
-            server_address: https://openshift.io
-            forge_api: https://forge.api.openshift.io
-            wit_api: https://api.openshift.io
-            auth_api: https://auth.openshift.io
-            danger_zone: true
-            pipeline: maven-releasestageapproveandpromote
-            booster_mission: configmap
-            booster_runtime_id: vert.x
-            booster_runtime_version: redhat
-            blank_booster: false
-            git_repo: test123
-            project_name: test123
-            auth_client_id: 740650a2-9c44-4db5-b067-a3d1b2cd2d01
-            report_dir: target
-            ui_headless: true
-            zabbix_enabled: true
-            zabbix_server: zabbix.devshift.net
-            zabbix_port: 9443
-            zabbix_host: qa_openshift.io
-            zabbix_metric_prefix: "booster-bdd.{booster_runtime_id}.{scenario}"
-        - 'devtools-bdd-test-booster-{test_url}-{cluster}-{booster_mission}-{booster_runtime_id}':
-            test_url: openshift.io
-            cluster: us-east-2a
-            osio_creds_username: 'username_2'
-            osio_creds_password: 'password_2'
-            bdd_test_start_time: '5 1-23/4 * * *'
-            timeout: 60m
-            scenario: launch-booster
-            server_address: https://openshift.io
-            forge_api: https://forge.api.openshift.io
-            wit_api: https://api.openshift.io
-            auth_api: https://auth.openshift.io
-            danger_zone: true
-            pipeline: maven-releasestageapproveandpromote
-            booster_mission: configmap
-            booster_runtime_id: spring-boot
-            booster_runtime_version: current-osio
-            blank_booster: false
-            git_repo: test123
-            project_name: test123
-            auth_client_id: 740650a2-9c44-4db5-b067-a3d1b2cd2d01
-            report_dir: target
-            ui_headless: true
-            zabbix_enabled: true
-            zabbix_server: zabbix.devshift.net
-            zabbix_port: 9443
-            zabbix_host: qa_openshift.io
-            zabbix_metric_prefix: "booster-bdd.{booster_runtime_id}.{scenario}"
-        - 'devtools-bdd-test-booster-import-{build_tool}-{test_url}-{cluster}':
-            test_url: openshift.io
-            cluster: us-east-2a
-            build_tool: maven
-            osio_creds_username: 'username_2'
-            osio_creds_password: 'password_2'
-            bdd_test_start_time: '5 2-23/4 * * *'
-            timeout: 60m
-            scenario: 'import-repo'
-            server_address: https://openshift.io
-            forge_api: https://forge.api.openshift.io
-            wit_api: https://api.openshift.io
-            auth_api: https://auth.openshift.io
-            danger_zone: true
-            pipeline: "{build_tool}-releasestageapproveandpromote"
-            blank_booster: false
-            git_repo: "bdd-booster-import-{build_tool}"
-            project_name: test123-imported
-            auth_client_id: 740650a2-9c44-4db5-b067-a3d1b2cd2d01
-            report_dir: target
-            ui_headless: true
-            zabbix_enabled: true
-            zabbix_server: zabbix.devshift.net
-            zabbix_port: 9443
-            zabbix_host: qa_openshift.io
-            zabbix_metric_prefix: "booster-bdd.{scenario}.{build_tool}"
         - 'devtools-contract-test-consumer-{consumer}-{provider}':
             consumer: fabric8-wit
             provider: fabric8-auth
@@ -4141,6 +3416,7 @@
             pact_version: 'latest'
             osio_username_cred: 'osio_username_1'
             osio_password_cred: 'osio_password_1'
+            osio_cluster_url_cred: 'osio_cluster_url_1'
             service_account_client_id_cred: 'online_registration_service_account_client_id'
             service_account_client_secret_cred: 'online_registration_service_account_client_secret'
             archive_artifacts: 'true'
@@ -4762,24 +4038,6 @@
             saas_git: saas-errortracking
             prj_name: sentry-preview
             timeout: '20m'
-        - '{ci_project}-{git_repo}-f8planner':
-            git_organization: fabric8-ui
-            git_repo: fabric8-planner
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            registry: 'quay.io'
-            image_name: 'openshiftio/fabric8-ui-fabric8-planner'
-            timeout: '1h'
-            discarder_days: 30
-        - 'devtools-test-end-to-end-{test_url}-planner-api-test':
-            test_url: openshift.io
-            git_organization: fabric8io
-            git_repo: fabric8-test
-            ci_project: 'devtools'
-            creds_id: 1b1d24cc-7bf5-46dc-a112-657de8f1388c
-            ee_test_start_time: '52 */4 * * *'
-            ci_cmd: 'cd EE_API_automation && /bin/bash cico_run_EE_tests.sh'
-            timeout: '30m'
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-api-gateway
@@ -4884,26 +4142,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
-        - 'devtools-test-e2e-{test_url}-{test_suite}':
-            git_organization: fabric8-ui
-            git_repo: fabric8-planner
-            test_url: prod-preview.openshift.io
-            test_suite: planner-functional-tests
-            osio_creds: osio-ci-planner-002-preview
-            branch: 'prod-preview-tests'
-            ee_test_start_time: '0 * * * *'
-            ci_cmd: 'cd payload && /bin/bash cico_test_prod.sh --prod-preview'
-            timeout: '60m'
-        - 'devtools-test-e2e-{test_url}-{test_suite}':
-            git_organization: fabric8-ui
-            git_repo: fabric8-planner
-            test_suite: planner-functional-tests
-            osio_creds: osio-ci-planner-002
-            test_url: 'openshift.io'
-            branch: 'prod-tests'
-            ee_test_start_time: '0 */4 * * *'
-            ci_cmd: 'cd payload && /bin/bash cico_test_prod.sh'
-            timeout: '60m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-analytics
             git_repo: cvedb
@@ -4916,15 +4154,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .qa/cico_run_tests.sh'
             timeout: '5m'
-        - 'devtools-test-end-to-end-{test_url}-planner-api-test':
-            test_url: prod-preview.openshift.io
-            git_organization: fabric8io
-            git_repo: fabric8-test
-            ee_test_start_time: '27 */2 * * *'
-            ci_project: 'devtools'
-            creds_id: be32035b-cdd2-441b-ab27-93d023feeb1d
-            ci_cmd: 'cd EE_API_automation && /bin/bash cico_run_EE_tests.sh --prod-preview'
-            timeout: '30m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-analytics
             git_repo: cvejob
