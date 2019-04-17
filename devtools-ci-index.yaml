@@ -3789,7 +3789,7 @@
             git_repo: fabric8-analytics-data-model
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
+            timeout: '30m'
             registry: 'quay.io'
             image_name: 'openshiftio/rhel-bayesian-data-model-importer'
         - '{ci_project}-{git_repo}-f8a-build-master':
@@ -3800,7 +3800,7 @@
             saas_git: saas-analytics
             deployment_units: 'data-importer'
             deployment_configs: 'bayesian-data-importer'
-            timeout: '20m'
+            timeout: '30m'
             extra_target: rhel
         - '{ci_project}-{git_repo}-fabric8-analytics-pylint':
             git_repo: fabric8-analytics-data-model
