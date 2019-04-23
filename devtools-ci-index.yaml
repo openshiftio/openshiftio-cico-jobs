@@ -3000,7 +3000,7 @@
             ci_project: 'devtools'
             ci_cmd: 'export HOST_URL="che.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
             env: 'prod'
-            timeout: '40m'
+            timeout: '50m'
             cluster: '2'
         - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
             git_organization: redhat-developer
@@ -3008,7 +3008,7 @@
             ci_project: 'devtools'
             ci_cmd: 'export HOST_URL="che.prod-preview.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
             env: 'prod-preview'
-            timeout: '40m'
+            timeout: '50m'
             cluster: '2a'
         - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
             git_organization: redhat-developer
@@ -3016,7 +3016,7 @@
             ci_project: 'devtools'
             ci_cmd: 'export HOST_URL="che.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
             env: 'prod'
-            timeout: '40m'
+            timeout: '50m'
             cluster: '2aProd'
         - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
             git_organization: redhat-developer
@@ -3024,7 +3024,7 @@
             ci_project: 'devtools'
             ci_cmd: 'export HOST_URL="che.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
             env: 'prod'
-            timeout: '40m'
+            timeout: '50m'
             cluster: '2'
         - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
             git_organization: redhat-developer
@@ -3032,7 +3032,7 @@
             ci_project: 'devtools'
             ci_cmd: 'export HOST_URL="che.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
             env: 'prod'
-            timeout: '40m'
+            timeout: '50m'
             cluster: '1b'
         - '{ci_project}-{git_repo}-periodic-{env}-{cluster}':
             git_organization: redhat-developer
@@ -3040,7 +3040,7 @@
             ci_project: 'devtools'
             ci_cmd: 'export HOST_URL="che.openshift.io" && source ./functional-tests/devscripts/prepare_env.sh && ./functional-tests/devscripts/run_tests.sh'
             env: 'prod'
-            timeout: '40m'
+            timeout: '50m'
             cluster: '1a'
         - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
             git_organization: redhat-developer
