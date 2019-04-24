@@ -1930,6 +1930,81 @@
       - rhche_credentials_wrapper-{cluster}
     concurrent: false
     <<: *job_template_defaults
+    
+- rhche-route-tests-template: &rhche-route-tests-template
+    name: 'rhche-route-tests-template'
+    wrappers:
+      - rhche_credentials_wrapper-route-{cluster}
+    concurrent: false
+    <<: *job_template_defaults
+    
+- rhche-route-2-creds: &rhche-route-2-creds
+    name: "rhche-route-2-creds"
+    secret-path: 'devtools-osio-ci/rhche-route-2-creds'
+    secret-values:
+      - env-var: 'USERNAME'
+        vault-key: 'username'
+      - env-var: 'PASSWORD'
+        vault-key: 'password'
+        
+- wrapper:
+    name: 'rhche_credentials_wrapper-route-2'
+    wrappers:
+       - vault-secrets:
+           <<: *vault_defaults
+           secrets:
+             - *rhche-route-2-creds
+             
+- rhche-route-2a-creds: &rhche-route-2a-creds
+    name: "rhche-route-2a-creds"
+    secret-path: 'devtools-osio-ci/rhche-route-2a-creds'
+    secret-values:
+      - env-var: 'USERNAME'
+        vault-key: 'username'
+      - env-var: 'PASSWORD'
+        vault-key: 'password'
+                
+- wrapper:
+    name: 'rhche_credentials_wrapper-route-2a'
+    wrappers:
+       - vault-secrets:
+           <<: *vault_defaults
+           secrets:
+             - *rhche-route-2a-creds
+             
+- rhche-route-1a-creds: &rhche-route-1a-creds
+    name: "rhche-route-1a-creds"
+    secret-path: 'devtools-osio-ci/rhche-route-1a-creds'
+    secret-values:
+      - env-var: 'USERNAME'
+        vault-key: 'username'
+      - env-var: 'PASSWORD'
+        vault-key: 'password'
+                 
+- wrapper:
+    name: 'rhche_credentials_wrapper-route-1a'
+    wrappers:
+       - vault-secrets:
+           <<: *vault_defaults
+           secrets:
+             - *rhche-route-1a-creds
+                 
+- rhche-route-1b-creds: &rhche-route-1b-creds
+    name: "rhche-route-1b-creds"
+    secret-path: 'devtools-osio-ci/rhche-route-1b-creds'
+    secret-values:
+      - env-var: 'USERNAME'
+        vault-key: 'username'
+      - env-var: 'PASSWORD'
+        vault-key: 'password'
+
+- wrapper:
+    name: 'rhche_credentials_wrapper-route-1b'
+    wrappers:
+       - vault-secrets:
+           <<: *vault_defaults
+           secrets:
+             - *rhche-route-1b-creds
 
 - wrapper:
     name: 'rhche_credentials_wrapper-2'
@@ -1985,6 +2060,20 @@
             branches:
                 - origin/master
     <<: *rhche-functional-tests-template
+    
+- job-template:
+    name: '{ci_project}-{git_repo}-periodic-route-{cluster}'
+    triggers:
+        - timed: 'H * * * *'
+    publishers:
+        - email:
+            recipients: rhopp@redhat.com kkanova@redhat.com tdancs@redhat.com
+    scm:
+        - git:
+            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            branches:
+                - origin/master
+    <<: *rhche-route-tests-template
 
 - job-template:
     name: '{ci_project}-{git_repo}-flaky-{env}-{cluster}'
@@ -2994,6 +3083,34 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash ./.ci/cico_build_prcheck_dep.sh'
             timeout: '120m'
+        - '{ci_project}-{git_repo}-periodic-route-{cluster}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: './functional-tests/devscripts/route_tests.sh -u $USERNAME -p $PASSWORD -f ./functional-tests/devscripts/resources/route.yml'
+            timeout: '5m'
+            cluster: '2'
+        - '{ci_project}-{git_repo}-periodic-route-{cluster}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: './functional-tests/devscripts/route_tests.sh -u $USERNAME -p $PASSWORD -f ./functional-tests/devscripts/resources/route.yml'
+            timeout: '5m'
+            cluster: '2a'
+        - '{ci_project}-{git_repo}-periodic-route-{cluster}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: './functional-tests/devscripts/route_tests.sh -u $USERNAME -p $PASSWORD -f ./functional-tests/devscripts/resources/route.yml'
+            timeout: '5m'
+            cluster: '1b'
+        - '{ci_project}-{git_repo}-periodic-route-{cluster}':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: './functional-tests/devscripts/route_tests.sh -u $USERNAME -p $PASSWORD -f ./functional-tests/devscripts/resources/route.yml'
+            timeout: '5m'
+            cluster: '1a'
         - '{ci_project}-{git_repo}-flaky-{env}-{cluster}':
             git_organization: redhat-developer
             git_repo: rh-che
