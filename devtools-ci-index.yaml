@@ -2841,7 +2841,7 @@
 
             $ssh_cmd yum -y install rsync
 
-            rsync -e "ssh $sshopts" -Ha $(pwd)/rhche/ $(pwd)/.env-toolkit $CICO_hostname:payload \
+            rsync -e "ssh $sshopts" -Ha $(pwd)/rhche/ $(pwd)/env-toolkit $CICO_hostname:payload \
             && /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && {ci_cmd}"
             rtn_code=$?
             if [ $rtn_code -eq 0 ]; then
