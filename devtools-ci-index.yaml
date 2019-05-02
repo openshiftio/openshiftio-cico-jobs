@@ -2806,9 +2806,9 @@
                     - env-var: 'PASSWORD'
                       vault-key: 'password'
                     - env-var: 'USERNAME'
-                      valut-key: 'username'
+                      vault-key: 'username'
                     - env-var: 'EMAIL'
-                      valut-key: email
+                      vault-key: 'email'
     <<: *saas_prcheck_rhche_template
 
 
