@@ -2087,6 +2087,18 @@
                 results:
                     - success
     <<: *rh-che-automation-depbuild-template
+    
+- job-template:
+    name: '{ci_project}-{git_repo}-build-func-dep'
+    triggers:
+        - build-result:
+            cron: '* * * * *'
+            groups:
+              - jobs:
+                    - 'devtools-rh-che-build-che-credentials-master'
+                results:
+                    - success
+    <<: *rh-che-automation-depbuild-template
 
 - job-template:
     name: 'devtools-test-e2e-cleanup'
@@ -3169,6 +3181,12 @@
             ci_cmd: './functional-tests/devscripts/route_tests.sh -u $USERNAME -p $PASSWORD -f ./functional-tests/devscripts/resources/route.yml'
             timeout: '5m'
             cluster: '1a'
+        - '{ci_project}-{git_repo}-build-func-dep':
+            git_organization: redhat-developer
+            git_repo: rh-che
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash ./.ci/cico_build_func_dep.sh'
+            timeout: '120m'
         - '{ci_project}-{git_repo}-flaky-{env}-{cluster}':
             git_organization: redhat-developer
             git_repo: rh-che
