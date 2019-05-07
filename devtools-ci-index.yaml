@@ -919,7 +919,6 @@
             shallow_clone: true
             branches:
                 - '{build_branch}'
-    saas_service_names: none
     saasherder_prepare: |
         set -x
         if [ "$SAAS_GIT" != "none" ]; then
@@ -927,16 +926,7 @@
             PATH=$PATH:~/.local/bin/
             CONTEXT=$(echo $SAAS_GIT | sed 's/.*://')
             SAAS_GIT=$(echo $SAAS_GIT | sed 's/:.*//')
-            if [[ -z "$SAAS_SERVICE_NAME" || "$SAAS_SERVICE_NAME" == "none" ]]; then
-                SAAS_SERVICE_NAME=$GIT_REPO
-            fi
-            SAAS_SERVICE_NAMES='{saas_service_names}'
-            if [[ -z "$SAAS_SERVICE_NAMES" || "$SAAS_SERVICE_NAMES" == "none" ]]; then
-                SAAS_SERVICE_NAMES="$SAAS_SERVICE_NAME"
-            fi
-            if [ "$SUBDIR" != "" ]; then
-                SAAS_SERVICE_NAME=$SAAS_SERVICE_NAME"-"$SUBDIR
-            fi
+            SAAS_SERVICE_NAMES=$SVC_NAME
             git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
             cd saas.git
             [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
@@ -944,10 +934,6 @@
         fi
         set +x
     saasherder_deploy: |
-        if [ "$SVC_NAME" != "none" ]; then
-            oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" rollout latest $SVC_NAME -n $PRJ_NAME
-            rtn_code=$?
-        fi
         if [ "$SAAS_GIT" != "none" ]; then
             cd saas.git
             for SAAS_SERVICE_NAME in $SAAS_SERVICE_NAMES; do
@@ -2895,9 +2881,9 @@
                     - env-var: 'PASSWORD'
                       vault-key: 'password'
                     - env-var: 'USERNAME'
-                      valut-key: 'username'
+                      vault-key: 'username'
                     - env-var: 'EMAIL'
-                      valut-key: email
+                      vault-key: 'email'
     <<: *saas_prcheck_rhche_template
 
 
@@ -4362,7 +4348,7 @@
             git_repo: cvejob
             saas_git: saas-analytics
             prj_name: bayesian-preview
-            saas_service_names: 'cvejob-pypi cvejob-npm cvejob-maven'
+            svc_name: 'cvejob-pypi cvejob-npm cvejob-maven'
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '60m'
