@@ -2834,7 +2834,7 @@
             ssh_cmd="ssh $sshopts $CICO_hostname"
 
             cp ~/cico-tools/env-toolkit .
-            ./env-toolkit dump -f jenkins-env.json
+            ./env-toolkit dump --force -f jenkins-env.json
             env > jenkins-env
 
             $ssh_cmd yum -y install rsync
