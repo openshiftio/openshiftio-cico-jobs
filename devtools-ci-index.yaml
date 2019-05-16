@@ -4548,7 +4548,7 @@
             git_repo: fabric8-analytics-bigquery-manifests-job
             saas_git: saas-analytics
             prj_name: bayesian-preview
-            saas_service_name: f8a-bq-manifests-job
+            saas_service_name: fabric8-analytics-bigquery-manifests-job
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
