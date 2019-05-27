@@ -4710,3 +4710,8 @@
             saas_git: saas-qe
             prj_name: dsaas-pact-broker
             timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: redhat-developer
+            git_repo: che-monitoring
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash build_deploy.sh'
