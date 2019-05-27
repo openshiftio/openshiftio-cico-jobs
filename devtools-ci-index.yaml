@@ -3419,7 +3419,7 @@
             git_repo: saas-openshiftio
             git_organization: openshiftio
             ci_project: 'devtools'
-            image_pattern: '^quay\.io/openshiftio/rhel-'
+            image_pattern: '^(quay\.io/openshiftio/rhel-)|^(prom/prometheus)'
         - '{ci_project}-{git_repo}-pr-check-rh-che':
             git_repo: saas-openshiftio
             git_organization: openshiftio
