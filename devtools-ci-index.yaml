@@ -4715,4 +4715,4 @@
             git_repo: che-monitoring
             ci_project: 'devtools'
             ci_cmd: '/bin/bash build_deploy.sh'
-            saas_git=saas-openshiftio
+            saas_git: saas-openshiftio
