@@ -4717,3 +4717,4 @@
             ci_cmd: '/bin/bash build_deploy.sh'
             saas_git: saas-openshiftio
             svc_name: rhche-monitoring
+            timeout: '10m'
