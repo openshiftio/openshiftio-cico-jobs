@@ -69,6 +69,7 @@
         - ljelinkova
         - MatousJobanek
         - maxandersen
+        - metlos
         - michaelkleinhenz
         - mindreeper2420
         - miteshvp
@@ -98,6 +99,7 @@
         - sbose78
         - sbryzak
         - ScrewTSW
+        - skabashnyuk
         - skryzhny
         - SMahil
         - sthaha
@@ -2102,23 +2104,6 @@
                     - success
     <<: *rh-che-automation-depbuild-template
 
-- job-template:
-    name: 'devtools-test-e2e-cleanup'
-    git_organization: fabric8io
-    git_repo: fabric8-test
-    wrappers:
-        - vault-secrets:
-            <<: *vault_defaults
-            secrets:
-              - *kube-config-dsaas-stg
-              - *osiotestmachine-clean-up-gh-token
-        - ansicolor
-    triggers:
-      - timed: '5 */2 * * *'
-    ci_project: 'devtools'
-    ci_cmd: '/bin/bash ee_tests/cico_clean_test_repos.sh'
-    <<: *job_template_build_defaults
-
 - wrapper:
     name: fabric8_launcher_credentials_wrapper
     wrappers:
@@ -3582,7 +3567,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_pr_build.sh'
             timeout: '20m'
-        - 'devtools-test-e2e-cleanup'
         - 'devtools-prebooster-test-{test_url}-{booster_name}':
             test_url: openshift.io
             prebooster_test_start_time: '5 0-23/4 * * *'
