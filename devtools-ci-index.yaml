@@ -67,6 +67,7 @@
         - l0rd
         - ldimaggi
         - ljelinkova
+        - maorfr
         - MatousJobanek
         - maxandersen
         - metlos
@@ -3313,6 +3314,12 @@
             git_repo: saasherder
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_test.sh'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: openshiftio
+            git_repo: saasherder
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: redhat-developer
