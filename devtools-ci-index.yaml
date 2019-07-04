@@ -1834,6 +1834,7 @@
     <<: *rh-che-automation-template
 
 - job-template:
+    disabled: '{obj:disabled}'
     name: '{ci_project}-{git_repo}-rh-che-compatibility-test-{test_url}'
     triggers:
         - timed: 'H 2 * * *'
