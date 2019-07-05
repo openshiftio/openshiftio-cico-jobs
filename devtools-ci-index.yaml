@@ -1213,6 +1213,38 @@
     <<: *job_template_defaults
 
 - job-template:
+    name: 'osd-monitor-analytics-build-master'
+    saasherder_prepare: |
+        SAAS_ENV=staging
+        PATH=$PATH:~/.local/bin/
+        CONTEXT=$(echo $SAAS_GIT | sed 's/.*://')
+        SAAS_GIT=$(echo $SAAS_GIT | sed 's/:.*//')
+        git clone --depth 1 https://github.com/openshiftio/$SAAS_GIT saas.git
+        cd saas.git
+        [ "$CONTEXT" != "$SAAS_GIT" ] && saasherder --context $CONTEXT config get-contexts > /dev/null
+
+        if [ "$(saasherder --environment $SAAS_ENV get hash_length|sort -u|wc -l)" != "1" ]; then
+            echo "In the ike-prow-plugins context all the tag lengths should be the same"
+            exit 1
+        fi
+
+        export DEVSHIFT_TAG_LEN=$(saasherder --environment $SAAS_ENV get hash_length|head -n1)
+        cd ..
+
+    saasherder_deploy: |
+        cd saas.git
+        for SAAS_SERVICE_NAME in $(saasherder --environment $SAAS_ENV get-services); do
+            saasherder --environment $SAAS_ENV update hash $SAAS_SERVICE_NAME $GIT_COMMIT
+            saasherder --environment $SAAS_ENV pull $SAAS_SERVICE_NAME
+            saasherder --environment $SAAS_ENV template --filter Route --output-dir $GIT_REPO-processed tag $SAAS_SERVICE_NAME
+            oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
+        done
+        rtn_code=$?
+        cd ..
+    <<: *job_template_build_master
+
+
+- job-template:
     name: '{ci_project}-test-end-to-end-prod-fabric8-analytics'
     triggers:
       - timed: '@hourly'
@@ -3329,6 +3361,13 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build.sh'
             saas_git: saas-openshiftio
+            extra_target: rhel
+        - 'osd-monitor-analytics-build-master':
+            git_organization: redhat-developer
+            git_repo: osd-monitor-poc
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build.sh'
+            saas_git: saas-analytics
             extra_target: rhel
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
