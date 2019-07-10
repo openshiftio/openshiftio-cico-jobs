@@ -242,6 +242,15 @@
       - env-var: 'QUAY_PASSWORD'
         vault-key: 'quay_password'
 
+- quay-eclipse-che-credentials: &quay-eclipse-che-credentials
+    name: "quay-eclipse-che-credentials"
+    secret-path: 'devtools-osio-ci/quay-eclipse-che-credentials'
+    secret-values:
+      - env-var: 'QUAY_ECLIPSE_CHE_USERNAME'
+        vault-key: 'quay_eclipse_che_username'
+      - env-var: 'QUAY_ECLIPSE_CHE_PASSWORD'
+        vault-key: 'quay_eclipse_che_password'
+
 - osiotestmachine-clean-up-gh-token: &osiotestmachine-clean-up-gh-token
     name: "osiotestmachine-clean-up-gh-token"
     secret-path: 'devtools-osio-ci/osiotestmachine-clean-up-gh-token'
@@ -961,6 +970,7 @@
           secrets:
             - *kube-config-dsaas-stg
             - *quay-credentials
+            - *quay-eclipse-che-credentials
             - *registry-devshift-credentials
     scm:
         - git:
@@ -2084,7 +2094,7 @@
             branches:
                 - origin/master
     <<: *rhche-functional-tests-template
-    
+
 - job-template:
     name: '{ci_project}-{git_repo}-periodic-route-{cluster}'
     triggers:
