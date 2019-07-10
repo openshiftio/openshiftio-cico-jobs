@@ -242,6 +242,15 @@
       - env-var: 'QUAY_PASSWORD'
         vault-key: 'quay_password'
 
+- quay-eclipse-che-credentials: &quay-eclipse-che-credentials
+    name: "quay-eclipse-che-credentials"
+    secret-path: 'devtools-osio-ci/quay-eclipse-che-credentials'
+    secret-values:
+      - env-var: 'QUAY_ECLIPSE_CHE_USERNAME'
+        vault-key: 'quay_eclipse_che_username'
+      - env-var: 'QUAY_ECLIPSE_CHE_PASSWORD'
+        vault-key: 'quay_eclipse_che_password'
+
 - osiotestmachine-clean-up-gh-token: &osiotestmachine-clean-up-gh-token
     name: "osiotestmachine-clean-up-gh-token"
     secret-path: 'devtools-osio-ci/osiotestmachine-clean-up-gh-token'
@@ -2084,7 +2093,26 @@
             branches:
                 - origin/master
     <<: *rhche-functional-tests-template
-    
+
+- job-template:
+    name: '{ci_project}-{git_repo}-periodic-image-build'
+    wrappers:
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *quay-eclipse-che-credentials
+    triggers:
+        - timed: '0 0 * * *'
+    publishers:
+        - email:
+            recipients: ibuziuk@redhat.com mloriedo@redhat.com amisevsk@redhat.com vparfono@redhat.com
+    scm:
+        - git:
+            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            branches:
+                - origin/master
+    <<: *job_template_defaults
+
 - job-template:
     name: '{ci_project}-{git_repo}-periodic-route-{cluster}'
     triggers:
@@ -4772,3 +4800,9 @@
             ci_cmd: '/bin/bash build_deploy.sh'
             saas_git: saas-openshiftio
             svc_name: che-monitoring
+        - '{ci_project}-{git_repo}-periodic-image-build':
+            git_organization: eclipse
+            git_repo: che-devfile-registry
+            ci_project: 'devtools'
+            ci_cmd: 'cd arbitrary-users-patch && /bin/bash build_images.sh'
+            timeout: '30m'
