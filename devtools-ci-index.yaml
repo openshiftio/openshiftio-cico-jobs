@@ -3398,29 +3398,7 @@
             timeout: '3h'
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: fabric8-launcher
-            git_repo: launcher-frontend
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-launchpad
-            prj_name: launchpad-preview
-            extra_target: rhel
-        - '{ci_project}-{git_repo}':
-            git_organization: fabric8-launcher
-            git_repo: launcher-frontend
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
-        - '{ci_project}-{git_repo}-generator-build-master':
-            git_organization: fabric8-launcher
             git_repo: launcher-backend
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-launchpad
-            prj_name: launchpad-preview
-            extra_target: rhel
-        - '{ci_project}-{git_repo}-generator-build-master':
-            git_organization: fabric8-launcher
-            git_repo: launcher-creator-backend
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-launchpad
