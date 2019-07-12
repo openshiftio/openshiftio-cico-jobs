@@ -2111,13 +2111,14 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-nightly'
+    concurrent: false
     wrappers:
       - vault-secrets:
           <<: *vault_defaults
           secrets:
             - *quay-eclipse-che-credentials
     triggers:
-        - timed: '*/30 * * * *'
+        - timed: '0 0 * * *'
     publishers:
         - email:
             recipients: ibuziuk@redhat.com mloriedo@redhat.com amisevsk@redhat.com vparfono@redhat.com
