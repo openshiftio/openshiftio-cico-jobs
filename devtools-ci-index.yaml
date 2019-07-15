@@ -3398,6 +3398,7 @@
             ci_cmd: '/bin/bash cico_build.sh'
             saas_git: saas-analytics
             extra_target: rhel
+            prj_name: bayesian-preview
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
             git_repo: ngx-base
