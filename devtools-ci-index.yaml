@@ -114,6 +114,7 @@
         - xcoulon
         - YuriyHorobey
         - sivaavkd
+        - yzainee
 
 
 - github_pull_request_defaults: &github_pull_request_defaults
@@ -2198,74 +2199,6 @@
     <<: *job_template_build_defaults
 
 - job-template:
-    name: 'devtools-launcher-backend'
-    wrappers:
-      - vault-secrets:
-          <<: *vault_defaults
-          secrets:
-            - *quay-credentials
-            - *registry-devshift-credentials
-      - fabric8_launcher_credentials_wrapper
-    builders:
-        - shell: |
-            # testing out the cico client
-            set +e
-            cp ~/artifacts.key .
-            export CICO_API_KEY=$(cat ~/duffy.key )
-            # get node
-            n=1
-            while true
-            do
-                cico_output=$(cico node get -f value -c ip_address -c comment)
-                if [ $? -eq 0 ]; then
-                    read CICO_hostname CICO_ssid <<< $cico_output
-                    if  [ ! -z "$CICO_hostname" ]; then
-                        # we got hostname from cico
-                        break
-                    fi
-                    echo "'cico node get' succeed, but can't get hostname from output"
-                fi
-                if [ $n -gt 15 ]; then
-                    # give up after 15 tries
-                    echo "giving up on 'cico node get'"
-                    exit 1
-                fi
-                echo "'cico node get' failed, trying again in 60s ($n/15)"
-                n=$[$n+1]
-                sleep 60
-            done
-            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
-            ssh_cmd="ssh $sshopts $CICO_hostname"
-
-            cp ~/cico-tools/env-toolkit .
-            ./env-toolkit dump -f jenkins-env.json
-            env > jenkins-env
-
-            $ssh_cmd yum -y install rsync
-            if [ -n "${{ghprbTargetBranch}}" ]; then
-                git rebase --preserve-merges origin/${{ghprbTargetBranch}}
-            else
-                echo "Not a PR build, using master"
-            fi
-            cat $FABRIC8_LAUNCHER_CREDENTIALS >> launcher-env-template.sh
-            rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload \
-            && /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && {ci_cmd}"
-            rtn_code=$?
-            if [ $rtn_code -eq 0 ]; then
-                cico node done $CICO_ssid
-            else
-                if [[ $rtn_code -eq 124 ]]; then
-                   echo "BUILD TIMEOUT";
-                   cico node done $CICO_ssid
-                else
-                    # fail mode gives us 12 hrs to debug the machine
-                    curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
-                fi
-            fi
-            exit $rtn_code
-    <<: *job_template_defaults
-
-- job-template:
     name: 'devtools-test-end-to-end-{test_url}-planner-api-test'
     triggers:
       - timed: '{ee_test_start_time}'
@@ -3399,6 +3332,7 @@
             ci_cmd: '/bin/bash cico_build.sh'
             saas_git: saas-analytics
             extra_target: rhel
+            prj_name: bayesian-preview
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-ui
             git_repo: ngx-base
@@ -3418,40 +3352,12 @@
             timeout: '3h'
         - '{ci_project}-{git_repo}-generator-build-master':
             git_organization: fabric8-launcher
-            git_repo: launcher-frontend
+            git_repo: launcher-application
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-launchpad
             prj_name: launchpad-preview
             extra_target: rhel
-        - '{ci_project}-{git_repo}':
-            git_organization: fabric8-launcher
-            git_repo: launcher-frontend
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
-        - '{ci_project}-{git_repo}-generator-build-master':
-            git_organization: fabric8-launcher
-            git_repo: launcher-backend
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-launchpad
-            prj_name: launchpad-preview
-            extra_target: rhel
-        - '{ci_project}-{git_repo}-generator-build-master':
-            git_organization: fabric8-launcher
-            git_repo: launcher-creator-backend
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-launchpad
-            prj_name: launchpad-preview
-            extra_target: rhel
-        - 'devtools-launcher-backend':
-            git_organization: fabric8-launcher
-            git_repo: launcher-backend
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '60m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-launcher
             git_repo: launcher-documentation
