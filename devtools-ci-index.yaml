@@ -4421,7 +4421,7 @@
             git_organization: eclipse
             git_repo: che-plugin-registry
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build.sh'
+            ci_cmd: '/bin/bash cico_build_ci.sh'
             saas_git: saas-openshiftio
             timeout: '10m'
             extra_target: rhel
@@ -4431,11 +4431,18 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_nightly.sh'
             timeout: '10m'
+        - '{ci_project}-{git_repo}-release':
+            git_organization: eclipse
+            git_repo: che-plugin-registry
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_release.sh'
+            timeout: '10m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
             git_organization: eclipse
             git_repo: che-devfile-registry
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build.sh'
+            ci_cmd: '/bin/bash cico_build_ci.sh'
             saas_git: saas-openshiftio
             timeout: '30m'
             extra_target: rhel
@@ -4449,8 +4456,9 @@
             git_organization: eclipse
             git_repo: che-devfile-registry
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_release.sh'
+            ci_cmd: '/bin/bash cico_build_release.sh'
             timeout: '30m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-lsp-server
