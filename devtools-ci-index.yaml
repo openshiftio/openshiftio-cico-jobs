@@ -2147,6 +2147,8 @@
             shallow_clone: true
             branches:
                 - release
+    triggers:
+        - github
     <<: *job_template_defaults
 
 - job-template:
