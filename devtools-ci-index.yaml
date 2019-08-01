@@ -153,7 +153,7 @@
 
 - kube-config-dsaas-stg: &kube-config-dsaas-stg
     name: "kube-config-dsaas-stg"
-    secret-path: 'app-sre/cico/kube-configs/dsaas-stg'
+    secret-path: 'app-sre/creds/kube-configs/dsaas-stg'
     secret-values:
       - env-var: 'KUBE_SERVER'
         vault-key: 'server'
@@ -162,7 +162,7 @@
 
 - kube-config-dsaas: &kube-config-dsaas
     name: "kube-config-dsaas-stg"
-    secret-path: 'app-sre/cico/kube-configs/dsaas'
+    secret-path: 'app-sre/creds/kube-configs/dsaas'
     secret-values:
       - env-var: 'KUBE_SERVER'
         vault-key: 'server'
