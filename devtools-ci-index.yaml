@@ -3396,9 +3396,6 @@
             git_repo: saas-openshiftio
             ci_project: 'devtools'
         - '{ci_project}-{git_repo}-promote-to-prod':
-            git_repo: saas-chat
-            ci_project: 'devtools'
-        - '{ci_project}-{git_repo}-promote-to-prod':
             git_repo: saas-analytics
             ci_project: 'devtools'
         - '{ci_project}-{git_repo}-promote-to-prod':
@@ -3427,10 +3424,6 @@
             image_pattern: '^quay\.io/openshiftio/rhel-'
         - '{ci_project}-{git_repo}-promote-to-prod-test':
             git_repo: saas-launchpad
-            git_organization: openshiftio
-            ci_project: 'devtools'
-        - '{ci_project}-{git_repo}-promote-to-prod-test':
-            git_repo: saas-chat
             git_organization: openshiftio
             ci_project: 'devtools'
         - '{ci_project}-{git_repo}-promote-to-prod-test':
@@ -4113,68 +4106,6 @@
             git_repo: fabric8-gemini-server
         - '{ci_project}-{git_repo}-fabric8-analytics-pydoc':
             git_repo: fabric8-gemini-server
-        - '{ci_project}-{git_repo}-build-master':
-            git_organization: rhdt
-            git_repo: chat
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-chat
-            prj_name: chat-preview
-        - '{ci_project}-{git_repo}-{subdir}-build-master':
-            git_organization: rhdt
-            git_repo: chat-integrations
-            subdir: 'github'
-            ci_project: 'devtools'
-            ci_cmd: 'cd github && /bin/bash cico_build_deploy.sh'
-            saas_git: saas-chat
-            prj_name: chat-preview
-        - '{ci_project}-{git_repo}-{subdir}-build-master':
-            git_organization: rhdt
-            git_repo: chat-integrations
-            subdir: 'gitlab'
-            ci_project: 'devtools'
-            ci_cmd: 'cd gitlab && /bin/bash cico_build_deploy.sh'
-            saas_git: saas-chat
-            prj_name: chat-preview
-        - '{ci_project}-{git_repo}-{subdir}-build-master':
-            git_organization: rhdt
-            git_repo: chat-integrations
-            subdir: 'rssfeeds'
-            ci_project: 'devtools'
-            ci_cmd: 'cd rssfeeds && /bin/bash cico_build_deploy.sh'
-            saas_git: saas-chat
-            prj_name: chat-preview
-        - '{ci_project}-{git_repo}-{subdir}-build-master':
-            git_organization: rhdt
-            git_repo: chat-integrations
-            subdir: 'irc'
-            ci_project: 'devtools'
-            ci_cmd: 'cd irc && /bin/bash cico_build_deploy.sh'
-            saas_git: saas-chat
-            prj_name: chat-preview
-        - '{ci_project}-{git_repo}-{subdir}-build-master':
-            git_organization: rhdt
-            git_repo: penfold
-            subdir: 'mongodb'
-            ci_project: 'devtools'
-            ci_cmd: 'cd mongodb && /bin/bash cico_build_deploy.sh'
-            saas_git: saas-chat
-            prj_name: penfold-preview
-        - '{ci_project}-{git_repo}-{subdir}-build-master':
-            git_organization: rhdt
-            git_repo: penfold
-            subdir: 'penfold'
-            ci_project: 'devtools'
-            ci_cmd: 'cd penfold && /bin/bash cico_build_deploy.sh'
-            saas_git: saas-chat
-            prj_name: penfold-preview
-        - '{ci_project}-{git_repo}-build-master':
-            git_organization: rhdt
-            git_repo: chat-push-proxy
-            ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_build_deploy.sh'
-            saas_git: saas-chat
-            prj_name: chat-preview
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-analytics
             git_repo: vscode-osio-auth
