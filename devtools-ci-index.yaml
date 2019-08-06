@@ -1860,20 +1860,23 @@
         - github-pull-request:
             github_hooks: '{github_hooks}'
             status-context: 'ci.centos.org PR check on {test_url}'
-            success-comment: "### $ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] has been successfully deployed.\n
-            http://rhche-prcheck-$ghprbPullId.devtools-dev.ext.devshift.net"
-            failure-comment: "### $ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] failed.\n
+            success-comment: "### $ghprbPullAuthorLoginMention RH-Che [build $BUILD_NUMBER] has been successfully deployed and tested.\n
+            deployment: http://rhche-prcheck-$ghprbPullId.devtools-dev.ext.devshift.net \n
+            console: https://ci.centos.org/view/Devtools/job/devtools-rh-che-rh-che-prcheck-dev.rdu2c.fabric8.io/$BUILD_NUMBER/console "
+            failure-comment: "### $ghprbPullAuthorLoginMention PR check [build $BUILD_NUMBER] failed.\n
             | Link | URL |\n
             | ---- | :-: |\n
             | console | https://ci.centos.org/view/Devtools/job/devtools-rh-che-rh-che-prcheck-dev.rdu2c.fabric8.io/$BUILD_NUMBER/console |\n
             | artifacts | http://artifacts.ci.centos.org/devtools/rhche/devtools-rh-che-rh-che-prcheck-dev.rdu2c.fabric8.io/$BUILD_NUMBER/ |\n
-            ### *If the build or deployment fails, the artifacts will not be present. Don't panic, just grab a towel.*"
-            error-comment: "### $ghprbPullAuthorLoginMention The che server [build $BUILD_NUMBER] failed.\n
+            | deployment | http://rhche-prcheck-$ghprbPullId.devtools-dev.ext.devshift.net |\n
+            ### *Depending on failure reason, the artifacts or deployment may not be present.*"
+            error-comment: "### $ghprbPullAuthorLoginMention PR check [build $BUILD_NUMBER] failed.\n
             | Link | URL |\n
             | ---- | :-: |\n
             | console | https://ci.centos.org/view/Devtools/job/devtools-rh-che-rh-che-prcheck-dev.rdu2c.fabric8.io/$BUILD_NUMBER/console |\n
             | artifacts | http://artifacts.ci.centos.org/devtools/rhche/devtools-rh-che-rh-che-prcheck-dev.rdu2c.fabric8.io/$BUILD_NUMBER/ |\n
-            ### *If the build or deployment fails, the artifacts will not be present. Don't panic, just grab a towel.*"
+            | deployment | http://rhche-prcheck-$ghprbPullId.devtools-dev.ext.devshift.net |\n
+            ### *Depending on failure reason, the artifacts or deployment may not be present.*"
             <<: *github_pull_request_defaults
     <<: *rh-che-automation-template
 
