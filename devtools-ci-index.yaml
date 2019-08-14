@@ -4394,6 +4394,12 @@
             ci_cmd: '/bin/bash cico_build_release.sh'
             timeout: '30m'
             extra_target: rhel
+        - '{ci_project}-{git_repo}-nightly':
+            git_organization: eclipse
+            git_repo: che-operator
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_nightly.sh'
+            timeout: '15m'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-lsp-server
