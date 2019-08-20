@@ -4358,7 +4358,6 @@
             git_repo: che-plugin-registry
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_ci.sh'
-            saas_git: saas-openshiftio
             timeout: '10m'
         - '{ci_project}-{git_repo}-nightly':
             git_organization: eclipse
@@ -4378,7 +4377,6 @@
             git_repo: che-devfile-registry
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_ci.sh'
-            saas_git: saas-openshiftio
             timeout: '30m'
         - '{ci_project}-{git_repo}-nightly':
             git_organization: eclipse
