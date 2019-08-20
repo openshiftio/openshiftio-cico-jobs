@@ -4359,6 +4359,8 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_ci.sh'
             saas_git: saas-openshiftio
+            build_branch: osio
+            branch: osio
             timeout: '10m'
             extra_target: rhel
         - '{ci_project}-{git_repo}-nightly':
@@ -4380,6 +4382,8 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_ci.sh'
             saas_git: saas-openshiftio
+            build_branch: osio
+            branch: osio
             timeout: '30m'
             extra_target: rhel
         - '{ci_project}-{git_repo}-nightly':
