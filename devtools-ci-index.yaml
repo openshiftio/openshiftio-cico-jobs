@@ -2155,7 +2155,7 @@
                 - release
     triggers:
         - github
-    <<: *job_template_defaults
+    <<: *job_template_build_defaults
 
 - job-template:
     name: '{ci_project}-{git_repo}-flaky-{env}-{cluster}'
