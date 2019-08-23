@@ -2158,6 +2158,30 @@
     <<: *job_template_build_defaults
 
 - job-template:
+    name: '{ci_project}-{git_repo}-promote-to-prod-preview'
+    concurrent: false
+    wrappers:
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *kube-config-dsaas-stg
+            - *quay-credentials
+            - *quay-eclipse-che-credentials
+            - *registry-devshift-credentials
+    publishers:
+        - email:
+            recipients: ibuziuk@redhat.com mloriedo@redhat.com amisevsk@redhat.com vparfono@redhat.com
+    scm:
+        - git:
+            url: https://github.com/{git_organization}/{git_repo}.git
+            shallow_clone: true
+            branches:
+                - '{build_branch}'
+    triggers:
+        - github
+    <<: *job_template_build_defaults
+
+- job-template:
     name: '{ci_project}-{git_repo}-flaky-{env}-{cluster}'
     triggers:
         - timed: 'H 3,9,15,21 * * *'
@@ -4391,6 +4415,16 @@
             ci_cmd: '/bin/bash cico_build_release.sh'
             timeout: '30m'
             extra_target: rhel
+        - '{ci_project}-{git_repo}-promote-to-prod-preview':
+            git_organization: eclipse
+            git_repo: che-devfile-registry
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_ci.sh'
+            saas_git: saas-openshiftio
+            branch: osio-prod-preview
+            build_branch: osio-prod-preview
+            extra_target: rhel
+            timeout: '30m'
         - '{ci_project}-{git_repo}-nightly':
             git_organization: eclipse
             git_repo: che-operator
