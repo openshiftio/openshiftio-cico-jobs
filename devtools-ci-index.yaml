@@ -2137,7 +2137,7 @@
     <<: *job_template_build_defaults
 
 - job-template:
-    name: '{ci_project}-{git_repo}-promote-to-prod-preview'
+    name: '{ci_project}-{git_repo}-release-preview'
     concurrent: false
     wrappers:
       - vault-secrets:
@@ -4375,6 +4375,16 @@
             ci_cmd: '/bin/bash cico_build_release.sh'
             timeout: '10m'
             extra_target: rhel
+        - '{ci_project}-{git_repo}-release-preview':
+            git_organization: eclipse
+            git_repo: che-plugin-registry
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_ci.sh'
+            saas_git: saas-openshiftio
+            branch: release-preview
+            build_branch: release-preview
+            extra_target: rhel
+            timeout: '30m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: eclipse
             git_repo: che-devfile-registry
@@ -4394,14 +4404,14 @@
             ci_cmd: '/bin/bash cico_build_release.sh'
             timeout: '30m'
             extra_target: rhel
-        - '{ci_project}-{git_repo}-promote-to-prod-preview':
+        - '{ci_project}-{git_repo}-release-preview':
             git_organization: eclipse
             git_repo: che-devfile-registry
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_ci.sh'
             saas_git: saas-openshiftio
-            branch: osio-prod-preview
-            build_branch: osio-prod-preview
+            branch: release-preview
+            build_branch: release-preview
             extra_target: rhel
             timeout: '30m'
         - '{ci_project}-{git_repo}-nightly':
