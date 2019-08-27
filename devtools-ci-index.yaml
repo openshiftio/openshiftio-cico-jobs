@@ -9,6 +9,7 @@
     discarder_days: -1
     discarder_num: -1
     build_branch: master
+    saasherder_object_whitelist: 'Deployment,DeploymentConfig,Service,ConfigMap,Role,RoleBinding,ServiceAccount,CronJob'
 
 - admin_list_defaults: &admin_list_defaults
     name: 'admin_list_defaults'
@@ -797,8 +798,14 @@
             saasherder --environment $SAAS_ENV update hash $SAAS_SERVICE_NAME $GIT_COMMIT
             saasherder --environment $SAAS_ENV pull $SAAS_SERVICE_NAME
             saasherder --environment $SAAS_ENV template --filter Route --output-dir $GIT_REPO-processed tag $SAAS_SERVICE_NAME
+            saasherder --environment $SAAS_ENV label --output-dir $GIT_REPO-processed --saas-repo-url $SAAS_GIT $SAAS_SERVICE_NAME > label_selector
             oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
             rtn_code=$?
+            label_selector=$(cat label_selector)
+            resources_to_delete=$(oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" get {saasherder_object_whitelist} -o name -l "$label_selector" -n $PRJ_NAME)
+            for r in $resources_to_delete; do
+                echo DRY-RUN oc delete $r
+            done
             cd ..
         fi
     extra_target: ""
@@ -937,8 +944,14 @@
                 saasherder --environment $SAAS_ENV update hash $SAAS_SERVICE_NAME $GIT_COMMIT
                 saasherder --environment $SAAS_ENV pull $SAAS_SERVICE_NAME
                 saasherder --environment $SAAS_ENV template --filter Route --output-dir $GIT_REPO-processed tag $SAAS_SERVICE_NAME
+                saasherder --environment $SAAS_ENV label --output-dir $GIT_REPO-processed --saas-repo-url $SAAS_GIT $SAAS_SERVICE_NAME > label_selector
                 oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
                 rtn_code=$(($rtn_code + $?))
+                label_selector=$(cat label_selector)
+                resources_to_delete=$(oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" get {saasherder_object_whitelist} -o name -l "$label_selector" -n $PRJ_NAME)
+                for r in $resources_to_delete; do
+                    echo DRY-RUN oc delete $r
+                done
             done
             cd ..
         fi
@@ -991,7 +1004,13 @@
             saasherder --environment $SAAS_ENV update hash $SAAS_SERVICE_NAME $GIT_COMMIT
             saasherder --environment $SAAS_ENV pull $SAAS_SERVICE_NAME
             saasherder --environment $SAAS_ENV template --filter Route --output-dir $GIT_REPO-processed tag $SAAS_SERVICE_NAME
+            saasherder --environment $SAAS_ENV label --output-dir $GIT_REPO-processed --saas-repo-url $SAAS_GIT $SAAS_SERVICE_NAME > label_selector
             oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
+            label_selector=$(cat label_selector)
+            resources_to_delete=$(oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" get {saasherder_object_whitelist} -o name -l "$label_selector" -n $PRJ_NAME)
+            for r in $resources_to_delete; do
+                echo DRY-RUN oc delete $r
+            done
         done
         rtn_code=$?
         cd ..
@@ -1229,7 +1248,13 @@
             saasherder --environment $SAAS_ENV update hash $SAAS_SERVICE_NAME $GIT_COMMIT
             saasherder --environment $SAAS_ENV pull $SAAS_SERVICE_NAME
             saasherder --environment $SAAS_ENV template --filter Route --output-dir $GIT_REPO-processed tag $SAAS_SERVICE_NAME
+            saasherder --environment $SAAS_ENV label --output-dir $GIT_REPO-processed --saas-repo-url $SAAS_GIT $SAAS_SERVICE_NAME > label_selector
             oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
+            label_selector=$(cat label_selector)
+            resources_to_delete=$(oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" get {saasherder_object_whitelist} -o name -l "$label_selector" -n $PRJ_NAME)
+            for r in $resources_to_delete; do
+                echo DRY-RUN oc delete $r
+            done
         done
         rtn_code=$?
         cd ..
