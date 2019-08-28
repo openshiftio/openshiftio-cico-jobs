@@ -948,7 +948,7 @@
                 oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
                 rtn_code=$(($rtn_code + $?))
                 label_selector=$(cat label_selector)
-                resources_to_delete=$(oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" get {saasherder_object_whitelist} -o name -l "$label_selector" -n $PRJ_NAME)
+                resources_to_delete=$(oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" get $SAASHERDER_OBJECT_WHITELIST -o name -l "$label_selector" -n $PRJ_NAME)
                 for r in $resources_to_delete; do
                     echo DRY-RUN oc delete $r
                 done
@@ -1007,7 +1007,7 @@
             saasherder --environment $SAAS_ENV label --output-dir $GIT_REPO-processed --saas-repo-url $SAAS_GIT $SAAS_SERVICE_NAME > label_selector
             oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
             label_selector=$(cat label_selector)
-            resources_to_delete=$(oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" get {saasherder_object_whitelist} -o name -l "$label_selector" -n $PRJ_NAME)
+            resources_to_delete=$(oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" get $SAASHERDER_OBJECT_WHITELIST -o name -l "$label_selector" -n $PRJ_NAME)
             for r in $resources_to_delete; do
                 echo DRY-RUN oc delete $r
             done
@@ -1251,7 +1251,7 @@
             saasherder --environment $SAAS_ENV label --output-dir $GIT_REPO-processed --saas-repo-url $SAAS_GIT $SAAS_SERVICE_NAME > label_selector
             oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" apply -f $GIT_REPO-processed/$SAAS_SERVICE_NAME.yaml -n $PRJ_NAME
             label_selector=$(cat label_selector)
-            resources_to_delete=$(oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" get {saasherder_object_whitelist} -o name -l "$label_selector" -n $PRJ_NAME)
+            resources_to_delete=$(oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" get $SAASHERDER_OBJECT_WHITELIST -o name -l "$label_selector" -n $PRJ_NAME)
             for r in $resources_to_delete; do
                 echo DRY-RUN oc delete $r
             done
