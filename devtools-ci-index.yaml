@@ -9,7 +9,7 @@
     discarder_days: -1
     discarder_num: -1
     build_branch: master
-    saasherder_object_whitelist: 'Deployment,DeploymentConfig,Service,ConfigMap,Role,RoleBinding,ServiceAccount,CronJob'
+    saasherder_object_whitelist: Deployment,DeploymentConfig,Service,ConfigMap,Role,RoleBinding,ServiceAccount,CronJob
 
 - admin_list_defaults: &admin_list_defaults
     name: 'admin_list_defaults'
