@@ -769,7 +769,6 @@
     prj_name: dsaas-preview
     saas_git: none
     saas_service_name: none
-    saasherder_object_whitelist: 'Deployment,DeploymentConfig,Service,ConfigMap,Role,RoleBinding,ServiceAccount,CronJob'
     saasherder_prepare: |
         if [ "$SAAS_GIT" != "none" ]; then
             SAAS_ENV=staging
