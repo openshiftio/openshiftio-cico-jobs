@@ -769,13 +769,13 @@
     prj_name: dsaas-preview
     saas_git: none
     saas_service_name: none
-    saasherder_object_whitelist: 'Deployment,DeploymentConfig,Service,ConfigMap,Role,RoleBinding,ServiceAccount,CronJob'
     saasherder_prepare: |
         if [ "$SAAS_GIT" != "none" ]; then
             SAAS_ENV=staging
             PATH=$PATH:~/.local/bin/
             CONTEXT=$(echo $SAAS_GIT | sed 's/.*://')
             SAAS_GIT=$(echo $SAAS_GIT | sed 's/:.*//')
+            SAASHERDER_OBJECT_WHITELIST=Deployment,DeploymentConfig,Service,ConfigMap,Role,RoleBinding,ServiceAccount,CronJob
             if [[ -z "$SAAS_SERVICE_NAME" || "$SAAS_SERVICE_NAME" == "none" ]]; then
                 SAAS_SERVICE_NAME=$GIT_REPO
             fi
