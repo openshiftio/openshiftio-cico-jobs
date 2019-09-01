@@ -9,7 +9,6 @@
     discarder_days: -1
     discarder_num: -1
     build_branch: master
-    saasherder_object_whitelist: Deployment,DeploymentConfig,Service,ConfigMap,Role,RoleBinding,ServiceAccount,CronJob
 
 - admin_list_defaults: &admin_list_defaults
     name: 'admin_list_defaults'
@@ -770,7 +769,7 @@
     prj_name: dsaas-preview
     saas_git: none
     saas_service_name: none
-    saasherder_object_whitelist: '{saasherder_object_whitelist}'
+    saasherder_object_whitelist: 'Deployment,DeploymentConfig,Service,ConfigMap,Role,RoleBinding,ServiceAccount,CronJob'
     saasherder_prepare: |
         if [ "$SAAS_GIT" != "none" ]; then
             SAAS_ENV=staging
@@ -1360,9 +1359,6 @@
       - string:
           name: PRJ_NAME
           default: '{prj_name}'
-      - string:
-          name: SAASHERDER_OBJECT_WHITELIST
-          default: '{saasherder_object_whitelist}'
       - string:
           name: SVC_NAME
           default: none
