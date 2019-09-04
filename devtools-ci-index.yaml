@@ -4421,6 +4421,18 @@
             build_branch: release-preview
             extra_target: rhel
             timeout: '30m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: eclipse
+            git_repo: che-jwtproxy
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_ci.sh'
+            timeout: '15m'
+        - '{ci_project}-{git_repo}-nightly':
+            git_organization: eclipse
+            git_repo: che-jwtproxy
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_nightly.sh'
+            timeout: '15m'
         - '{ci_project}-{git_repo}-nightly':
             git_organization: eclipse
             git_repo: che-operator
