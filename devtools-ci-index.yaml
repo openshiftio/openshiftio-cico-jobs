@@ -30,7 +30,7 @@
         - christianvogt
         - davidfestal
         - dependabot[bot]
-        - dependabot-preview[bot] 
+        - dependabot-preview[bot]
         - dgutride
         - DhritiShikhar
         - dipak-pawar
@@ -324,7 +324,7 @@
         vault-key: 'password'
       - env-var: 'EMAIL'
         vault-key: 'email'
-        
+
 - rhche-periodic-1b-creds: &rhche-periodic-1b-creds
     name: "rhche-periodic-1b-creds"
     secret-path: 'devtools-osio-ci/rhche-periodic-1b-creds'
@@ -524,7 +524,7 @@
                 git rebase --preserve-merges origin/${{ghprbTargetBranch}}
                 rtn_code=$?
                 if [ $rtn_code -ne 0 ]; then
-                    echo "The branch can not be rebased onto origin/${{ghprbTargetBranch}}." 
+                    echo "The branch can not be rebased onto origin/${{ghprbTargetBranch}}."
                     exit $rtn_code
                 fi
             else
@@ -1957,14 +1957,14 @@
       - rhche_credentials_wrapper-{cluster}
     concurrent: false
     <<: *job_template_defaults
-    
+
 - rhche-route-tests-template: &rhche-route-tests-template
     name: 'rhche-route-tests-template'
     wrappers:
       - rhche_credentials_wrapper-route-{cluster}
     concurrent: false
     <<: *job_template_defaults
-    
+
 - rhche-route-2-creds: &rhche-route-2-creds
     name: "rhche-route-2-creds"
     secret-path: 'devtools-osio-ci/rhche-route-2-creds'
@@ -1973,7 +1973,7 @@
         vault-key: 'username'
       - env-var: 'PASSWORD'
         vault-key: 'password'
-        
+
 - wrapper:
     name: 'rhche_credentials_wrapper-route-2'
     wrappers:
@@ -1981,7 +1981,7 @@
            <<: *vault_defaults
            secrets:
              - *rhche-route-2-creds
-             
+
 - rhche-route-2a-creds: &rhche-route-2a-creds
     name: "rhche-route-2a-creds"
     secret-path: 'devtools-osio-ci/rhche-route-2a-creds'
@@ -1990,7 +1990,7 @@
         vault-key: 'username'
       - env-var: 'PASSWORD'
         vault-key: 'password'
-                
+
 - wrapper:
     name: 'rhche_credentials_wrapper-route-2a'
     wrappers:
@@ -1998,7 +1998,7 @@
            <<: *vault_defaults
            secrets:
              - *rhche-route-2a-creds
-             
+
 - rhche-route-1a-creds: &rhche-route-1a-creds
     name: "rhche-route-1a-creds"
     secret-path: 'devtools-osio-ci/rhche-route-1a-creds'
@@ -2007,7 +2007,7 @@
         vault-key: 'username'
       - env-var: 'PASSWORD'
         vault-key: 'password'
-                 
+
 - wrapper:
     name: 'rhche_credentials_wrapper-route-1a'
     wrappers:
@@ -2015,7 +2015,7 @@
            <<: *vault_defaults
            secrets:
              - *rhche-route-1a-creds
-                 
+
 - rhche-route-1b-creds: &rhche-route-1b-creds
     name: "rhche-route-1b-creds"
     secret-path: 'devtools-osio-ci/rhche-route-1b-creds'
@@ -2065,7 +2065,7 @@
            <<: *vault_defaults
            secrets:
              - *rhche-periodic-1a-creds
-             
+
 - wrapper:
     name: 'rhche_credentials_wrapper-1b'
     wrappers:
@@ -2073,7 +2073,7 @@
            <<: *vault_defaults
            secrets:
              - *rhche-periodic-1b-creds
-             
+
 - job-template:
     name: '{ci_project}-{git_repo}-periodic-{env}-{cluster}'
     triggers:
@@ -2194,7 +2194,7 @@
                 results:
                     - success
     <<: *rh-che-automation-depbuild-template
-    
+
 - job-template:
     name: '{ci_project}-{git_repo}-build-func-dep'
     triggers:
@@ -2416,17 +2416,6 @@
 
             sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
             ssh_cmd="ssh $sshopts $CICO_hostname"
-
-            if [ -n "${{ghprbTargetBranch}}" ]; then
-                git rebase --preserve-merges origin/${{ghprbTargetBranch}}
-                rtn_code=$?
-                if [ $rtn_code -ne 0 ]; then
-                    echo "The branch can not be rebased onto origin/${{ghprbTargetBranch}}."
-                    exit $rtn_code
-                fi
-            else
-                echo "Not a PR build, using master"
-            fi
 
             set -ex
 
@@ -2812,7 +2801,7 @@
         - ansicolor
         - vault-secrets:
             <<: *vault_defaults
-            secrets:               
+            secrets:
               - secret-path: 'devtools-osio-ci/contract-tests-creds'
                 secret-values:
                     - env-var: 'PACT_BROKER_USERNAME'
@@ -2984,35 +2973,35 @@
             fi
             exit $rtn_code
 
-- job-template: 
-    name: '{ci_project}-{git_repo}-pr-check-rh-che'  
-    scm:  
+- job-template:
+    name: '{ci_project}-{git_repo}-pr-check-rh-che'
+    scm:
         - git-scm:
             git_url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
             git_basedir: '{git_repo}'
-        - git: 
+        - git:
             url: https://github.com/redhat-developer/rh-che/
-            shallow_clone: true 
-            branches: 
-                - master  
+            shallow_clone: true
+            branches:
+                - master
             basedir: rhche
-    triggers:  
-        - github-pull-request:  
-            github_hooks: '{github_hooks}'  
-            status-context: 'ci.centos.org rh-che test against prod-preview'  
-            failure-comment: "**The rh-che test against prod-preview failed.**\n\n  
-            | Link | URL |\n  
-            | ---- | :-: |\n  
-            | job log | https://ci.centos.org/job/$JOB_NAME/$BUILD_NUMBER/console |\n 
-            | artifacts | http://artifacts.ci.centos.org/devtools/saas-openshiftio/$JOB_NAME/$BUILD_NUMBER |\n\n 
-            **Please review the job results and re-run the job by commenting [test] if necessary.**"  
-            error-comment: "**The rh-che test against prod-preview failed.**\n\n  
-            | Link | URL |\n  
-            | ---- | :-: |\n  
-            | job log | https://ci.centos.org/job/$JOB_NAME/$BUILD_NUMBER/console |\n 
-            | artifacts | http://artifacts.ci.centos.org/devtools/saas-openshiftio/$JOB_NAME/$BUILD_NUMBER |\n\n 
-            **Please review the job results and re-run the job by commenting [test] if necessary.**"  
-            <<: *github_pull_request_defaults 
+    triggers:
+        - github-pull-request:
+            github_hooks: '{github_hooks}'
+            status-context: 'ci.centos.org rh-che test against prod-preview'
+            failure-comment: "**The rh-che test against prod-preview failed.**\n\n
+            | Link | URL |\n
+            | ---- | :-: |\n
+            | job log | https://ci.centos.org/job/$JOB_NAME/$BUILD_NUMBER/console |\n
+            | artifacts | http://artifacts.ci.centos.org/devtools/saas-openshiftio/$JOB_NAME/$BUILD_NUMBER |\n\n
+            **Please review the job results and re-run the job by commenting [test] if necessary.**"
+            error-comment: "**The rh-che test against prod-preview failed.**\n\n
+            | Link | URL |\n
+            | ---- | :-: |\n
+            | job log | https://ci.centos.org/job/$JOB_NAME/$BUILD_NUMBER/console |\n
+            | artifacts | http://artifacts.ci.centos.org/devtools/saas-openshiftio/$JOB_NAME/$BUILD_NUMBER |\n\n
+            **Please review the job results and re-run the job by commenting [test] if necessary.**"
+            <<: *github_pull_request_defaults
     wrappers:
         - vault-secrets:
             <<: *vault_defaults
@@ -3863,7 +3852,7 @@
             git_repo: fabric8-analytics-license-analysis
         - '{ci_project}-{git_repo}-fabric8-analytics':
             git_organization: fabric8-analytics
-            git_repo: metrics-accumulator 
+            git_repo: metrics-accumulator
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
@@ -3871,7 +3860,7 @@
             image_name: 'openshiftio/rhel-metrics-accumulator'
         - '{ci_project}-{git_repo}-f8a-build-master':
             git_organization: fabric8-analytics
-            git_repo: metrics-accumulator 
+            git_repo: metrics-accumulator
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             saas_git: saas-analytics
