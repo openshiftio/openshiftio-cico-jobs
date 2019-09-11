@@ -2367,7 +2367,7 @@
                 DIR=$(readlink -f $c-20* | tail -1)
                 for f in `ls $DIR`; do
                     python ~/saasherder/check_image.py $DIR/$f '{image_pattern}'
-                    cat $f | $ssh_cmd docker run --rm -i quay.io/app-sre/manifest-bouncer:{manifest_bouncer_tag} -
+                    cat $DIR/$f | $ssh_cmd docker run --rm -i quay.io/app-sre/manifest-bouncer:{manifest_bouncer_tag} -
                 done
             done
 
@@ -2427,7 +2427,7 @@
                 DIR=$(readlink -f $c-20* | tail -1)
                 for f in `ls $DIR`; do
                     python ~/saasherder/check_image.py $DIR/$f '{image_pattern}'
-                    cat $f | $ssh_cmd docker run --rm -i quay.io/app-sre/manifest-bouncer:{manifest_bouncer_tag} -
+                    cat $DIR/$f | $ssh_cmd docker run --rm -i quay.io/app-sre/manifest-bouncer:{manifest_bouncer_tag} -
                 done
             done
 
