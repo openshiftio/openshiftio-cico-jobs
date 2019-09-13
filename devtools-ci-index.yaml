@@ -3036,7 +3036,7 @@
             git_repo: fabric8-wit
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_coverage.sh'
-            timeout: '3h'
+            timeout: '4h'
             discarder_days: 30
         - '{ci_project}-{git_repo}-e2e':
             git_repo: fabric8-wit
