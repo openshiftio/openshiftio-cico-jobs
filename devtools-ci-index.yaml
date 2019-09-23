@@ -805,7 +805,7 @@
             label_selector=$(cat label_selector)
             resources_to_delete=$(oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" get $SAASHERDER_OBJECT_WHITELIST -o name -l "$label_selector" -n $PRJ_NAME)
             for r in $resources_to_delete; do
-                echo DRY-RUN oc delete $r
+                oc --server="$KUBE_SERVER" --token="$KUBE_TOKEN" -n $PRJ_NAME delete $r
             done
             cd ..
         fi
