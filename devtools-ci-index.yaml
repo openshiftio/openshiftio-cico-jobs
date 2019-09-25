@@ -1874,10 +1874,9 @@
     triggers:
         - timed: 'H 2 * * *'
     scm:
-        - git:
-            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
-            branches:
-                - origin/master
+        - git-scm:
+            git_url: 'https://{github_user}@github.com/{git_organization}/{git_repo}.git'
+            git_basedir: ''
     <<: *rh-che-automation-template
 
 - job-template:
