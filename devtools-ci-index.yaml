@@ -250,6 +250,15 @@
       - env-var: 'COPR_TOKEN_MERCATOR'
         vault-key: 'token'
 
+- rh-che-compatibility-github-credentials: &rh-che-compatibility-github-credentials
+    name: "rh-che-compatibility-github-credentials"
+    secret-path: 'devtools-osio-ci/rh-che-compatibility-github-push-token'
+    secret-values:
+      - env-var: 'GITHUB_PUSH_TOKEN'
+        vault-key: 'TOKEN'
+      - env-var: 'GITHUB_TOKEN_PASSWORD'
+        vault-key: 'PASSWORD'
+
 - rh-che-automation-credentials-devrdu2c-fabric8-io: &rh-che-automation-credentials-devrdu2c-fabric8-io
     name: "rh-che-automation-credentials-devrdu2c-fabric8-io"
     secret-path: 'devtools-osio-ci/rh-che-automation-credentials-devrdu2c-fabric8-io'
@@ -1740,13 +1749,13 @@
           secrets:
             - *quay-credentials
             - *registry-devshift-credentials
+            - *rh-che-compatibility-github-credentials
             - *rh-che-automation-credentials-devrdu2c-fabric8-io
             - *rh-che-automation-credentials-prod-preview-openshift-io
             - *rh-che-automation-credentials-dockerhub
             - *rh-che-automation-quay-secret
             - *fabric8-hub-token
             - *qe-osio-dev-cluster-SA-token
-      - almighty-git-push
     <<: *job_template_defaults
 
 - rh-che-automation-depbuild-template: &rh-che-automation-depbuild-template
@@ -1864,15 +1873,6 @@
       - rhche_credentials_wrapper-flaky-{cluster}
     concurrent: false
     <<: *job_template_defaults
-
-- wrapper:
-    name: almighty-git-push
-    wrappers:
-        - credentials-binding:
-            - username-password-separated:
-                credential-id: c4872223-4024-4cd4-8e09-1bbdc7d6e971
-                username: ALMIGHTY_GIT_USER
-                password: ALMIGHTY_GIT_PASSWORD
 
 - wrapper:
     name: 'rhche_credentials_wrapper-flaky-2'
