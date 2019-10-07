@@ -17,8 +17,6 @@
     github-hooks: '{github_hooks}'
     permit-all: false
     trigger-phrase: '.*\[test\].*'
-    admin-list:
-    - Dependabot
     org-list:
     - app-sre
     - openshiftio
