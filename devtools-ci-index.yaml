@@ -17,6 +17,8 @@
     github-hooks: '{github_hooks}'
     permit-all: false
     trigger-phrase: '(?ms).*^(\[test\]|\/retest)\s*$.*'
+    admin-list:
+    - dependabot[bot]
     org-list:
     - app-sre
     - openshiftio
