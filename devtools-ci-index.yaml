@@ -11,101 +11,17 @@
     build_branch: master
     manifest_bouncer_tag: d21c96f
 
-- admin_list_defaults: &admin_list_defaults
-    name: 'admin_list_defaults'
-    admin-list:
-        - aditya-konarde
-        - akurinnoy
-        - alexeykazakov
-        - amisevsk
-        - andrewazores
-        - aptmac
-        - arajkumar
-        - ashumilova
-        - aslakknutsen
-        - baijum
-        - bartoszmajsak
-        - chmouel
-        - chrislessard
-        - christianvogt
-        - davidfestal
-        - dependabot[bot]
-        - dependabot-preview[bot]
-        - dgutride
-        - DhritiShikhar
-        - dipak-pawar
-        - dipanjanS
-        - dlabrecq
-        - ebaron
-        - edewit
-        - fabric8cd
-        - fche
-        - gastaldi
-        - hrishin
-        - ia3andy
-        - ibuziuk
-        - inoxx03
-        - invincibleJai
-        - jfchevrette
-        - jiekang
-        - jmelis
-        - joshuawilson
-        - Katka92
-        - kbsingh
-        - khrm
-        - kwk
-        - l0rd
-        - ldimaggi
-        - ljelinkova
-        - maorfr
-        - MatousJobanek
-        - maxandersen
-        - michaelkleinhenz
-        - mindreeper2420
-        - miteshvp
-        - mmclanerh
-        - msrb
-        - neugens
-        - nimishamukherjee
-        - nurali-techie
-        - pbergene
-        - piyush-garg
-        - pmacik
-        - ppitonak
-        - Preeticp
-        - quintesse
-        - rhopp
-        - rkratky
-        - rohitkrai03
-        - rohanKanojia
-        - rupalibehera
-        - sahil143
-        - samuzzal-choudhury
-        - sanketpathak
-        - sbose78
-        - sbryzak
-        - ScrewTSW
-        - skabashnyuk
-        - skryzhny
-        - sthaha
-        - stooke
-        - tinakurian
-        - tisnik
-        - tradej
-        - tsmaeder
-        - vikram-raj
-        - xcoulon
-        - sivaavkd
-        - yzainee
-
-
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
-    <<: *admin_list_defaults
     cron: '* * * * *'
     github-hooks: '{github_hooks}'
     permit-all: false
-    trigger-phrase: '.*\[test\].*'
+    trigger-phrase: '(?ms).*^(\[test\]|\/retest)\s*$.*'
+    admin-list:
+    - Dependabot
+    org-list:
+    - app-sre
+    - openshiftio
     allow-whitelist-orgs-as-admins: true
     status-context: "ci.centos.org PR build"
 
