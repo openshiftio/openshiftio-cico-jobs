@@ -3141,7 +3141,6 @@
             ci_cmd: '/bin/bash cico_build_deploy.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}-rh-che-compatibility-test-{test_url}':
-            disabled: true
             git_organization: redhat-developer
             git_repo: rh-che
             ci_project: 'devtools'
