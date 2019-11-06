@@ -3347,6 +3347,7 @@
             ci_cmd: '/bin/bash cico_build.sh'
             saas_git: saas-openshiftio
             extra_target: rhel
+            timeout: '30m'
         - 'osd-monitor-analytics-build-master':
             git_organization: redhat-developer
             git_repo: osd-monitor-poc
