@@ -9,7 +9,7 @@
     discarder_days: -1
     discarder_num: -1
     build_branch: master
-    manifest_bouncer_tag: d21c96f
+    manifest_bouncer_tag: 731b85f
 
 - admin_list_defaults: &admin_list_defaults
     name: 'admin_list_defaults'
@@ -2303,7 +2303,7 @@
                 DIR=$(readlink -f $c-20* | tail -1)
                 for f in `ls $DIR`; do
                     python ~/saasherder/check_image.py $DIR/$f '{image_pattern}'
-                    cat $DIR/$f | $ssh_cmd docker run --rm -i quay.io/app-sre/manifest-bouncer:{manifest_bouncer_tag} --warn-only -
+                    cat $DIR/$f | $ssh_cmd docker run --rm -i quay.io/app-sre/manifest-bouncer:{manifest_bouncer_tag} -
                 done
             done
 
@@ -2363,7 +2363,7 @@
                 DIR=$(readlink -f $c-20* | tail -1)
                 for f in `ls $DIR`; do
                     python ~/saasherder/check_image.py $DIR/$f '{image_pattern}'
-                    cat $DIR/$f | $ssh_cmd docker run --rm -i quay.io/app-sre/manifest-bouncer:{manifest_bouncer_tag} --warn-only -
+                    cat $DIR/$f | $ssh_cmd docker run --rm -i quay.io/app-sre/manifest-bouncer:{manifest_bouncer_tag} -
                 done
             done
 
