@@ -3943,7 +3943,7 @@
             git_repo: fabric8-gemini-server
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_run_tests.sh'
-            timeout: '20m'
+            timeout: '40m'
             registry: 'quay.io'
             image_name: 'openshiftio/rhel-fabric8-analytics-f8a-gemini-server'
         - '{ci_project}-{git_repo}-f8a-build-master':
@@ -3954,7 +3954,7 @@
             saas_git: saas-analytics
             deployment_units: 'gemini'
             deployment_configs: 'f8a-gemini-server'
-            timeout: '20m'
+            timeout: '40m'
             extra_target: rhel
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-analytics
