@@ -4246,6 +4246,13 @@
             discarder_days: 30
         - '{ci_project}-{git_repo}-build-master':
             git_organization: eclipse
+            git_repo: che-parent
+            branch: cico_build
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .ci/cico_build.sh'
+            timeout: '10m'    
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: eclipse
             git_repo: che-machine-exec
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_ci.sh'
