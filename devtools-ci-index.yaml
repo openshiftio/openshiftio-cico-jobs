@@ -4364,6 +4364,26 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_nightly.sh'
             timeout: '15m'
+        - '{ci_project}-{git_repo}-nightly':
+            git_organization: eclipse
+            git_repo: che-theia
+            branch: cico_build
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_nightly.sh'
+            timeout: '2h'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: eclipse
+            git_repo: che-theia
+            branch: cico_build
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_master.sh'
+            timeout: '2h'
+        - '{ci_project}-{git_repo}-release':
+            git_organization: eclipse
+            git_repo: che-theia
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_build_release.sh'
+            timeout: '2h'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-lsp-server
