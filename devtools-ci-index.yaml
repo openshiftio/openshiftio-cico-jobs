@@ -4351,6 +4351,7 @@
             git_organization: eclipse
             git_repo: che-theia
             branch: cico_build
+            build_branch: cico_build
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_master.sh'
             timeout: '2h'
