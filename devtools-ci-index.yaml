@@ -4244,13 +4244,30 @@
             ci_cmd: '/bin/bash cico_build.sh'
             timeout: '20m'
             discarder_days: 30
+        - '{ci_project}-{git_repo}-nightly':
+            git_organization: eclipse
+            git_repo: che-parent
+            branch: cico_build
+            build_branch: cico_build
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .ci/cico_build_nightly.sh'
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-release':
+            git_organization: eclipse
+            git_repo: che-parent
+            branch: cico_build
+            build_branch: cico_build
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .ci/cico_build_release.sh'
+            timeout: '10m'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: eclipse
             git_repo: che-parent
             branch: cico_build
+            build_branch: cico_build
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .ci/cico_build.sh'
-            timeout: '10m'    
+            timeout: '10m'        
         - '{ci_project}-{git_repo}-build-master':
             git_organization: eclipse
             git_repo: che-machine-exec
