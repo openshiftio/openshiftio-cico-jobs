@@ -4250,7 +4250,6 @@
             git_organization: eclipse
             git_repo: che-parent
             branch: cico_build
-            build_branch: cico_build
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .ci/cico_build_nightly.sh'
             timeout: '10m'
@@ -4258,7 +4257,6 @@
             git_organization: eclipse
             git_repo: che-parent
             branch: cico_build
-            build_branch: cico_build
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .ci/cico_build_release.sh'
             timeout: '10m'
