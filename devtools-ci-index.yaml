@@ -251,6 +251,8 @@
         vault-key: 'che_oss_sonatype_username'
       - env-var: 'CHE_OSS_SONATYPE_PASSWORD'
         vault-key: 'che_oss_sonatype_password'
+      - env-var: 'CHE_MAVEN_SETTINGS'
+        vault-key: 'settings.xml'
 
 - osiotestmachine-clean-up-gh-token: &osiotestmachine-clean-up-gh-token
     name: "osiotestmachine-clean-up-gh-token"
