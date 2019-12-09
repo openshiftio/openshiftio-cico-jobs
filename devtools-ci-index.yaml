@@ -253,7 +253,11 @@
         vault-key: 'che_oss_sonatype_password'
       - env-var: 'CHE_MAVEN_SETTINGS'
         vault-key: 'settings.xml'
-
+      - env-var: 'CHE_OSS_SONATYPE_GPG_KEY'
+        vault-key: 'che_oss_sonatype_gpg_key'
+      - env-var: 'CHE_OSS_SONATYPE_PASSPHRASE'
+        vault-key: 'che_oss_sonatype_gpg_passphrase'
+      
 - osiotestmachine-clean-up-gh-token: &osiotestmachine-clean-up-gh-token
     name: "osiotestmachine-clean-up-gh-token"
     secret-path: 'devtools-osio-ci/osiotestmachine-clean-up-gh-token'
