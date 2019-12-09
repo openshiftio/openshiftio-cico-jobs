@@ -245,7 +245,7 @@
 
 - eclipse-che-oss-sonatype: &eclipse-che-oss-sonatype
     name: "eclipse-che-oss-sonatype"
-    secret-path: "devtools-osio-ci/eclipse-che-oss-sonatype"
+    secret-path: "devtools-osio-ci/che-oss-sonatype"
     secret-values:
       - env-var: 'CHE_OSS_SONATYPE_USERNAME'
         vault-key: 'che_oss_sonatype_username'
