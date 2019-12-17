@@ -4322,47 +4322,39 @@
         - '{ci_project}-{git_repo}-che-nightly':
             git_organization: eclipse
             git_repo: che-parent
-            branch: cico_build
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .ci/cico_build_nightly.sh'
             timeout: '10m'
         - '{ci_project}-{git_repo}-che-release':
             git_organization: eclipse
             git_repo: che-parent
-            branch: cico_build
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .ci/cico_build_release.sh'
             timeout: '10m'
         - '{ci_project}-{git_repo}-che-build-master':
             git_organization: eclipse
             git_repo: che-parent
-            branch: cico_build
-            build_branch: cico_build
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .ci/cico_build.sh'
-            timeout: '10m' 
+            timeout: '10m'
         - '{ci_project}-{git_repo}-che-nightly':
             git_organization: eclipse
             git_repo: che
-            branch: cico_build
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .ci/cico_build_nightly.sh'
-            timeout: '30m'
+            timeout: '1h'
         - '{ci_project}-{git_repo}-che-release':
             git_organization: eclipse
             git_repo: che
-            branch: cico_build
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .ci/cico_build_release.sh'
-            timeout: '30m'
+            timeout: '1h'
         - '{ci_project}-{git_repo}-che-build-master':
             git_organization: eclipse
             git_repo: che
-            branch: cico_build
-            build_branch: cico_build
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .ci/cico_build.sh'
-            timeout: '30m'       
+            timeout: '1h'       
         - '{ci_project}-{git_repo}-build-master':
             git_organization: eclipse
             git_repo: che-machine-exec
