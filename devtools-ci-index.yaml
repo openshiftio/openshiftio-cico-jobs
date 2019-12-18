@@ -4342,13 +4342,13 @@
             git_repo: che
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .ci/cico_build_nightly.sh'
-            timeout: '1h'
+            timeout: '2h'
         - '{ci_project}-{git_repo}-che-release':
             git_organization: eclipse
             git_repo: che
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .ci/cico_build_release.sh'
-            timeout: '1h'
+            timeout: '2h'
         - '{ci_project}-{git_repo}-che-build-master':
             git_organization: eclipse
             git_repo: che
