@@ -260,6 +260,13 @@
         vault-key: 'che_oss_sonatype_gpg_key'
       - env-var: 'CHE_OSS_SONATYPE_PASSPHRASE'
         vault-key: 'che_oss_sonatype_gpg_passphrase'
+
+- eclipse-che-github-ssh-key: &eclipse-che-github-ssh-key
+    name: "eclipse-che-github-ssh-key"
+    secret-path: 'devtools-osio-ci/eclipse-che-github-ssh-key'
+    secret-values:
+      - env-var: 'CHE_GITHUB_SSH_KEY'
+        vault-key: 'che-github-ssh-key'
       
 - osiotestmachine-clean-up-gh-token: &osiotestmachine-clean-up-gh-token
     name: "osiotestmachine-clean-up-gh-token"
@@ -1635,6 +1642,7 @@
             - *quay-eclipse-che-credentials
             - *che-bot-github-credentials
             - *eclipse-che-oss-sonatype
+            - *eclipse-che-github-ssh-key
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
