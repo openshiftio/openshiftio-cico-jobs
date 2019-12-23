@@ -68,7 +68,7 @@
         - miteshvp
         - mmclanerh
         - msrb
-        - musienko-maxim 
+        - musienko-maxim
         - neugens
         - nimishamukherjee
         - nurali-techie
@@ -267,7 +267,7 @@
     secret-values:
       - env-var: 'CHE_GITHUB_SSH_KEY'
         vault-key: 'che-github-ssh-key'
-      
+
 - osiotestmachine-clean-up-gh-token: &osiotestmachine-clean-up-gh-token
     name: "osiotestmachine-clean-up-gh-token"
     secret-path: 'devtools-osio-ci/osiotestmachine-clean-up-gh-token'
@@ -1606,7 +1606,7 @@
     wrappers:
     - vault-secrets:
         <<: *vault_defaults
-        secrets: 
+        secrets:
             - *quay-eclipse-che-credentials
             - *che-bot-github-credentials
             - *eclipse-che-oss-sonatype
@@ -4365,7 +4365,7 @@
             git_repo: che
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .ci/cico_build.sh'
-            timeout: '1h'       
+            timeout: '1h'
         - '{ci_project}-{git_repo}-build-master':
             git_organization: eclipse
             git_repo: che-machine-exec
@@ -4413,6 +4413,25 @@
             build_branch: release-preview
             extra_target: rhel
             timeout: '30m'
+        - '{ci_project}-{git_repo}-build-master':
+            git_organization: eclipse
+            git_repo: che-plugin-broker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/cico_build_ci.sh'
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-nightly':
+            git_organization: eclipse
+            git_repo: che-plugin-broker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/cico_build_nightly.sh'
+            timeout: '10m'
+        - '{ci_project}-{git_repo}-release':
+            git_organization: eclipse
+            git_repo: che-plugin-broker
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash .cico/cico_build_release.sh'
+            timeout: '10m'
+            extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
             git_organization: eclipse
             git_repo: che-devfile-registry
