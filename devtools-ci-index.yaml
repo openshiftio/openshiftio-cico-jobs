@@ -1900,6 +1900,7 @@
             | artifacts | http://artifacts.ci.centos.org/devtools/rhche/devtools-rh-che-rh-che-prcheck-dev.rdu2c.fabric8.io/$BUILD_NUMBER/ |\n
             | deployment | http://rhche-prcheck-$ghprbPullId.devtools-dev.ext.devshift.net |\n
             ### *Depending on failure reason, the artifacts or deployment may not be present.*"
+            cancel-builds-on-update: true
             <<: *github_pull_request_defaults
     <<: *rh-che-automation-template
 
