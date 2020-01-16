@@ -1613,7 +1613,16 @@
 
     <<: *job_template_build_master
 
-
+- eclipse-che-automation-template: &eclipse-che-automation-template
+    name: "eclipse-che-automation-template"
+    concurrent: false
+    wrapper:
+      - vault-secrets:
+        <<: *vault_defaults
+        secret:
+            - *quay-eclipse-che-credentials
+    <<: *job_template_defaults
+    
 - job-template:
     name: '{ci_project}-{git_repo}-che-nightly-test-master'
     wrappers:
@@ -1621,9 +1630,8 @@
         <<: *vault_defaults
         secrets: 
             - *quay-eclipse-che-credentials
-            - *eclipse-che-oss-sonatype
 
-    <<: *job_template_build_master
+    <<: *eclipse-che-automation-template
 
 
 - job-template:
