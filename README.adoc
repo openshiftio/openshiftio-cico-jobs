@@ -1,5 +1,12 @@
 == Almighty Jenkins Builder jobs
 
+### Deprecation notice
+
+This repository is scheduled to be deprecated on January 29th, 2020.
+All job definitions will be moved to [app-interface](https://gitlab.cee.redhat.com/service/app-interface).
+
+For any questions, please contact the [Red Hat App-SRE Team](sd-app-sre@redhat.com).
+
 image:https://ci.centos.org/buildStatus/icon?job=devtools-jjb-service[Jenkins,link="https://ci.centos.org/view/Devtools/job/devtools-jjb-service/lastBuild/"]
 
 This repository contains the definitions of the various jobs
