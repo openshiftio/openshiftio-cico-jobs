@@ -1621,6 +1621,9 @@
         <<: *vault_defaults
         secret:
             - *quay-eclipse-che-credentials
+    triggers:
+        - github
+
     <<: *job_template_defaults
     
 - job-template:
