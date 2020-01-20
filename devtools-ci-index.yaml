@@ -4566,9 +4566,7 @@
             git_repo: che
             ci_project: 'devtools'
             ci_cmd: '/bin/bash tests/.infra/centos-ci/cico_pr_test.sh'
-            branch: 'cico-pr-test'
-            build_branch: 'cico-pr-test'
-            timeout: '3h' 
+            timeout: '3h'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-lsp-server
