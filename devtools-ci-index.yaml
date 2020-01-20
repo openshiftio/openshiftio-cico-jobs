@@ -1625,9 +1625,9 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-che-nightly-test-master'
-
-    triggers:
-        - github
+#temporary excluded
+    #triggers:
+    #    - github
     scm:
         - git:
             url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
