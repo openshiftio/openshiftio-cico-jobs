@@ -1634,7 +1634,7 @@
     <<: *eclipse-che-automation-template
 
 - job-template:
-    name: '{ci_project}-{git_repo}-che-pullrequests-test'
+    name: '{ci_project}-{git_repo}-che-pullrequests-test-temporary'
     wrappers:
     - vault-secrets:
         <<: *vault_defaults
@@ -4561,7 +4561,7 @@
             branch: 'cico-nightly-test'
             build_branch: 'cico-nightly-test'
             timeout: '3h'    
-        - '{ci_project}-{git_repo}-che-pullrequests-test':
+        - '{ci_project}-{git_repo}-che-pullrequests-test-temporary':
             git_organization: eclipse
             git_repo: che
             ci_project: 'devtools'
