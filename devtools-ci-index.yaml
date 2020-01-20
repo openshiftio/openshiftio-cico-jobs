@@ -863,7 +863,6 @@
             set +e
 
             export CICO_API_KEY=$(cat ~/duffy.key )
-
             get_cico_node() {{
                 # get node
                 n=1
@@ -1617,19 +1616,36 @@
     name: "eclipse-che-automation-template"
     concurrent: false
     wrapper:
-      - vault-secrets:
-        <<: *vault_defaults
-        secret:
-            - *quay-eclipse-che-credentials
-    <<: *job_template_defaults
-    
-- job-template:
-    name: '{ci_project}-{git_repo}-che-nightly-test-master'
-    wrappers:
     - vault-secrets:
         <<: *vault_defaults
-        secrets: 
+        secrets:
             - *quay-eclipse-che-credentials
+
+    <<: *job_template_defaults
+
+- job-template:
+    name: '{ci_project}-{git_repo}-che-nightly-test-master'
+#temporary excluded
+    #triggers:
+    #    - github
+    scm:
+        - git:
+            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            branches:
+                - origin/cico-nightly-test
+
+    <<: *eclipse-che-automation-template
+
+- job-template:
+    name: '{ci_project}-{git_repo}-che-nightly-test-master-temporary'
+
+    triggers:
+        - github
+    scm:
+        - git:
+            url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+            branches:
+                - origin/cico-nightly-test
 
     <<: *eclipse-che-automation-template
 
@@ -4536,6 +4552,14 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_release.sh'
             timeout: '2h'
+        - '{ci_project}-{git_repo}-che-nightly-test-master-temporary':
+            git_organization: eclipse
+            git_repo: che
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash tests/.infra/centos-ci/cico_build.sh'
+            branch: 'cico-nightly-test'
+            build_branch: 'cico-nightly-test'
+            timeout: '3h'       
         - '{ci_project}-{git_repo}-che-nightly-test-master':
             git_organization: eclipse
             git_repo: che
