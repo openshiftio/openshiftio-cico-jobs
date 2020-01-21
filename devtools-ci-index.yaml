@@ -1615,7 +1615,7 @@
 - eclipse-che-automation-template: &eclipse-che-automation-template
     name: "eclipse-che-automation-template"
     concurrent: false
-    wrapper:
+    wrappers:
     - vault-secrets:
         <<: *vault_defaults
         secrets:
