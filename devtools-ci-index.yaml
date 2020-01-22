@@ -1670,6 +1670,20 @@
     <<: *eclipse-che-automation-template
 
 - job-template:
+    name: '{ci_project}-{git_repo}-rc-integration-tests'
+
+    scm:
+        - git:
+            url: https://github.com/{git_organization}/{git_repo}.git
+            shallow_clone: true
+            branches:
+                - cico-rc-test
+    triggers:
+        - github
+
+    <<: *eclipse-che-automation-template
+
+- job-template:
     name: '{ci_project}-{git_repo}-che-nightly'
     concurrent: false
     wrappers:
@@ -4593,6 +4607,12 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash tests/.infra/centos-ci/cico_pr_test.sh'
             timeout: '3h'
+        - '{ci_project}-{git_repo}-rc-integration-tests':
+            git_organization: eclipse
+            git_repo: che
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash tests/.infra/centos-ci/cico_rc_test.sh'
+            timeout: '1h'
         - '{ci_project}-{git_repo}':
             git_organization: fabric8-analytics
             git_repo: fabric8-analytics-lsp-server
