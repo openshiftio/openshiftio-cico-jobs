@@ -2225,14 +2225,6 @@
 
 - job-template:
     name: '{ci_project}-{git_repo}-pr-check'
-    triggers:
-        - github
-        - github-pull-request:
-            github_hooks: '{github_hooks}'
-            status-context: 'ci.centos.org PR check'
-            success-comment: "### $ghprbPullAuthorLoginMention RH-Che [build $BUILD_NUMBER] has been successfully deployed and tested.\n"
-            failure-comment: "### $ghprbPullAuthorLoginMention PR check [build $BUILD_NUMBER] failed."
-            <<: *github_pull_request_defaults
     <<: *che-operator-pr-template
 
 - job-template:
