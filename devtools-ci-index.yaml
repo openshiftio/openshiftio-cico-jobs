@@ -2224,7 +2224,7 @@
     <<: *job_template_defaults
 
 - job-template:
-    name: '{ci_project}-{git_repo}-che-operator-pr-check'
+    name: '{ci_project}-{git_repo}-pr-check'
     triggers:
         - github
         - github-pull-request:
