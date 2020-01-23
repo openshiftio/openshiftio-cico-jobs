@@ -1918,6 +1918,18 @@
             - *qe-osio-dev-cluster-SA-token
     <<: *job_template_defaults
 
+- rh-che-operator-pr-template: &rh-che-operator-pr-template
+    name: 'rh-che-operator-pr-template'
+    concurrent: false
+    wrappers:
+      - vault-secrets:
+          <<: *vault_defaults
+          secrets:
+            - *quay-credentials
+            - *rh-che-automation-quay-secret
+            - *fabric8-hub-token
+    <<: *job_template_defaults
+
 - rh-che-automation-depbuild-template: &rh-che-automation-depbuild-template
     name: 'rh-che-automation-depbuild-template'
     concurrent: false
@@ -2216,16 +2228,16 @@
     <<: *job_template_defaults
 
 - job-template:
-    name: '{ci_project}-{git_repo}-che-operator-pr-check'
+    name: '{ci_project}-{git_repo}-rh-che-operator-pr-check'
     triggers:
         - github
         - github-pull-request:
             github_hooks: '{github_hooks}'
-            status-context: 'ci.centos.org PR check on {test_url}'
+            status-context: 'ci.centos.org PR check'
             success-comment: "### $ghprbPullAuthorLoginMention RH-Che [build $BUILD_NUMBER] has been successfully deployed and tested.\n"
             failure-comment: "### $ghprbPullAuthorLoginMention PR check [build $BUILD_NUMBER] failed."
             <<: *github_pull_request_defaults
-    <<: *rh-che-automation-template
+    <<: *rh-che-operator-pr-template
 
 - job-template:
     name: '{ci_project}-{git_repo}-release'
@@ -4579,6 +4591,12 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_nightly.sh'
             timeout: '15m'
+        - '{ci_project}-{git_repo}-pr-check':
+            git_organization: eclipse
+            git_repo: che-operator
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash e2e/run-okd-tests.sh'
+            timeout: '35'
         - '{ci_project}-{git_repo}-che-nightly':
             git_organization: eclipse
             git_repo: che-theia
