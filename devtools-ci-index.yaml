@@ -105,7 +105,8 @@
         - xcoulon
         - sivaavkd
         - yzainee
-
+        - flacatus 
+ 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
     <<: *admin_list_defaults
