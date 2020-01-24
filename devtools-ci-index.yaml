@@ -1623,6 +1623,7 @@
         <<: *vault_defaults
         secrets:
             - *quay-eclipse-che-credentials
+            - *eclipse-che-oss-sonatype
 
     <<: *job_template_defaults
 
