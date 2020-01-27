@@ -1623,6 +1623,7 @@
         <<: *vault_defaults
         secrets:
             - *quay-eclipse-che-credentials
+            - *eclipse-che-oss-sonatype
 
     <<: *job_template_defaults
 
@@ -4533,7 +4534,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .cico/cico_build_release.sh'
             timeout: '10m'
-            extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
             git_organization: eclipse
             git_repo: che-devfile-registry
