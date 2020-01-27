@@ -105,7 +105,8 @@
         - xcoulon
         - sivaavkd
         - yzainee
-
+        - flacatus 
+ 
 - github_pull_request_defaults: &github_pull_request_defaults
     name: 'github_pull_request_defaults'
     <<: *admin_list_defaults
@@ -1622,6 +1623,7 @@
         <<: *vault_defaults
         secrets:
             - *quay-eclipse-che-credentials
+            - *eclipse-che-oss-sonatype
 
     <<: *job_template_defaults
 
@@ -1658,6 +1660,7 @@
         <<: *vault_defaults
         secrets: 
             - *quay-eclipse-che-credentials
+            - *eclipse-che-oss-sonatype
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
@@ -4531,7 +4534,6 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash .cico/cico_build_release.sh'
             timeout: '10m'
-            extra_target: rhel
         - '{ci_project}-{git_repo}-build-master':
             git_organization: eclipse
             git_repo: che-devfile-registry
