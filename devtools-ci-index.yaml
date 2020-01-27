@@ -4584,7 +4584,7 @@
             git_repo: che-operator
             ci_project: 'devtools'
             ci_cmd: '/bin/bash e2e/run-okd-tests.sh'
-            timeout: '35'
+            timeout: '1h'
         - '{ci_project}-{git_repo}-che-nightly':
             git_organization: eclipse
             git_repo: che-theia
