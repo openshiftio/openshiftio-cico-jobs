@@ -461,6 +461,13 @@
       - env-var: 'GPG_PASSPHRASE'
         vault-key: 'gpg.passphrase'
 
+- che-akamai-cdn-auth: &che-akamai-cdn-auth
+    name: "che-akamai-cdn-auth"
+    secret-path: "devtools-osio-ci/akamai-che-auth"
+    secret-values:
+      - env-var: 'AKAMAI_CHE_AUTH'
+        vault-key: 'AKAMAI_CHE_AUTH'
+
 - wrapper:
     name: che_credentials_wrapper
     wrappers:
@@ -1612,6 +1619,7 @@
             - *quay-eclipse-che-credentials
             - *che-bot-github-credentials
             - *eclipse-che-oss-sonatype
+            - *che-akamai-cdn-auth
 
     <<: *job_template_build_master
 
@@ -1704,6 +1712,7 @@
             - *che-bot-github-credentials
             - *eclipse-che-oss-sonatype
             - *eclipse-che-github-ssh-key
+            - *che-akamai-cdn-auth            
     scm:
         - git:
             url: https://github.com/{git_organization}/{git_repo}.git
