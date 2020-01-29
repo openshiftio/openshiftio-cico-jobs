@@ -1944,6 +1944,14 @@
             - *qe-osio-dev-cluster-SA-token
     <<: *job_template_defaults
 
+- che-operator-pr-template: &che-operator-pr-template
+    name: 'che-operator-pr-template'
+    concurrent: false
+    wrappers:
+      - vault-secrets:
+          <<: *vault_defaults
+    <<: *job_template_defaults
+
 - rh-che-automation-depbuild-template: &rh-che-automation-depbuild-template
     name: 'rh-che-automation-depbuild-template'
     concurrent: false
@@ -2242,6 +2250,10 @@
     <<: *job_template_defaults
 
 - job-template:
+    name: '{ci_project}-{git_repo}-pr-check'
+    <<: *che-operator-pr-template
+
+- job-template:
     name: '{ci_project}-{git_repo}-release'
     concurrent: false
     wrappers:
@@ -2301,7 +2313,6 @@
                 - origin/master
     <<: *rhche-flaky-tests-template
 
-
 - job-template:
     name: '{ci_project}-{git_repo}-prcheck-build-dep'
     triggers:
@@ -2313,6 +2324,7 @@
                 results:
                     - success
     <<: *rh-che-automation-depbuild-template
+
 
 - job-template:
     name: '{ci_project}-{git_repo}-build-func-dep'
@@ -4592,6 +4604,12 @@
             ci_project: 'devtools'
             ci_cmd: '/bin/bash cico_build_nightly.sh'
             timeout: '15m'
+        - '{ci_project}-{git_repo}-pr-check':
+            git_organization: eclipse
+            git_repo: che-operator
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash e2e/run-okd-tests.sh'
+            timeout: '1h'
         - '{ci_project}-{git_repo}-che-nightly':
             git_organization: eclipse
             git_repo: che-theia
